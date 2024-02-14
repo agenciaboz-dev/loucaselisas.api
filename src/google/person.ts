@@ -2,7 +2,7 @@ import { people_v1 } from "@googleapis/people"
 import { OAuth2Client } from "google-auth-library"
 import { Socket } from "socket.io"
 import { User } from "@prisma/client"
-import { People } from "../definitions/google/People"
+import { People } from "../types/google/People"
 
 const getPerson = (socket: Socket, accessToken: string) => {
     const oAuth2Client = new OAuth2Client()

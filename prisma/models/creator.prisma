@@ -1,0 +1,13 @@
+model Creator {
+    id          String          @id
+
+    user_id     String          @unique
+    user        User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id          String          @id
+
+    creator_id  String?
+    creator     Creator?
+}

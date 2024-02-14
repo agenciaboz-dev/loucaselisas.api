@@ -4,20 +4,20 @@ datasource db {
 }
 
 model User {
-    id              Int         @id @default(autoincrement())
+    id              String      @id
     username        String      @unique
     email           String      @unique
     password        String
     name            String
     cpf             String
-    birth           DateTime
+    birth           String
     phone           String      
     pronoun         String
 
     image           String?     @db.Text
     
 
-    googleId        String?
-    googleToken     String?     @db.Text
+    google_id       String?
+    google_token    String?     @db.Text
 
 }
