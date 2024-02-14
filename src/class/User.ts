@@ -27,18 +27,7 @@ export class User {
     // missing creator_id and creator
 
     constructor(user_prisma: UserPrisma) {
-        this.id = user_prisma.id
-        this.cpf = user_prisma.cpf
-        this.birth = new Date(Number(user_prisma.birth))
-        this.username = user_prisma.username
-        this.email = user_prisma.email
-        this.name = user_prisma.name
-        this.password = user_prisma.password
-        this.phone = user_prisma.phone
-        this.pronoun = user_prisma.pronoun
-        this.image = user_prisma.image
-        this.google_id = user_prisma.google_id
-        this.google_token = user_prisma.google_token
+        this.buildInstance(user_prisma)
     }
 
     static async signup(socket: Socket, data: SignupForm) {
