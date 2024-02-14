@@ -4,7 +4,7 @@ import { Server as HttpsServer } from "https"
 import { Socket } from "socket.io"
 import google from "../google"
 import { SignupForm } from "../types/user/signup"
-import { User } from "../class/User"
+import { User, UserPrisma } from "../class/User"
 import { LoginForm } from "../types/user/login"
 
 let io: SocketIoServer | null = null
@@ -35,6 +35,7 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:signup", (data: SignupForm) => User.signup(socket, data))
     socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(socket, data))
+    socket.on("user:update", async (data: Partial<UserPrisma> & { id: number }) => (await User.newInstance(data.id)).update(data, socket))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }

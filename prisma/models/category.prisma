@@ -1,0 +1,10 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+    id          String          @id
+    name        String
+    cover       String          @db.Text
+}

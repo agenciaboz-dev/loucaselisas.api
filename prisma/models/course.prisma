@@ -1,0 +1,4 @@
+model Course {
+    id          String          @id
+    
+}
