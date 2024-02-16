@@ -14,20 +14,20 @@ export class Creator {
 
     courses: Course[] = []
 
-    constructor(data: CreatorPrisma) {
-        this.load(data)
+    constructor(id: string) {
+        this.id = id
     }
 
-    static async newInstance(id: string) {
-        const creator_prisma = await prisma.creator.findUnique({ where: { id }, include })
+    async init() {
+        const creator_prisma = await prisma.creator.findUnique({ where: { id: this.id }, include })
         if (creator_prisma) {
-            return new Creator(creator_prisma)
+            this.load(creator_prisma)
         } else {
             throw "criador não encontrado"
         }
     }
 
-    async load(data: CreatorPrisma) {
+    load(data: CreatorPrisma) {
         this.id = data.id
         this.active = data.active
         this.language = data.language
