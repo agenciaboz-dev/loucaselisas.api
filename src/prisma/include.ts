@@ -5,6 +5,7 @@ export const user = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: { user: true, courses: true, categories: true, favorited_by: true } },
     favorite_courses: true,
     favorite_creators: { include: { user: true, courses: true, categories: true, favorited_by: true } },
+    payment_cards: true,
 })
 
 export const creator = Prisma.validator<Prisma.CreatorInclude>()({

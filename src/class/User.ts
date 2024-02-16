@@ -97,35 +97,35 @@ export class User {
         }
     }
 
-    async load(user_prisma: UserPrisma) {
-        this.id = user_prisma.id
-        this.cpf = user_prisma.cpf
-        this.birth = new Date(Number(user_prisma.birth))
-        this.username = user_prisma.username
-        this.email = user_prisma.email
-        this.name = user_prisma.name
-        this.password = user_prisma.password
-        this.phone = user_prisma.phone
-        this.pronoun = user_prisma.pronoun
-        this.uf = user_prisma.uf
-        this.admin = user_prisma.admin
+    async load(data: UserPrisma) {
+        this.id = data.id
+        this.cpf = data.cpf
+        this.birth = new Date(Number(data.birth))
+        this.username = data.username
+        this.email = data.email
+        this.name = data.name
+        this.password = data.password
+        this.phone = data.phone
+        this.pronoun = data.pronoun
+        this.uf = data.uf
+        this.admin = data.admin
 
-        this.image = user_prisma.image
-        this.cover = user_prisma.cover
+        this.image = data.image
+        this.cover = data.cover
 
-        this.google_id = user_prisma.google_id
-        this.google_token = user_prisma.google_token
+        this.google_id = data.google_id
+        this.google_token = data.google_token
 
-        this.creator_id = user_prisma.creator_id
+        this.creator_id = data.creator_id
 
-        if (user_prisma.creator_id) {
-            const creator = new Creator(user_prisma.creator_id)
+        if (data.creator_id) {
+            const creator = new Creator(data.creator_id)
             await creator.init()
             this.creator = creator
         }
 
         const favorite_creators = await Promise.all(
-            user_prisma.favorite_creators.map(async (creator) => {
+            data.favorite_creators.map(async (creator) => {
                 const new_creator = new Creator(creator.id)
                 await new_creator.init()
                 return new_creator
@@ -135,6 +135,8 @@ export class User {
 
         const favorite_courses: Course[] = []
         this.favorite_courses = favorite_courses
+
+        this.payment_cards = data.payment_cards.map((item) => new PaymentCard(item))
     }
 
     async update(data: Partial<UserPrisma>, socket?: Socket) {

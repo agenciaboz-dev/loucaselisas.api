@@ -10,9 +10,9 @@ generator client {
 }
 
 model User {
-  id                String    @id
-  username          String    @unique
-  email             String    @unique
+  id                String        @id
+  username          String        @unique
+  email             String        @unique
   password          String
   name              String
   cpf               String
@@ -20,17 +20,18 @@ model User {
   phone             String
   pronoun           String
   uf                String
-  admin             Boolean   @default(false)
-  image             String?   @db.Text
-  cover             String?   @db.Text
-  bio               String?   @db.Text
+  admin             Boolean       @default(false)
+  image             String?       @db.Text
+  cover             String?       @db.Text
+  bio               String?       @db.Text
   google_id         String?
-  google_token      String?   @db.Text
-  courses           Course[]  @relation(name: "CourseToUser")
-  favorite_creators Creator[] @relation(name: "favorite_creators")
-  favorite_courses  Course[]  @relation(name: "favorite_courses")
+  google_token      String?       @db.Text
+  courses           Course[]      @relation(name: "CourseToUser")
+  favorite_creators Creator[]     @relation(name: "favorite_creators")
+  favorite_courses  Course[]      @relation(name: "favorite_courses")
   creator_id        String?
-  creator           Creator?  @relation(name: "CreatorToUser")
+  creator           Creator?      @relation(name: "CreatorToUser")
+  payment_cards     Paymentcard[] @relation(name: "PaymentcardToUser")
 }
 
 model Course {
@@ -59,4 +60,15 @@ model Category {
   creators Creator[] @relation(name: "CategoryToCreator")
   name     String
   cover    String    @db.Text
+}
+
+model Paymentcard {
+  id       String @id
+  number   String
+  owner    String
+  validity String
+  cvc      String
+  type     String
+  user_id  String
+  user     User   @relation(name: "PaymentcardToUser", fields: [user_id], references: [id], onDelete: Cascade)
 }

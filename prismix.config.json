@@ -6,7 +6,8 @@
                 "prisma/models/user.prisma",
                 "prisma/models/creator.prisma",
                 "prisma/models/category.prisma",
-                "prisma/models/course.prisma"
+                "prisma/models/course.prisma",
+                "prisma/models/paymentcard.prisma"
             ],
             "output": "prisma/schema.prisma"
         }
