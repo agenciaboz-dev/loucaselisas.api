@@ -122,9 +122,10 @@ export class User {
         })
 
         if (user_prisma) {
-            console.log(user_prisma)
-            const user = new User(user_prisma.id)
-            user.load(user_prisma)
+            const user = user_prisma.creator
+                ? new Creator(user_prisma.creator.id, { ...user_prisma.creator, ...user_prisma })
+                : new User(user_prisma.id, user_prisma)
+
             socket.emit("user:login", user)
         } else {
             socket.emit("user:login", null)
@@ -299,5 +300,6 @@ export class Creator extends User {
         this.language = data.language
         this.nickname = data.nickname
         this.courses = data.courses
+        this.description = data.description
     }
 }
