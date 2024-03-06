@@ -1,15 +1,28 @@
-import { Prisma } from "@prisma/client";
-import { user as include } from "../prisma/include"
+import { Prisma } from "@prisma/client"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
 import { SignupForm } from "../types/user/signup"
 import { uid } from "uid"
 import { LoginForm } from "../types/user/login"
-import { Creator, CreatorPrisma } from "./Creator"
 import { Course } from "./Course"
 import { PaymentCard } from "./PaymentCard"
 
-export type UserPrisma = Prisma.UserGetPayload<{ include: typeof include }>
+export const user_include = Prisma.validator<Prisma.UserInclude>()({
+    courses: true,
+    creator: { include: { user: true, courses: true, categories: true, favorited_by: true } },
+    favorite_courses: true,
+    favorite_creators: { include: { user: true, courses: true, categories: true, favorited_by: true } },
+    payment_cards: true,
+})
+export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
+
+export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
+    user: true,
+    categories: true,
+    courses: true,
+    favorited_by: true,
+})
+export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_include }>
 
 export class User {
     id: string
@@ -32,19 +45,18 @@ export class User {
     google_token: string | null
 
     creator_id: string | null
-    creator: Creator | null = null
 
     favorite_creators: Creator[] = []
     favorite_courses: Course[] = []
 
     payment_cards: PaymentCard[] = []
 
-    constructor(id: string) {
-        this.id = id
+    constructor(id: string, user_prisma?: UserPrisma) {
+        user_prisma ? this.load(user_prisma) : (this.id = id)
     }
 
     async init() {
-        const user_prisma = await prisma.user.findUnique({ where: { id: this.id }, include })
+        const user_prisma = await prisma.user.findUnique({ where: { id: this.id }, include: user_include })
         if (user_prisma) {
             await this.load(user_prisma)
         } else {
@@ -61,23 +73,21 @@ export class User {
     static async signup(socket: Socket, data: SignupForm) {
         const user_prisma = await prisma.user.create({
             data: { ...data, id: uid() },
-            include,
+            include: user_include,
         })
 
         const user = new User(user_prisma.id)
-        await user.init()
+        user.load(user_prisma)
         socket.emit("user:signup", user)
     }
 
     static async list(socket: Socket) {
-        const users_prisma = await prisma.user.findMany({ include })
-        const users = await Promise.all(
-            users_prisma.map(async (user) => {
-                const new_user = new User(user.id)
-                await new_user.init()
-                return new_user
-            })
-        )
+        const users_prisma = await prisma.user.findMany({ include: user_include })
+        const users = users_prisma.map((item) => {
+            const user = new User(item.id)
+            user.load(item)
+            return user
+        })
 
         socket.emit("user:list", users)
     }
@@ -85,19 +95,19 @@ export class User {
     static async login(socket: Socket, data: LoginForm) {
         const user_prisma = await prisma.user.findFirst({
             where: { OR: [{ email: data.login }, { username: data.login }, { cpf: data.login }], password: data.password },
-            include,
+            include: user_include,
         })
 
         if (user_prisma) {
             const user = new User(user_prisma.id)
-            await user.init()
+            user.load(user_prisma)
             socket.emit("user:login", user)
         } else {
             socket.emit("user:login", null)
         }
     }
 
-    async load(data: UserPrisma) {
+    load(data: UserPrisma) {
         this.id = data.id
         this.cpf = data.cpf
         this.birth = new Date(Number(data.birth))
@@ -118,19 +128,11 @@ export class User {
 
         this.creator_id = data.creator_id
 
-        if (data.creator_id) {
-            const creator = new Creator(data.creator_id)
-            await creator.init()
-            this.creator = creator
-        }
+        const favorite_creators = data.favorite_creators.map((item) => {
+            const creator = new Creator("", { ...item, ...data })
+            return creator
+        })
 
-        const favorite_creators = await Promise.all(
-            data.favorite_creators.map(async (creator) => {
-                const new_creator = new Creator(creator.id)
-                await new_creator.init()
-                return new_creator
-            })
-        )
         this.favorite_creators = favorite_creators
 
         const favorite_courses: Course[] = []
@@ -164,14 +166,64 @@ export class User {
                     },
                     creator: {},
                 },
-                include: include,
+                include: user_include,
             })
 
-            await this.load(user_prisma)
+            this.load(user_prisma)
 
             socket && socket.emit("user:update", this)
         } catch (error) {
             console.log(error)
         }
+    }
+}
+
+export class Creator extends User {
+    nickname: string
+    language: string
+    description: string
+    active: boolean
+
+    courses: Course[] = []
+
+    constructor(id: string, data?: UserPrisma & CreatorPrisma) {
+        super(id)
+        data ? this.load(data) : (this.id = id)
+    }
+
+    async init() {
+        const creator_prisma = await prisma.creator.findUnique({ where: { id: this.id }, include: creator_include })
+        if (creator_prisma) {
+            const user_prisma = await prisma.user.findUnique({ where: { id: creator_prisma.user_id }, include: user_include })
+            user_prisma && this.load({ ...creator_prisma, ...user_prisma })
+        } else {
+            throw "criador não encontrado"
+        }
+    }
+
+    static async list(socket: Socket) {
+        const creators_prisma = await prisma.creator.findMany({ include: creator_include })
+
+        const creators = await Promise.all(
+            creators_prisma.map(async (item) => {
+                const user_prisma = await prisma.user.findUnique({ where: { id: item.user_id }, include: user_include })
+                if (user_prisma) {
+                    const creator = new Creator("", { ...item, ...user_prisma })
+                    return creator
+                } else {
+                    throw "usuário não encontrado"
+                }
+            })
+        )
+
+        socket.emit("creator:list", creators)
+    }
+
+    load(data: UserPrisma & CreatorPrisma) {
+        super.load(data)
+        this.active = data.active
+        this.language = data.language
+        this.nickname = data.nickname
+        this.courses = data.courses
     }
 }
