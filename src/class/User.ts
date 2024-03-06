@@ -1,11 +1,13 @@
 import { Prisma } from "@prisma/client"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
-import { SignupForm } from "../types/user/signup"
 import { uid } from "uid"
 import { LoginForm } from "../types/user/login"
 import { Course } from "./Course"
 import { PaymentCard } from "./PaymentCard"
+import { ImageUpload, PickDiff, WithoutFunctions } from "./helpers"
+import { saveImage } from "../tools/saveImage"
+import { handlePrismaError } from "../prisma/errors"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     courses: true,
@@ -24,6 +26,10 @@ export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
 })
 export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_include }>
 
+export type UserForm = Omit<WithoutFunctions<User>, "id" | "admin" | "creator_id" | "favorite_creators" | "favorite_courses" | "payment_cards"> & {
+    image?: ImageUpload
+    cover?: ImageUpload
+}
 export class User {
     id: string
     username: string
@@ -31,7 +37,7 @@ export class User {
     password: string
     name: string
     cpf: string
-    birth: Date
+    birth: string
     phone: string
     pronoun: string
     uf: string
@@ -43,8 +49,6 @@ export class User {
 
     google_id: string | null
     google_token: string | null
-
-    creator_id: string | null
 
     favorite_creators: Creator[] = []
     favorite_courses: Course[] = []
@@ -58,7 +62,7 @@ export class User {
     async init() {
         const user_prisma = await prisma.user.findUnique({ where: { id: this.id }, include: user_include })
         if (user_prisma) {
-            await this.load(user_prisma)
+            this.load(user_prisma)
         } else {
             throw "usuário não encontrado"
         }
@@ -70,15 +74,34 @@ export class User {
         user.update(data, socket)
     }
 
-    static async signup(socket: Socket, data: SignupForm) {
-        const user_prisma = await prisma.user.create({
-            data: { ...data, id: uid() },
-            include: user_include,
-        })
+    static async updateImage(data: { id: string; image?: ImageUpload; cover?: ImageUpload }, socket: Socket) {
+        const user = new User(data.id)
+        await user.init()
+        user.updateImage(data, socket)
+    }
 
-        const user = new User(user_prisma.id)
-        user.load(user_prisma)
-        socket.emit("user:signup", user)
+    static async signup(socket: Socket, data: UserForm) {
+        try {
+            const user_prisma = await prisma.user.create({
+                data: {
+                    ...data,
+                    image: null,
+                    cover: null,
+
+                    id: uid(),
+                },
+                include: user_include,
+            })
+
+            const user = new User(user_prisma.id)
+            user.load(user_prisma)
+            await user.updateImage(data)
+
+            socket.emit("user:signup", user)
+            socket.broadcast.emit("user:update", user)
+        } catch (error) {
+            handlePrismaError(error, { socket, event: "user:signup:error" }) || console.log(error)
+        }
     }
 
     static async list(socket: Socket) {
@@ -99,6 +122,7 @@ export class User {
         })
 
         if (user_prisma) {
+            console.log(user_prisma)
             const user = new User(user_prisma.id)
             user.load(user_prisma)
             socket.emit("user:login", user)
@@ -110,7 +134,7 @@ export class User {
     load(data: UserPrisma) {
         this.id = data.id
         this.cpf = data.cpf
-        this.birth = new Date(Number(data.birth))
+        this.birth = data.birth
         this.username = data.username
         this.email = data.email
         this.name = data.name
@@ -125,8 +149,6 @@ export class User {
 
         this.google_id = data.google_id
         this.google_token = data.google_token
-
-        this.creator_id = data.creator_id
 
         const favorite_creators = data.favorite_creators.map((item) => {
             const creator = new Creator("", { ...item, ...data })
@@ -171,23 +193,46 @@ export class User {
 
             this.load(user_prisma)
 
-            socket && socket.emit("user:update", this)
+            if (socket) {
+                socket.emit("user:update", this)
+                socket.broadcast.emit("user:update", this)
+            }
+        } catch (error) {
+            handlePrismaError(error, socket ? { socket, event: "user:update:error" } : undefined) || console.log(error)
+        }
+    }
+
+    async updateImage(data: { image?: ImageUpload; cover?: ImageUpload }, socket?: Socket) {
+        try {
+            if (data.image) {
+                const url = saveImage(`/users/${this.id}`, data.image)
+                await this.update({ image: url }, socket)
+            }
+
+            if (data.cover) {
+                const url = saveImage(`/users/${this.id}`, data.cover)
+                await this.update({ cover: url }, socket)
+            }
         } catch (error) {
             console.log(error)
         }
     }
 }
 
+export type CreatorForm = Omit<WithoutFunctions<PickDiff<Creator, User>>, "active" | "courses" | "creator_id"> & { user_id: string }
+
 export class Creator extends User {
     nickname: string
     language: string
     description: string
     active: boolean
+    creator_id: string
 
     courses: Course[] = []
 
     constructor(id: string, data?: UserPrisma & CreatorPrisma) {
         super(id)
+        this.creator_id = id
         data ? this.load(data) : (this.id = id)
     }
 
@@ -208,7 +253,7 @@ export class Creator extends User {
             creators_prisma.map(async (item) => {
                 const user_prisma = await prisma.user.findUnique({ where: { id: item.user_id }, include: user_include })
                 if (user_prisma) {
-                    const creator = new Creator("", { ...item, ...user_prisma })
+                    const creator = new Creator(item.id, { ...item, ...user_prisma })
                     return creator
                 } else {
                     throw "usuário não encontrado"
@@ -217,6 +262,35 @@ export class Creator extends User {
         )
 
         socket.emit("creator:list", creators)
+    }
+
+    static async new(socket: Socket, data: CreatorForm) {
+        try {
+            const creator_prisma = await prisma.creator.create({
+                data: {
+                    ...data,
+                    id: uid(),
+                },
+                include: creator_include,
+            })
+            const creator = new Creator(creator_prisma.id)
+            await creator.init()
+
+            socket.emit("creator:signup", creator)
+            socket.broadcast.emit("creator:update", creator)
+        } catch (error) {
+            handlePrismaError(error, { socket, event: "creator:signup:error" }) || console.log(error)
+        }
+    }
+
+    static async delete(socket: Socket, id: string) {
+        try {
+            const deleted = await prisma.creator.delete({ where: { id } })
+            socket.emit("creator:delete", deleted)
+            socket.broadcast.emit("creator:delete", deleted)
+        } catch (error) {
+            handlePrismaError(error, { socket, event: "creator:delete:error" })
+        }
     }
 
     load(data: UserPrisma & CreatorPrisma) {

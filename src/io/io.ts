@@ -3,8 +3,7 @@ import { Server as HttpServer } from "http"
 import { Server as HttpsServer } from "https"
 import { Socket } from "socket.io"
 import google from "../google"
-import { SignupForm } from "../types/user/signup"
-import { Creator, User, UserPrisma } from "../class/User"
+import { Creator, CreatorForm, User, UserForm, UserPrisma } from "../class/User"
 import { LoginForm } from "../types/user/login"
 
 let io: SocketIoServer | null = null
@@ -32,12 +31,14 @@ export const handleSocket = (socket: Socket) => {
     socket.on("google:exchange", (data) => google.login.exchangeCode(socket, data))
     socket.on("google:link", (user) => google.person.link(socket, user))
 
-    socket.on("user:signup", (data: SignupForm) => User.signup(socket, data))
+    socket.on("user:signup", (data: UserForm) => User.signup(socket, data))
     socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(socket, data))
     socket.on("user:update", (data: Partial<UserPrisma> & { id: number }) => User.update(data, socket))
 
     socket.on("creator:list", () => Creator.list(socket))
+    socket.on("creator:signup", (data: CreatorForm) => Creator.new(socket, data))
+    socket.on("creator:delete", (id: string) => Creator.delete(socket, id))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }

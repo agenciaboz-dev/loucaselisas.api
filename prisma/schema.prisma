@@ -29,7 +29,6 @@ model User {
   courses           Course[]      @relation(name: "CourseToUser")
   favorite_creators Creator[]     @relation(name: "favorite_creators")
   favorite_courses  Course[]      @relation(name: "favorite_courses")
-  creator_id        String?
   creator           Creator?      @relation(name: "CreatorToUser")
   payment_cards     Paymentcard[] @relation(name: "PaymentcardToUser")
 }
