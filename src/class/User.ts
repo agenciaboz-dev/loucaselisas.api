@@ -107,8 +107,7 @@ export class User {
     static async list(socket: Socket) {
         const users_prisma = await prisma.user.findMany({ include: user_include })
         const users = users_prisma.map((item) => {
-            const user = new User(item.id)
-            user.load(item)
+            const user = item.creator ? new Creator(item.creator.id, { ...item.creator, ...item }) : new User(item.id, item)
             return user
         })
 
