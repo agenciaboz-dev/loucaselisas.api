@@ -149,12 +149,8 @@ export class User {
         this.google_id = data.google_id
         this.google_token = data.google_token
 
-        const favorite_creators = data.favorite_creators.map((item) => {
-            const creator = new Creator("", { ...item, ...data })
-            return creator
-        })
 
-        this.favorite_creators = favorite_creators
+        this.favorite_creators = data.favorite_creators.map((item) => new Creator("", { ...item, ...data }))
 
         const favorite_courses: Course[] = []
         this.favorite_courses = favorite_courses
