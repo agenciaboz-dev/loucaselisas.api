@@ -7,7 +7,8 @@ import cookieParser from "cookie-parser"
 import https from "https"
 import http from "http"
 import fs from "fs"
-import {handleSocket, initializeIoServer} from "./src/io"
+import { handleSocket, initializeIoServer } from "./src/io/io"
+import { setProd } from "./src/env"
 
 dotenv.config()
 
@@ -41,6 +42,7 @@ try {
 
     server.listen(port, () => {
         console.log(`[server]: Server is running at https://${port}`)
+        setProd()
     })
 } catch (e) {
     const server = http.createServer(app)
