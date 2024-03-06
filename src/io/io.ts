@@ -3,8 +3,8 @@ import { Server as HttpServer } from "http"
 import { Server as HttpsServer } from "https"
 import { Socket } from "socket.io"
 import google from "../google"
-import { Creator, CreatorForm, User, UserForm, UserPrisma } from "../class/User"
 import { LoginForm } from "../types/user/login"
+import { Creator, CreatorForm, User, UserForm, UserPrisma } from "../class"
 
 let io: SocketIoServer | null = null
 
