@@ -4,7 +4,7 @@ import { Server as HttpsServer } from "https"
 import { Socket } from "socket.io"
 import google from "../google"
 import { SignupForm } from "../types/user/signup"
-import { User, UserPrisma } from "../class/User"
+import { Creator, User, UserPrisma } from "../class/User"
 import { LoginForm } from "../types/user/login"
 
 let io: SocketIoServer | null = null
@@ -24,7 +24,7 @@ export const getIoInstance = () => {
 export const handleSocket = (socket: Socket) => {
     console.log(`new connection: ${socket.id}`)
 
-    socket.on("disconnect", async (reason) => {
+    socket.on("disconnect", (reason) => {
         console.log(`disconnected: ${socket.id}`)
     })
 
@@ -33,9 +33,11 @@ export const handleSocket = (socket: Socket) => {
     socket.on("google:link", (user) => google.person.link(socket, user))
 
     socket.on("user:signup", (data: SignupForm) => User.signup(socket, data))
-    socket.on("user:list", async () => await User.list(socket))
+    socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(socket, data))
-    socket.on("user:update", async (data: Partial<UserPrisma> & { id: number }) => await User.update(data, socket))
+    socket.on("user:update", (data: Partial<UserPrisma> & { id: number }) => User.update(data, socket))
+
+    socket.on("creator:list", () => Creator.list(socket))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }
