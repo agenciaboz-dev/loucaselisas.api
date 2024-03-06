@@ -18,6 +18,6 @@ export class Category {
         this.name = data.name
         this.cover = data.cover
 
-        this.creators = creators.map((creator) => new Creator(creator))
+        this.creators = creators.map((creator) => new Creator(creator.id))
     }
 }

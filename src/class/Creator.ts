@@ -14,7 +14,7 @@ export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
     favorited_by: true,
 })
 export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_include }>
-
+export type CreatorType = WithoutFunctions<Creator>
 export type CreatorForm = Omit<WithoutFunctions<PickDiff<Creator, User>>, "active" | "courses" | "creator_id"> & { user_id: string }
 
 export class Creator extends User {
@@ -90,7 +90,7 @@ export class Creator extends User {
     }
 
     load(data: UserPrisma & CreatorPrisma) {
-        super.load(data)
+        super.load(data, { creator: true })
         this.active = data.active
         this.language = data.language
         this.nickname = data.nickname

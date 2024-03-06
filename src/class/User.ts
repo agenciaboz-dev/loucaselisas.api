@@ -8,11 +8,12 @@ import { PaymentCard } from "./PaymentCard"
 import { ImageUpload, PickDiff, WithoutFunctions } from "./helpers"
 import { saveImage } from "../tools/saveImage"
 import { handlePrismaError } from "../prisma/errors"
-import { Creator } from "./index"
+import { Creator, Student } from "./index"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     courses: true,
     creator: { include: { user: true, courses: true, categories: true, favorited_by: true } },
+    student: { include: { user: true, courses: true } },
     favorite_courses: true,
     favorite_creators: { include: { user: true, courses: true, categories: true, favorited_by: true } },
     payment_cards: true,
@@ -48,6 +49,9 @@ export class User {
 
     payment_cards: PaymentCard[] = []
 
+    creator: Creator | null
+    student: Student | null
+
     constructor(id: string, user_prisma?: UserPrisma) {
         user_prisma ? this.load(user_prisma) : (this.id = id)
     }
@@ -80,6 +84,8 @@ export class User {
                     ...data,
                     image: null,
                     cover: null,
+                    creator: {},
+                    student: {},
 
                     id: uid(),
                 },
@@ -124,7 +130,7 @@ export class User {
         }
     }
 
-    load(data: UserPrisma) {
+    load(data: UserPrisma, omit?: { creator?: boolean; student?: boolean }) {
         this.id = data.id
         this.cpf = data.cpf
         this.birth = data.birth
@@ -154,6 +160,14 @@ export class User {
         this.favorite_courses = favorite_courses
 
         this.payment_cards = data.payment_cards.map((item) => new PaymentCard(item))
+
+        if (!omit?.creator) {
+            this.creator = data.creator ? new Creator(data.creator.id, { ...data.creator, ...data }) : null
+        }
+
+        if (!omit?.student) {
+            this.student = data.student ? new Student(data.student.id, { ...data.student, ...data }) : null
+        }
     }
 
     async update(data: Partial<UserPrisma>, socket?: Socket) {
@@ -180,6 +194,7 @@ export class User {
                         connect: data.payment_cards?.map((creator) => ({ id: creator.id })),
                     },
                     creator: {},
+                    student: {},
                 },
                 include: user_include,
             })
