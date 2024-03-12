@@ -8,11 +8,11 @@ import { PaymentCard } from "./PaymentCard"
 import { ImageUpload, PickDiff, WithoutFunctions } from "./helpers"
 import { saveImage } from "../tools/saveImage"
 import { handlePrismaError } from "../prisma/errors"
-import { Creator, Student } from "./index"
+import { Creator, Student, creator_include } from "./index"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     courses: true,
-    creator: { include: { user: true, courses: true, categories: true, favorited_by: true } },
+    creator: { include: creator_include },
     student: { include: { user: true, courses: true } },
     favorite_courses: true,
     favorite_creators: { include: { user: true, courses: true, categories: true, favorited_by: true } },
@@ -147,7 +147,6 @@ export class User {
         this.google_id = data.google_id
         this.google_token = data.google_token
 
-
         this.favorite_creators = data.favorite_creators.map((item) => new Creator("", { ...item, ...data }))
 
         const favorite_courses: Course[] = []
@@ -155,13 +154,8 @@ export class User {
 
         this.payment_cards = data.payment_cards.map((item) => new PaymentCard(item))
 
-        if (!omit?.creator) {
-            this.creator = data.creator ? new Creator(data.creator.id, { ...data.creator, ...data }) : null
-        }
-
-        if (!omit?.student) {
-            this.student = data.student ? new Student(data.student.id, { ...data.student, ...data }) : null
-        }
+        this.creator = data.creator ? new Creator(data.creator.id, data.creator) : null
+        this.student = data.student ? new Student(data.student.id, data.student) : null
     }
 
     async update(data: Partial<UserPrisma>, socket?: Socket) {
