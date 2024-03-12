@@ -31,7 +31,21 @@ model User {
   favorite_courses  Course[]      @relation(name: "favorite_courses")
   creator           Creator?      @relation(name: "CreatorToUser")
   student           Student?      @relation(name: "StudentToUser")
+  role_id           Int           @default(1)
+  role              Role          @relation(name: "RoleToUser", fields: [role_id], references: [id], onDelete: Restrict)
   payment_cards     Paymentcard[] @relation(name: "PaymentcardToUser")
+}
+
+model Role {
+  id                     Int                @id @default(autoincrement())
+  user                   User[]             @relation(name: "RoleToUser")
+  name                   String
+  profile_permissions_id String
+  profile_permissions    ProfilePermissions @relation(name: "ProfilePermissionsToRole", fields: [profile_permissions_id], references: [id], onDelete: Cascade)
+  admin_permissions_id   String
+  admin_permissions      AdminPermissions   @relation(name: "AdminPermissionsToRole", fields: [admin_permissions_id], references: [id], onDelete: Cascade)
+  general_permissions_id String
+  general_permissions    GeneralPermissions @relation(name: "GeneralPermissionsToRole", fields: [general_permissions_id], references: [id], onDelete: Cascade)
 }
 
 model Course {
@@ -79,4 +93,32 @@ model Paymentcard {
   type     String
   user_id  String
   user     User   @relation(name: "PaymentcardToUser", fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model ProfilePermissions {
+  id                 String  @id
+  roles              Role[]  @relation(name: "ProfilePermissionsToRole")
+  viewMembers        Boolean @default(false)
+  privacyProfile     Boolean @default(false)
+  viewPrivacyProfile Boolean @default(false)
+  indexProfile       Boolean @default(false)
+}
+
+model AdminPermissions {
+  id              String  @id
+  roles           Role[]  @relation(name: "AdminPermissionsToRole")
+  panelAdm        Boolean @default(false)
+  panelCreator    Boolean @default(false)
+  createChats     Boolean @default(false)
+  deleteComments  Boolean @default(false)
+  panelStatistics Boolean @default(false)
+  updateUsers     Boolean @default(false)
+  deleteUsers     Boolean @default(false)
+}
+
+model GeneralPermissions {
+  id            String  @id
+  roles         Role[]  @relation(name: "GeneralPermissionsToRole")
+  editProfile   Boolean @default(false)
+  deleteProfile Boolean @default(false)
 }

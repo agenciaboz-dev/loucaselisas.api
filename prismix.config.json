@@ -7,7 +7,8 @@
                 "prisma/models/creator.prisma",
                 "prisma/models/category.prisma",
                 "prisma/models/course.prisma",
-                "prisma/models/paymentcard.prisma"
+                "prisma/models/paymentcard.prisma",
+                "prisma/models/role.prisma"
             ],
             "output": "prisma/schema.prisma"
         }

@@ -1,0 +1,38 @@
+model Role {
+    id          Int         @id @default(autoincrement())
+    name                    String
+    profile_permissions_id  String
+    profile_permissions     ProfilePermissions     @relation(fields: [profile_permissions_id], references: [id], onDelete: Cascade)
+    admin_permissions_id    String
+    admin_permissions       AdminPermissions     @relation(fields: [admin_permissions_id], references: [id], onDelete: Cascade)
+    general_permissions_id  String
+    general_permissions     GeneralPermissions     @relation(fields: [general_permissions_id], references: [id], onDelete: Cascade)
+}
+
+model ProfilePermissions {
+    id                  String      @id
+    roles               Role[]
+    viewMembers         Boolean     @default(false)
+    privacyProfile      Boolean     @default(false)
+    viewPrivacyProfile  Boolean     @default(false)
+    indexProfile        Boolean     @default(false)
+}
+
+model AdminPermissions {
+    id                  String      @id
+    roles               Role[]
+    panelAdm            Boolean     @default(false)
+    panelCreator        Boolean     @default(false)
+    createChats         Boolean     @default(false)
+    deleteComments      Boolean     @default(false)
+    panelStatistics     Boolean     @default(false)
+    updateUsers         Boolean     @default(false)
+    deleteUsers         Boolean     @default(false)
+}
+
+model GeneralPermissions {
+    id                  String      @id
+    roles               Role[]
+    editProfile         Boolean     @default(false)
+    deleteProfile       Boolean     @default(false)
+}

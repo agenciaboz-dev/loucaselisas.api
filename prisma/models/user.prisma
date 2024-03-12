@@ -30,8 +30,16 @@ model User {
     favorite_courses    Course[]    @relation(name: "favorite_courses")
 
     creator         Creator?
-    student     Student?
+    student         Student?
 
+    role_id         Int         @default(1)
+    role            Role        @relation(fields: [role_id], references: [id], onDelete: Restrict)
+
+}
+
+model Role {
+    id          Int         @id @default(autoincrement())
+    user        User[]
 }
 
 model Course {

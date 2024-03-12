@@ -9,6 +9,7 @@ import { ImageUpload, PickDiff, WithoutFunctions } from "./helpers"
 import { saveImage } from "../tools/saveImage"
 import { handlePrismaError } from "../prisma/errors"
 import { Creator, Student, creator_include } from "./index"
+import { Role, role_include } from "./Role"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     courses: true,
@@ -17,6 +18,7 @@ export const user_include = Prisma.validator<Prisma.UserInclude>()({
     favorite_courses: true,
     favorite_creators: { include: { user: true, courses: true, categories: true, favorited_by: true } },
     payment_cards: true,
+    role: { include: role_include },
 })
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
 
@@ -52,6 +54,8 @@ export class User {
     creator: Creator | null
     student: Student | null
 
+    role: Role
+
     constructor(id: string, user_prisma?: UserPrisma) {
         user_prisma ? this.load(user_prisma) : (this.id = id)
     }
@@ -79,6 +83,9 @@ export class User {
 
     static async signup(socket: Socket, data: UserForm) {
         try {
+            if (!(await Role.existsDefault())) {
+                await Role.createDefault(socket)
+            }
             const user_prisma = await prisma.user.create({
                 data: {
                     ...data,
@@ -86,6 +93,7 @@ export class User {
                     cover: null,
                     creator: {},
                     student: {},
+                    role: { connect: { id: 1 } },
 
                     id: uid(),
                 },
@@ -128,7 +136,7 @@ export class User {
         }
     }
 
-    load(data: UserPrisma, omit?: { creator?: boolean; student?: boolean }) {
+    load(data: UserPrisma) {
         this.id = data.id
         this.cpf = data.cpf
         this.birth = data.birth
@@ -156,6 +164,8 @@ export class User {
 
         this.creator = data.creator ? new Creator(data.creator.id, data.creator) : null
         this.student = data.student ? new Student(data.student.id, data.student) : null
+
+        this.role = new Role(data.role)
     }
 
     async update(data: Partial<UserPrisma>, socket?: Socket) {
@@ -183,6 +193,8 @@ export class User {
                     },
                     creator: {},
                     student: {},
+                    role: {},
+                    role_id: undefined,
                 },
                 include: user_include,
             })
