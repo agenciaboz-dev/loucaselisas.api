@@ -120,9 +120,7 @@ export class User {
         })
 
         if (user_prisma) {
-            const user = user_prisma.creator
-                ? new Creator(user_prisma.creator.id, { ...user_prisma.creator, ...user_prisma })
-                : new User(user_prisma.id, user_prisma)
+            const user = new User(user_prisma.id, user_prisma)
 
             socket.emit("user:login", user)
         } else {
