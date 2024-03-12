@@ -8,7 +8,7 @@ import { PaymentCard } from "./PaymentCard"
 import { ImageUpload, PickDiff, WithoutFunctions } from "./helpers"
 import { saveImage } from "../tools/saveImage"
 import { handlePrismaError } from "../prisma/errors"
-import { Creator, Student, creator_include } from "./index"
+import { Creator, CreatorForm, Student, creator_include } from "./index"
 import { Role, role_include } from "./Role"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
@@ -22,9 +22,14 @@ export const user_include = Prisma.validator<Prisma.UserInclude>()({
 })
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
 
-export type UserForm = Omit<WithoutFunctions<User>, "id" | "admin" | "creator_id" | "favorite_creators" | "favorite_courses" | "payment_cards"> & {
+export type UserForm = Omit<
+    WithoutFunctions<User>,
+    "id" | "admin" | "favorite_creators" | "favorite_courses" | "payment_cards" | "creator" | "student" | "role"
+> & {
     image?: ImageUpload
     cover?: ImageUpload
+    creator?: CreatorForm
+    student?: boolean
 }
 export class User {
     id: string
@@ -91,8 +96,8 @@ export class User {
                     ...data,
                     image: null,
                     cover: null,
-                    creator: {},
-                    student: {},
+                    creator: data.creator ? { create: { id: uid(), ...data.creator } } : {},
+                    student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
 
                     id: uid(),
