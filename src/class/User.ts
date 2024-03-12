@@ -24,7 +24,7 @@ export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
 
 export type UserForm = Omit<
     WithoutFunctions<User>,
-    "id" | "admin" | "favorite_creators" | "favorite_courses" | "payment_cards" | "creator" | "student" | "role"
+    "id" | "admin" | "favorite_creators" | "favorite_courses" | "payment_cards" | "creator" | "student" | "role" | "cover" | "image"
 > & {
     image?: ImageUpload
     cover?: ImageUpload
