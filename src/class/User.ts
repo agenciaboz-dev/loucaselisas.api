@@ -28,8 +28,8 @@ export type UserForm = Omit<
 > & {
     image?: ImageUpload
     cover?: ImageUpload
+    student: boolean
     creator?: CreatorForm
-    student?: boolean
 }
 export class User {
     id: string
