@@ -26,10 +26,10 @@ export type UserForm = Omit<
     WithoutFunctions<User>,
     "id" | "admin" | "favorite_creators" | "favorite_courses" | "payment_cards" | "creator" | "student" | "role" | "cover" | "image"
 > & {
-    image?: ImageUpload
-    cover?: ImageUpload
+    image: ImageUpload | null
+    cover: ImageUpload | null
     student: boolean
-    creator?: CreatorForm
+    creator: CreatorForm | null
 }
 export class User {
     id: string
@@ -80,7 +80,7 @@ export class User {
         user.update(data, socket)
     }
 
-    static async updateImage(data: { id: string; image?: ImageUpload; cover?: ImageUpload }, socket: Socket) {
+    static async updateImage(data: { id: string; image: ImageUpload | null; cover: ImageUpload | null }, socket: Socket) {
         const user = new User(data.id)
         await user.init()
         user.updateImage(data, socket)
@@ -215,7 +215,7 @@ export class User {
         }
     }
 
-    async updateImage(data: { image?: ImageUpload; cover?: ImageUpload }, socket?: Socket) {
+    async updateImage(data: { image: ImageUpload | null; cover: ImageUpload | null }, socket?: Socket) {
         try {
             if (data.image) {
                 const url = saveImage(`/users/${this.id}`, data.image)
