@@ -15,11 +15,7 @@ export class Role {
     general_permissions: GeneralPermissions
 
     constructor(data: RolePrisma) {
-        this.id = data.id
-        this.name = data.name
-        this.admin_permissions = new AdminPermissions(data.admin_permissions)
-        this.general_permissions = new GeneralPermissions(data.general_permissions)
-        this.profile_permissions = new ProfilePermissions(data.profile_permissions)
+        this.load(data)
     }
 
     static async existsDefault() {
@@ -47,6 +43,34 @@ export class Role {
         } catch (error) {
             console.log(error)
             socket.emit("role:createdefault:error", error?.toString())
+        }
+    }
+
+    load(data: RolePrisma) {
+        this.id = data.id
+        this.name = data.name
+        this.admin_permissions = new AdminPermissions(data.admin_permissions)
+        this.general_permissions = new GeneralPermissions(data.general_permissions)
+        this.profile_permissions = new ProfilePermissions(data.profile_permissions)
+    }
+
+    async update(data: Partial<Role>) {
+        try {
+            const updated = await prisma.role.update({
+                where: { id: this.id },
+                data: {
+                    ...data,
+                    id: undefined,
+                    admin_permissions: data.admin_permissions ? { update: { ...data.admin_permissions } } : {},
+                    profile_permissions: data.profile_permissions ? { update: { ...data.profile_permissions } } : {},
+                    general_permissions: data.general_permissions ? { update: { ...data.general_permissions } } : {},
+                },
+                include: role_include,
+            })
+
+            this.load(updated)
+        } catch (error) {
+            console.log(error)
         }
     }
 }

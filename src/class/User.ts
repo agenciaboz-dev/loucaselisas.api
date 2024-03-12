@@ -204,6 +204,12 @@ export class User {
                 include: user_include,
             })
 
+            if (data.role) {
+                await this.role.update(data.role)
+                socket?.emit("role:update", this.role)
+                socket?.broadcast.emit("role:update", this.role)
+            }
+
             this.load(user_prisma)
 
             if (socket) {
