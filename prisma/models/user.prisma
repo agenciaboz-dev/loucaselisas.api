@@ -15,6 +15,9 @@ model User {
     pronoun         String
     uf              String
     admin           Boolean     @default(false)
+    instagram       String?
+    tiktok          String?
+    profession      String?
 
     image           String?     @db.Text
     cover           String?     @db.Text

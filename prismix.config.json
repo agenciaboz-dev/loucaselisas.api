@@ -8,6 +8,8 @@
                 "prisma/models/category.prisma",
                 "prisma/models/course.prisma",
                 "prisma/models/paymentcard.prisma",
+                "prisma/models/gallery.prisma",
+                "prisma/models/lesson.prisma",
                 "prisma/models/role.prisma"
             ],
             "output": "prisma/schema.prisma"

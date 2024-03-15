@@ -1,0 +1,33 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model Lesson {
+    id          String          @id
+    published   String
+    name        String
+    cover       String?
+    info        String          @db.Text
+    
+    image       Image?
+    pdf         String?
+
+    video_id    String          @unique
+    video       Video           @relation(fields: [video_id], references: [id], onDelete: Cascade)
+}
+
+model Image {
+    id          String          @id
+    url         String
+    
+    lesson_id  String?          @unique
+    lesson     Lesson?          @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+}
+
+model Video {
+    id          String          @id
+    url         String
+
+    lesson     Lesson?
+}

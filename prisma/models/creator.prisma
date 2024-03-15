@@ -6,7 +6,7 @@ model Creator {
     active      Boolean         @default(false)
 
     categories  Category[]
-    courses     Course[]
+    
 
 
     user_id     String          @unique
@@ -17,13 +17,6 @@ model User {
     id          String          @id
 
     creator     Creator?
-}
-
-model Course {
-    id          String          @id
-    creator_id  String
-    creator     Creator         @relation(fields: [creator_id], references: [id], onDelete: Cascade)
-    
 }
 
 model Category {

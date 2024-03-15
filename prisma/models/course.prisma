@@ -1,4 +1,47 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
 model Course {
     id          String          @id
+    name        String
+    cover       String          @db.Text
+    published   String
+    description String          @db.Text
+    language    String
+    recorder    String?
+
     
+    owner       Creator         @relation(fields: [id], references: [id], onDelete: Cascade, name: "course_owner")
+    owner_id    String
+
+    gallery_id  String          @unique
+    gallery     Gallery         @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
+
+    categories  Category[]
+    // lessons     Lesson[]
+    creators    Creator[]
+}
+
+model Creator {
+    id          String          @id
+
+    owned_courses   Course[]    @relation(name: "course_owner")
+    courses     Course[]
+
+}
+
+model Category {
+    id          String          @id
+    name        String
+    cover       String          @db.Text
+
+    courses     Course[]
+}
+
+model Gallery {
+    id          String          @id
+    course_id   String?
+    course      Course?
 }

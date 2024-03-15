@@ -42,8 +42,11 @@ export class User {
     phone: string
     pronoun: string
     uf: string
-    admin: boolean
 
+    admin: boolean
+    instagram: string | null
+    tiktok: string | null
+    profession: string | null
     image: string | null
     cover: string | null
     bio: string | null
@@ -154,6 +157,9 @@ export class User {
         this.uf = data.uf
         this.admin = data.admin
 
+        this.instagram = data.instagram
+        this.tiktok = data.tiktok
+        this.profession = data.profession
         this.image = data.image
         this.cover = data.cover
 

@@ -21,6 +21,9 @@ model User {
   pronoun           String
   uf                String
   admin             Boolean       @default(false)
+  instagram         String?
+  tiktok            String?
+  profession        String?
   image             String?       @db.Text
   cover             String?       @db.Text
   bio               String?       @db.Text
@@ -49,25 +52,36 @@ model Role {
 }
 
 model Course {
-  id           String    @id
-  students     User[]    @relation(name: "CourseToUser")
-  favorited_by User[]    @relation(name: "favorite_courses")
-  student      Student[] @relation(name: "CourseToStudent")
-  creator_id   String
-  creator      Creator   @relation(name: "CourseToCreator", fields: [creator_id], references: [id], onDelete: Cascade)
+  id           String     @id
+  students     User[]     @relation(name: "CourseToUser")
+  favorited_by User[]     @relation(name: "favorite_courses")
+  student      Student[]  @relation(name: "CourseToStudent")
+  name         String
+  cover        String     @db.Text
+  published    String
+  description  String     @db.Text
+  language     String
+  recorder     String?
+  owner        Creator    @relation(name: "course_owner", fields: [id], references: [id], onDelete: Cascade)
+  owner_id     String
+  gallery_id   String     @unique
+  gallery      Gallery    @relation(name: "CourseToGallery", fields: [gallery_id], references: [id], onDelete: Cascade)
+  categories   Category[] @relation(name: "CategoryToCourse")
+  creators     Creator[]  @relation(name: "CourseToCreator")
 }
 
 model Creator {
-  id           String     @id
-  user_id      String     @unique
-  user         User       @relation(name: "CreatorToUser", fields: [user_id], references: [id], onDelete: Cascade)
-  favorited_by User[]     @relation(name: "favorite_creators")
-  nickname     String
-  language     String
-  description  String
-  active       Boolean    @default(false)
-  categories   Category[] @relation(name: "CategoryToCreator")
-  courses      Course[]   @relation(name: "CourseToCreator")
+  id            String     @id
+  user_id       String     @unique
+  user          User       @relation(name: "CreatorToUser", fields: [user_id], references: [id], onDelete: Cascade)
+  favorited_by  User[]     @relation(name: "favorite_creators")
+  nickname      String
+  language      String
+  description   String
+  active        Boolean    @default(false)
+  categories    Category[] @relation(name: "CategoryToCreator")
+  owned_courses Course[]   @relation(name: "course_owner")
+  courses       Course[]   @relation(name: "CourseToCreator")
 }
 
 model Student {
@@ -82,6 +96,16 @@ model Category {
   creators Creator[] @relation(name: "CategoryToCreator")
   name     String
   cover    String    @db.Text
+  courses  Course[]  @relation(name: "CategoryToCourse")
+}
+
+model Gallery {
+  id        String  @id
+  course_id String?
+  course    Course? @relation(name: "CourseToGallery")
+  name      String
+  images    Image[] @relation(name: "GalleryToImage")
+  videos    Video[] @relation(name: "GalleryToVideo")
 }
 
 model Paymentcard {
@@ -93,6 +117,35 @@ model Paymentcard {
   type     String
   user_id  String
   user     User   @relation(name: "PaymentcardToUser", fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Image {
+  id         String   @id
+  url        String
+  gallery_id String?
+  gallery    Gallery? @relation(name: "GalleryToImage", fields: [gallery_id], references: [id], onDelete: Cascade)
+  lesson_id  String?  @unique
+  lesson     Lesson?  @relation(name: "ImageToLesson", fields: [lesson_id], references: [id], onDelete: Cascade)
+}
+
+model Video {
+  id         String   @id
+  url        String
+  gallery_id String?
+  gallery    Gallery? @relation(name: "GalleryToVideo", fields: [gallery_id], references: [id], onDelete: Cascade)
+  lesson     Lesson?  @relation(name: "LessonToVideo")
+}
+
+model Lesson {
+  id        String  @id
+  published String
+  name      String
+  cover     String?
+  info      String  @db.Text
+  image     Image?  @relation(name: "ImageToLesson")
+  pdf       String?
+  video_id  String  @unique
+  video     Video   @relation(name: "LessonToVideo", fields: [video_id], references: [id], onDelete: Cascade)
 }
 
 model ProfilePermissions {
