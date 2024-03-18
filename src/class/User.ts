@@ -12,7 +12,6 @@ import { Creator, CreatorForm, Student, creator_include } from "./index"
 import { Role, role_include } from "./Role"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
-    courses: true,
     creator: { include: creator_include },
     student: { include: { user: true, courses: true } },
     favorite_courses: true,
