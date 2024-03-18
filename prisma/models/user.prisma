@@ -27,8 +27,6 @@ model User {
     google_id       String?
     google_token    String?     @db.Text
 
-    courses         Course[]
-
     favorite_creators   Creator[]   @relation(name: "favorite_creators")
     favorite_courses    Course[]    @relation(name: "favorite_courses")
 
@@ -47,9 +45,8 @@ model Role {
 
 model Course {
     id          String          @id
-    students    User[]
+    students    Student[]
     favorited_by    User[]      @relation(name: "favorite_courses")
-    student     Student[]
 }
 
 model Creator {

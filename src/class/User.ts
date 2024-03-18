@@ -185,11 +185,6 @@ export class User {
                 where: { id: this.id },
                 data: {
                     ...data,
-
-                    courses: {
-                        disconnect: data.courses?.map((course) => ({ id: course.id })),
-                        connect: data.courses?.map((course) => ({ id: course.id })),
-                    },
                     favorite_courses: {
                         disconnect: data.favorite_courses?.map((course) => ({ id: course.id })),
                         connect: data.favorite_courses?.map((course) => ({ id: course.id })),

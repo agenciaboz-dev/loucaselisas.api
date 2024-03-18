@@ -29,7 +29,6 @@ model User {
   bio               String?       @db.Text
   google_id         String?
   google_token      String?       @db.Text
-  courses           Course[]      @relation(name: "CourseToUser")
   favorite_creators Creator[]     @relation(name: "favorite_creators")
   favorite_courses  Course[]      @relation(name: "favorite_courses")
   creator           Creator?      @relation(name: "CreatorToUser")
@@ -53,9 +52,8 @@ model Role {
 
 model Course {
   id           String     @id
-  students     User[]     @relation(name: "CourseToUser")
+  students     Student[]  @relation(name: "CourseToStudent")
   favorited_by User[]     @relation(name: "favorite_courses")
-  student      Student[]  @relation(name: "CourseToStudent")
   name         String
   cover        String     @db.Text
   published    String
