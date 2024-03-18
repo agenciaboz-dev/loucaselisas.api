@@ -198,10 +198,7 @@ export class User {
                         disconnect: data.favorite_creators?.map((creator) => ({ id: creator.id })),
                         connect: data.favorite_creators?.map((creator) => ({ id: creator.id })),
                     },
-                    payment_cards: {
-                        disconnect: data.payment_cards?.map((creator) => ({ id: creator.id })),
-                        connect: data.payment_cards?.map((creator) => ({ id: creator.id })),
-                    },
+                    payment_cards: data.payment_cards ? { deleteMany: { user_id: this.id }, create: data.payment_cards } : {},
                     creator: {},
                     student: {},
                     role: {},
