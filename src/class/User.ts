@@ -4,7 +4,7 @@ import { Socket } from "socket.io"
 import { uid } from "uid"
 import { LoginForm } from "../types/user/login"
 import { Course } from "./Course"
-import { PaymentCard } from "./PaymentCard"
+import { PaymentCard, PaymentCardForm } from "./PaymentCard"
 import { ImageUpload, PickDiff, WithoutFunctions } from "./helpers"
 import { saveImage } from "../tools/saveImage"
 import { handlePrismaError } from "../prisma/errors"
@@ -23,12 +23,13 @@ export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
 
 export type UserForm = Omit<
     WithoutFunctions<User>,
-    "id" | "admin" | "favorite_creators" | "favorite_courses" | "payment_cards" | "creator" | "student" | "role" | "cover" | "image"
+    "id" | "admin" | "favorite_creators" | "favorite_courses" | "payment_cards" | "creator" | "student" | "role" | "cover" | "image" | "payment_cards"
 > & {
     image: ImageUpload | null
     cover: ImageUpload | null
     student: boolean
     creator: CreatorForm | null
+    payment_cards: PaymentCardForm[]
 }
 export class User {
     id: string
@@ -101,6 +102,7 @@ export class User {
                     creator: data.creator ? { create: { id: uid(), ...data.creator } } : {},
                     student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
+                    payment_cards: {},
 
                     id: uid(),
                 },

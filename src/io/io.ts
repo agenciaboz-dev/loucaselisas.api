@@ -35,7 +35,7 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:signup", (data: UserForm) => User.signup(socket, data))
     socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(socket, data))
-    socket.on("user:update", (data: Partial<UserPrisma> & { id: number }) => User.update(data, socket))
+    socket.on("user:update", (data: Partial<UserPrisma> & { id: string }) => User.update(data, socket))
 
     socket.on("creator:list", () => Creator.list(socket))
     socket.on("creator:signup", (data: CreatorForm) => Creator.new(socket, data))
