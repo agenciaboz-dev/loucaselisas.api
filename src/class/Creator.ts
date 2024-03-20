@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { WithoutFunctions } from "./helpers"
-import { Course } from "./Course"
+import { Course, course_include } from "./Course"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
 import { uid } from "uid"
@@ -8,7 +8,7 @@ import { handlePrismaError } from "../prisma/errors"
 
 export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
     categories: true,
-    courses: true,
+    courses: { include: course_include },
     favorited_by: true,
 })
 export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_include }>
@@ -22,6 +22,7 @@ export class Creator {
     language: string
     description: string
     active: boolean
+    favorited_by: number
 
     courses: Course[] = []
 
@@ -52,6 +53,7 @@ export class Creator {
             const creator_prisma = await prisma.creator.create({
                 data: {
                     ...data,
+                    favorited_by: {},
                     id: uid(),
                 },
                 include: creator_include,
@@ -80,7 +82,8 @@ export class Creator {
         this.active = data.active
         this.language = data.language
         this.nickname = data.nickname
-        this.courses = data.courses
+        this.courses = data.courses.map((course) => new Course(course))
         this.description = data.description
+        this.favorited_by = data.favorited_by.length
     }
 }

@@ -15,7 +15,7 @@ export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
     student: { include: { user: true, courses: true } },
     favorite_courses: true,
-    favorite_creators: { include: { user: true, courses: true, categories: true, favorited_by: true } },
+    favorite_creators: { include: creator_include },
     payment_cards: true,
     role: { include: role_include },
 })
@@ -99,7 +99,7 @@ export class User {
                     ...data,
                     image: null,
                     cover: null,
-                    creator: data.creator ? { create: { id: uid(), ...data.creator } } : {},
+                    creator: data.creator ? { create: { id: uid(), ...data.creator, favorited_by: undefined } } : {},
                     student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
                     payment_cards: {},
@@ -167,7 +167,7 @@ export class User {
         this.google_id = data.google_id
         this.google_token = data.google_token
 
-        this.favorite_creators = data.favorite_creators.map((item) => new Creator("", { ...item, ...data }))
+        this.favorite_creators = data.favorite_creators.map((item) => new Creator(item.id, item))
 
         const favorite_courses: Course[] = []
         this.favorite_courses = favorite_courses

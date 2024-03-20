@@ -66,6 +66,8 @@ model Course {
   gallery      Gallery    @relation(name: "CourseToGallery", fields: [gallery_id], references: [id], onDelete: Cascade)
   categories   Category[] @relation(name: "CategoryToCourse")
   creators     Creator[]  @relation(name: "CourseToCreator")
+  chat_id      String?
+  chat         Chat?      @relation(name: "ChatToCourse")
 }
 
 model Creator {
@@ -97,6 +99,16 @@ model Category {
   courses  Course[]  @relation(name: "CategoryToCourse")
 }
 
+model Chat {
+  id          String    @id
+  course_id   String    @unique
+  course      Course    @relation(name: "ChatToCourse", fields: [course_id], references: [id], onDelete: Cascade)
+  description String?   @db.Text
+  media_id    String    @unique
+  media       Gallery   @relation(name: "ChatToGallery", fields: [media_id], references: [id], onDelete: Cascade)
+  messages    Message[] @relation(name: "ChatToMessage")
+}
+
 model Gallery {
   id        String  @id
   course_id String?
@@ -104,6 +116,8 @@ model Gallery {
   name      String
   images    Image[] @relation(name: "GalleryToImage")
   videos    Video[] @relation(name: "GalleryToVideo")
+  chat_id   String?
+  chat      Chat?   @relation(name: "ChatToGallery")
 }
 
 model Paymentcard {
@@ -138,12 +152,23 @@ model Lesson {
   id        String  @id
   published String
   name      String
-  cover     String?
   info      String  @db.Text
+  cover     String? @db.Text
   image     Image?  @relation(name: "ImageToLesson")
   pdf       String?
-  video_id  String  @unique
-  video     Video   @relation(name: "LessonToVideo", fields: [video_id], references: [id], onDelete: Cascade)
+  video_id  String? @unique
+  video     Video?  @relation(name: "LessonToVideo", fields: [video_id], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id              String  @id
+  text            String  @db.Text
+  datetime        String
+  user_id         String
+  video_id        String?
+  video_timestamp String?
+  chat_id         String
+  chat            Chat    @relation(name: "ChatToMessage", fields: [chat_id], references: [id], onDelete: Cascade)
 }
 
 model ProfilePermissions {

@@ -22,6 +22,16 @@ model Course {
     categories  Category[]
     // lessons     Lesson[]
     creators    Creator[]
+
+    chat_id     String?         
+    chat        Chat?
+}
+
+model Chat {
+    id          String          @id
+
+    course_id   String          @unique
+    course      Course          @relation(fields: [course_id], references: [id], onDelete: Cascade)
 }
 
 model Creator {
@@ -34,8 +44,6 @@ model Creator {
 
 model Category {
     id          String          @id
-    name        String
-    cover       String          @db.Text
 
     courses     Course[]
 }

@@ -1,4 +1,36 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
 model Chat {
     id          String          @id
-    
+    description String?         @db.Text
+
+    media_id    String          @unique
+    media       Gallery         @relation(fields: [media_id], references: [id], onDelete: Cascade)
+
+    messages    Message[]
+}
+
+model Gallery {
+    id          String          @id
+
+    chat_id     String?
+    chat        Chat?
+}
+
+model Message {
+    id                  String          @id
+    text                String          @db.Text
+    datetime            String
+
+    user_id             String
+
+    video_id            String?
+    video_timestamp     String?
+
+    chat_id             String
+    chat                Chat            @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+
 }

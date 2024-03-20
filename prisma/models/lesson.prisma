@@ -7,14 +7,14 @@ model Lesson {
     id          String          @id
     published   String
     name        String
-    cover       String?
     info        String          @db.Text
+    cover       String?         @db.Text
     
     image       Image?
     pdf         String?
 
-    video_id    String          @unique
-    video       Video           @relation(fields: [video_id], references: [id], onDelete: Cascade)
+    video_id    String?         @unique
+    video       Video?          @relation(fields: [video_id], references: [id], onDelete: Cascade)
 }
 
 model Image {

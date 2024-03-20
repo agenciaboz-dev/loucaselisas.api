@@ -1,23 +1,18 @@
 import { Prisma } from "@prisma/client"
-import { category as include } from "../prisma/include"
-import { Creator, CreatorPrisma } from "./Creator"
 
-export type CategoryPrisma = Prisma.CategoryGetPayload<{ include: typeof include }>
+export const category_include = Prisma.validator<Prisma.CategoryInclude>()({})
+export type CategoryPrisma = Prisma.CategoryGetPayload<{ include: typeof category_include }>
 
 export class Category {
     id: string
     name: string
     cover: string
 
-    creators: Creator[] = []
-
     constructor(data: CategoryPrisma) {}
 
-    load(data: CategoryPrisma, creators: CreatorPrisma[]) {
+    load(data: CategoryPrisma) {
         this.id = data.id
         this.name = data.name
         this.cover = data.cover
-
-        this.creators = creators.map((creator) => new Creator(creator.id))
     }
 }
