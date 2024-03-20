@@ -6,6 +6,7 @@ import google from "../google"
 import { LoginForm } from "../types/user/login"
 import { Creator, CreatorForm, User, UserForm, UserPrisma } from "../class"
 import { Role } from "../class/Role"
+import { Course, CourseForm } from "../class/Course"
 
 let io: SocketIoServer | null = null
 
@@ -42,6 +43,8 @@ export const handleSocket = (socket: Socket) => {
     socket.on("creator:delete", (id: string) => Creator.delete(socket, id))
 
     socket.on("role:createdefault", () => Role.createDefault(socket))
+
+    socket.on("course:new", (data: CourseForm) => Course.new(socket, data))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }
