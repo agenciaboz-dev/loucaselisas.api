@@ -3,7 +3,7 @@ import { prisma } from "../prisma"
 import { Socket } from "socket.io"
 import { uid } from "uid"
 import { LoginForm } from "../types/user/login"
-import { Course } from "./Course"
+import { Course, course_include } from "./Course"
 import { PaymentCard, PaymentCardForm } from "./PaymentCard"
 import { FileUpload, PickDiff, WithoutFunctions } from "./helpers"
 import { saveFile } from "../tools/saveFile"
@@ -13,7 +13,7 @@ import { Role, role_include } from "./Role"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
-    student: { include: { user: true, courses: true } },
+    student: { include: { user: true, courses: { include: course_include } } },
     favorite_courses: true,
     favorite_creators: { include: creator_include },
     payment_cards: true,
