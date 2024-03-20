@@ -2,7 +2,7 @@ import { createWriteStream, existsSync, mkdirSync } from "fs"
 import { join } from "path"
 import { env } from "../env"
 
-export const saveImage = (path: string, file: { file: ArrayBuffer | File; name: string }) => {
+export const saveFile = (path: string, file: { file: ArrayBuffer | File; name: string }) => {
     const buffer = Buffer.from(file.file as ArrayBuffer)
     const uploadDir = `static/${path}`
     if (!existsSync(uploadDir)) {

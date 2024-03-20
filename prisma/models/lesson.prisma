@@ -12,9 +12,7 @@ model Lesson {
     
     image       Image?
     pdf         String?
-
-    video_id    String?         @unique
-    video       Video?          @relation(fields: [video_id], references: [id], onDelete: Cascade)
+    video       Video?          
 }
 
 model Image {
@@ -29,5 +27,6 @@ model Video {
     id          String          @id
     url         String
 
-    lesson     Lesson?
+    lesson_id  String?          @unique
+    lesson     Lesson?          @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
 }

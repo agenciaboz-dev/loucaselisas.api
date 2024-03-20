@@ -110,8 +110,7 @@ model Lesson {
   cover     String? @db.Text
   image     Image?  @relation(name: "ImageToLesson")
   pdf       String?
-  video_id  String? @unique
-  video     Video?  @relation(name: "LessonToVideo", fields: [video_id], references: [id], onDelete: Cascade)
+  video     Video?  @relation(name: "LessonToVideo")
 }
 
 model Chat {
@@ -160,7 +159,8 @@ model Video {
   url        String
   gallery_id String?
   gallery    Gallery? @relation(name: "GalleryToVideo", fields: [gallery_id], references: [id], onDelete: Cascade)
-  lesson     Lesson?  @relation(name: "LessonToVideo")
+  lesson_id  String?  @unique
+  lesson     Lesson?  @relation(name: "LessonToVideo", fields: [lesson_id], references: [id], onDelete: Cascade)
 }
 
 model Message {

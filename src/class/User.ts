@@ -5,8 +5,8 @@ import { uid } from "uid"
 import { LoginForm } from "../types/user/login"
 import { Course } from "./Course"
 import { PaymentCard, PaymentCardForm } from "./PaymentCard"
-import { ImageUpload, PickDiff, WithoutFunctions } from "./helpers"
-import { saveImage } from "../tools/saveImage"
+import { FileUpload, PickDiff, WithoutFunctions } from "./helpers"
+import { saveFile } from "../tools/saveFile"
 import { handlePrismaError } from "../prisma/errors"
 import { Creator, CreatorForm, Student, creator_include } from "./index"
 import { Role, role_include } from "./Role"
@@ -25,8 +25,8 @@ export type UserForm = Omit<
     WithoutFunctions<User>,
     "id" | "admin" | "favorite_creators" | "favorite_courses" | "payment_cards" | "creator" | "student" | "role" | "cover" | "image" | "payment_cards"
 > & {
-    image: ImageUpload | null
-    cover: ImageUpload | null
+    image: FileUpload | null
+    cover: FileUpload | null
     student: boolean
     creator: CreatorForm | null
     payment_cards: PaymentCardForm[]
@@ -83,7 +83,7 @@ export class User {
         user.update(data, socket)
     }
 
-    static async updateImage(data: { id: string; image: ImageUpload | null; cover: ImageUpload | null }, socket: Socket) {
+    static async updateImage(data: { id: string; image: FileUpload | null; cover: FileUpload | null }, socket: Socket) {
         const user = new User(data.id)
         await user.init()
         user.updateImage(data, socket)
@@ -222,15 +222,15 @@ export class User {
         }
     }
 
-    async updateImage(data: { image: ImageUpload | null; cover: ImageUpload | null }, socket?: Socket) {
+    async updateImage(data: { image: FileUpload | null; cover: FileUpload | null }, socket?: Socket) {
         try {
             if (data.image) {
-                const url = saveImage(`/users/${this.id}`, data.image)
+                const url = saveFile(`/users/${this.id}`, data.image)
                 await this.update({ image: url }, socket)
             }
 
             if (data.cover) {
-                const url = saveImage(`/users/${this.id}`, data.cover)
+                const url = saveFile(`/users/${this.id}`, data.cover)
                 await this.update({ cover: url }, socket)
             }
         } catch (error) {

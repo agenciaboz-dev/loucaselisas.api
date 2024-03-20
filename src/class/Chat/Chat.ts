@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client"
-import { Gallery, gallery_include } from "../Gallery"
+import { Gallery, gallery_include } from "../Gallery/Gallery"
 import { Message } from "./Message"
 
 export const chat_include = Prisma.validator<Prisma.ChatInclude>()({ media: { include: gallery_include }, messages: true })
