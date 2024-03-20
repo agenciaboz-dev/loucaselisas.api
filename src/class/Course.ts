@@ -3,6 +3,7 @@ import { Category } from "./Category"
 import { Prisma } from "@prisma/client"
 import { Gallery, gallery_include } from "./Gallery"
 import { Chat, chat_include } from "./Chat/Chat"
+import { Lesson, lesson_include } from "./Course/Lesson"
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     categories: true,
@@ -12,6 +13,7 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     owner: { include: { user: true } },
     students: true,
     favorited_by: true,
+    lessons: { include: lesson_include },
 })
 
 export type CoursePrisma = Prisma.CourseGetPayload<{ include: typeof course_include }>
@@ -26,6 +28,7 @@ export class Course {
     recorder: string | null
     favorited_by: number
 
+    lessons: Lesson[]
     owner: Partial<Creator>
     gallery: Gallery
     categories: Category[]
@@ -45,6 +48,7 @@ export class Course {
         this.favorited_by = data.favorited_by.length
 
         this.categories = data.categories.map((category) => new Category(category))
+        this.lessons = data.lessons.map((lesson) => new Lesson(lesson))
 
         this.owner = data.owner
         this.creators = data.creators

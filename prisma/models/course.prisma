@@ -20,11 +20,17 @@ model Course {
     gallery     Gallery         @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
 
     categories  Category[]
-    // lessons     Lesson[]
+    lessons     Lesson[]
     creators    Creator[]
 
     chat_id     String?         
     chat        Chat?
+}
+
+model Lesson {
+    id          String          @id
+    course_id   String
+    course      Course          @relation(fields: [course_id], references: [id], onDelete: Cascade)
 }
 
 model Chat {

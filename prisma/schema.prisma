@@ -65,6 +65,7 @@ model Course {
   gallery_id   String     @unique
   gallery      Gallery    @relation(name: "CourseToGallery", fields: [gallery_id], references: [id], onDelete: Cascade)
   categories   Category[] @relation(name: "CategoryToCourse")
+  lessons      Lesson[]   @relation(name: "CourseToLesson")
   creators     Creator[]  @relation(name: "CourseToCreator")
   chat_id      String?
   chat         Chat?      @relation(name: "ChatToCourse")
@@ -97,6 +98,20 @@ model Category {
   name     String
   cover    String    @db.Text
   courses  Course[]  @relation(name: "CategoryToCourse")
+}
+
+model Lesson {
+  id        String  @id
+  course_id String
+  course    Course  @relation(name: "CourseToLesson", fields: [course_id], references: [id], onDelete: Cascade)
+  published String
+  name      String
+  info      String  @db.Text
+  cover     String? @db.Text
+  image     Image?  @relation(name: "ImageToLesson")
+  pdf       String?
+  video_id  String? @unique
+  video     Video?  @relation(name: "LessonToVideo", fields: [video_id], references: [id], onDelete: Cascade)
 }
 
 model Chat {
@@ -146,18 +161,6 @@ model Video {
   gallery_id String?
   gallery    Gallery? @relation(name: "GalleryToVideo", fields: [gallery_id], references: [id], onDelete: Cascade)
   lesson     Lesson?  @relation(name: "LessonToVideo")
-}
-
-model Lesson {
-  id        String  @id
-  published String
-  name      String
-  info      String  @db.Text
-  cover     String? @db.Text
-  image     Image?  @relation(name: "ImageToLesson")
-  pdf       String?
-  video_id  String? @unique
-  video     Video?  @relation(name: "LessonToVideo", fields: [video_id], references: [id], onDelete: Cascade)
 }
 
 model Message {
