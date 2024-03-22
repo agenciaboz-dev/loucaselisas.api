@@ -22,8 +22,8 @@ export const user_include = Prisma.validator<Prisma.UserInclude>()({
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
 export interface UserImageForm {
     id: string
-    image?: FileUpload
-    cover?: FileUpload
+    image?: FileUpload | null
+    cover?: FileUpload | null
 }
 
 export type UserForm = Omit<
@@ -116,7 +116,9 @@ export class User {
 
             const user = new User(user_prisma.id)
             user.load(user_prisma)
-            await user.updateImage(data)
+            if (data.image || data.cover) {
+                await user.updateImage({ ...data, id: user.id })
+            }
 
             socket.emit("user:signup", user)
             socket.broadcast.emit("user:update", user)
