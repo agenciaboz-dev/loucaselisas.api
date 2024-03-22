@@ -13,7 +13,7 @@ export const saveFile = (path: string, file: { file: ArrayBuffer | File; name: s
     createWriteStream(filepath).write(buffer)
 
     const port = process.env.PORT
-    const url = `${env == "dev" ? `http://localhost:${port}` : `https://agencyboz.com:${port}`}/${filepath}`
+    const url = `${env == "dev" ? `http://localhost:${port}` : `https://app.agencyboz.com:${port}`}/${filepath}`
     console.log(url)
     return url
 }
