@@ -20,6 +20,11 @@ export const user_include = Prisma.validator<Prisma.UserInclude>()({
     role: { include: role_include },
 })
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
+export interface UserImageForm {
+    id: string
+    image?: FileUpload
+    cover?: FileUpload
+}
 
 export type UserForm = Omit<
     WithoutFunctions<User>,
@@ -83,7 +88,7 @@ export class User {
         user.update(data, socket)
     }
 
-    static async updateImage(data: Partial<UserForm> & { id: string }, socket: Socket) {
+    static async updateImage(data: UserImageForm & { id: string }, socket: Socket) {
         const user = new User(data.id)
         await user.init()
         user.updateImage(data, socket)
@@ -222,7 +227,7 @@ export class User {
         }
     }
 
-    async updateImage(data: Partial<UserForm>, socket?: Socket) {
+    async updateImage(data: UserImageForm, socket?: Socket) {
         try {
             if (data.image) {
                 const url = saveFile(`/users/${this.id}`, data.image)
