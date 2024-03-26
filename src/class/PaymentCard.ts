@@ -3,7 +3,7 @@ import { WithoutFunctions } from "./helpers"
 
 export type PaymentCardPrisma = Prisma.PaymentcardGetPayload<{}>
 
-export type PaymentCardForm = Omit<WithoutFunctions<PaymentCard>, "id">
+export type PaymentCardForm = WithoutFunctions<PaymentCard> 
 
 export class PaymentCard {
     id: string
