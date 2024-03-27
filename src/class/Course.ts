@@ -9,6 +9,7 @@ import { Socket } from "socket.io"
 import { prisma } from "../prisma"
 import { uid } from "uid"
 import { saveFile } from "../tools/saveFile"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     categories: true,
@@ -76,11 +77,15 @@ export class Course {
     }
 
     static async new(socket: Socket, data: CourseForm) {
+        console.log("new course")
+        console.log(data)
         try {
             const gallery = await Gallery.new(data.gallery)
+            console.log(gallery)
             const new_course = await prisma.course.create({
                 data: {
                     ...data,
+
                     id: uid(),
                     cover: "",
                     lessons: {
@@ -100,6 +105,9 @@ export class Course {
                     creators: { connect: data.creators },
                     gallery: undefined,
                     gallery_id: gallery.id,
+                    favorited_by: {},
+                    chat: {},
+                    students: {},
                 },
             })
 
@@ -136,6 +144,7 @@ export class Course {
             })
 
             const course = new Course(course_prisma)
+            console.log(course)
             socket.emit("course:new", course)
             socket.broadcast.emit("course:update", course)
         } catch (error) {

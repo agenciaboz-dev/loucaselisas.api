@@ -104,7 +104,7 @@ export class User {
                     ...data,
                     image: null,
                     cover: null,
-                    creator: data.creator ? { create: { id: uid(), ...data.creator, favorited_by: undefined } } : {},
+                    creator: data.creator ? { create: { id: uid(), ...data.creator, favorited_by: undefined, owned_courses: {} } } : {},
                     student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
                     payment_cards: {},
@@ -142,6 +142,7 @@ export class User {
             where: { OR: [{ email: data.login }, { username: data.login }, { cpf: data.login }], password: data.password },
             include: user_include,
         })
+        console.log(user_prisma)
 
         if (user_prisma) {
             const user = new User(user_prisma.id, user_prisma)

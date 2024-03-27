@@ -10,6 +10,7 @@ export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
     categories: true,
     courses: { include: course_include },
     favorited_by: true,
+    owned_courses: { include: course_include },
 })
 export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_include }>
 export type CreatorType = WithoutFunctions<Creator>
@@ -23,6 +24,7 @@ export class Creator {
     description: string
     active: boolean
     favorited_by: number
+    owned_courses: Course[] = []
 
     courses: Course[] = []
 
@@ -55,6 +57,7 @@ export class Creator {
                     ...data,
                     favorited_by: {},
                     id: uid(),
+                    owned_courses: {},
                 },
                 include: creator_include,
             })
@@ -82,8 +85,13 @@ export class Creator {
         this.active = data.active
         this.language = data.language
         this.nickname = data.nickname
-        this.courses = data.courses.map((course) => new Course(course))
+        if (data.courses) {
+            this.courses = data.courses.map((course) => new Course(course))
+        }
+        if (data.owned_courses) {
+            this.owned_courses = data.owned_courses.map((course) => new Course(course))
+        }
         this.description = data.description
-        this.favorited_by = data.favorited_by.length
+        this.favorited_by = data.favorited_by?.length || 0
     }
 }

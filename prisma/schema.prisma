@@ -60,7 +60,7 @@ model Course {
   description  String     @db.Text
   language     String
   recorder     String?
-  owner        Creator    @relation(name: "course_owner", fields: [id], references: [id], onDelete: Cascade)
+  owner        Creator    @relation(name: "course_owner", fields: [owner_id], references: [id], onDelete: Cascade)
   owner_id     String
   gallery_id   String     @unique
   gallery      Gallery    @relation(name: "CourseToGallery", fields: [gallery_id], references: [id], onDelete: Cascade)

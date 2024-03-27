@@ -13,7 +13,7 @@ model Course {
     recorder    String?
 
     
-    owner       Creator         @relation(fields: [id], references: [id], onDelete: Cascade, name: "course_owner")
+    owner       Creator         @relation(fields: [owner_id], references: [id], onDelete: Cascade, name: "course_owner")
     owner_id    String
 
     gallery_id  String          @unique
