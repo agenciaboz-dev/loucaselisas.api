@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
 import { uid } from "uid"
-import { LoginForm } from "../types/user/login"
+import { LoginForm } from "../types/shared/login"
 import { Course, course_include } from "./Course"
 import { PaymentCard, PaymentCardForm } from "./PaymentCard"
 import { FileUpload, PickDiff, WithoutFunctions } from "./helpers"
@@ -83,9 +83,10 @@ export class User {
     }
 
     static async update(data: Partial<UserPrisma> & { id: string }, socket: Socket) {
+        console.log(data)
         const user = new User(data.id)
         await user.init()
-        user.update(data, socket)
+        await user.update(data, socket)
     }
 
     static async updateImage(data: UserImageForm & { id: string }, socket: Socket) {
@@ -137,7 +138,7 @@ export class User {
         socket.emit("user:list", users)
     }
 
-    static async login(socket: Socket, data: LoginForm) {
+    static async login(data: LoginForm, socket?: Socket) {
         const user_prisma = await prisma.user.findFirst({
             where: { OR: [{ email: data.login }, { username: data.login }, { cpf: data.login }], password: data.password },
             include: user_include,
@@ -147,10 +148,13 @@ export class User {
         if (user_prisma) {
             const user = new User(user_prisma.id, user_prisma)
 
-            socket.emit("user:login", user)
+            socket?.emit("user:login", user)
+            return user
         } else {
-            socket.emit("user:login", null)
+            socket?.emit("user:login", null)
         }
+
+        return null
     }
 
     load(data: UserPrisma) {
@@ -223,7 +227,9 @@ export class User {
 
             if (socket) {
                 socket.emit("user:update", this)
+                socket.emit("user:update:success")
                 socket.broadcast.emit("user:update", this)
+                console.log("user:update")
             }
         } catch (error) {
             handlePrismaError(error, socket ? { socket, event: "user:update:error" } : undefined) || console.log(error)
