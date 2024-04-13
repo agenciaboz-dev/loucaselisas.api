@@ -34,7 +34,7 @@ export const handleSocket = (socket: Socket) => {
     socket.on("google:exchange", (data) => google.login.exchangeCode(socket, data))
     socket.on("google:link", (user) => google.person.link(socket, user))
 
-    socket.on("user:signup", (data: UserForm) => User.signup(socket, data))
+    socket.on("user:signup", (data: UserForm) => User.signup(data, socket))
     socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(data, socket))
     socket.on("user:update", (data: Partial<UserPrisma> & { id: string }) => User.update(data, socket))

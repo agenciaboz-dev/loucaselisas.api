@@ -16,8 +16,8 @@ const app: Express = express()
 const port = process.env.PORT
 
 app.use(cors())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json({ limit: "100mb" }))
+app.use(bodyParser.urlencoded({ extended: false, limit: "100mb" }))
 app.use(cookieParser())
 app.use("/api", router)
 app.use("/static", express.static("static"))

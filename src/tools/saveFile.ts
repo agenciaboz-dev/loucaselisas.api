@@ -1,9 +1,19 @@
 import { createWriteStream, existsSync, mkdirSync } from "fs"
 import { join } from "path"
 import { env } from "../env"
+import { FileUpload } from "../class/helpers"
+import { getLocalUrl } from "./getLocalUrl"
 
-export const saveFile = (path: string, file: { file: ArrayBuffer | File; name: string }) => {
-    const buffer = Buffer.from(file.file as ArrayBuffer)
+const getBuffer = (file: FileUpload) => {
+    if (file.base64) {
+        return Buffer.from(file.base64, "base64")
+    }
+
+    return Buffer.from(file.file as ArrayBuffer)
+}
+
+export const saveFile = (path: string, file: FileUpload) => {
+    const buffer = getBuffer(file)
     const uploadDir = `static/${path}`
     if (!existsSync(uploadDir)) {
         mkdirSync(uploadDir, { recursive: true })
@@ -12,8 +22,6 @@ export const saveFile = (path: string, file: { file: ArrayBuffer | File; name: s
     const filepath = join(uploadDir, file.name)
     createWriteStream(filepath).write(buffer)
 
-    const port = process.env.PORT
-    const url = `${env == "dev" ? `http://localhost:${port}` : `https://app.agencyboz.com:${port}`}/${filepath}`
-    console.log(url)
+    const url = `${getLocalUrl()}/${filepath}`
     return url
 }

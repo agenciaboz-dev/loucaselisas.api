@@ -23,7 +23,7 @@ export class Role {
         return !!default_role
     }
 
-    static async createDefault(socket: Socket) {
+    static async createDefault(socket?: Socket) {
         try {
             const admin = await prisma.adminPermissions.create({ data: { id: uid() } })
             const general = await prisma.generalPermissions.create({ data: { id: uid() } })
@@ -39,10 +39,10 @@ export class Role {
                 include: role_include,
             })
 
-            socket.emit("role:createdefault", new Role(role))
+            socket?.emit("role:createdefault", new Role(role))
         } catch (error) {
             console.log(error)
-            socket.emit("role:createdefault:error", error?.toString())
+            socket?.emit("role:createdefault:error", error?.toString())
         }
     }
 

@@ -1,14 +1,19 @@
 import express, { Express, Request, Response } from "express"
-import { LoginForm } from "../types/shared/login"
-import { User } from "../class"
+import { LoginForm } from "../../types/shared/login"
+import { User } from "../../class"
 const router = express.Router()
 
 router.post("/", async (request: Request, response: Response) => {
     const data = request.body as LoginForm
     console.log(data)
-    const user = await User.login(data)
+    try {
+        const user = await User.login(data)
 
-    response.json(user)
+        response.json(user)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
 })
 
 router.post("/keep_session", async (request: Request, response: Response) => {

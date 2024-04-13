@@ -95,7 +95,7 @@ export class User {
         user.updateImage(data, socket)
     }
 
-    static async signup(socket: Socket, data: UserForm) {
+    static async signup(data: UserForm, socket?: Socket) {
         try {
             if (!(await Role.existsDefault())) {
                 await Role.createDefault(socket)
@@ -121,10 +121,13 @@ export class User {
                 await user.updateImage({ ...data, id: user.id })
             }
 
-            socket.emit("user:signup", user)
-            socket.broadcast.emit("user:update", user)
+            socket?.emit("user:signup", user)
+            socket?.broadcast.emit("user:update", user)
+            return user
         } catch (error) {
-            handlePrismaError(error, { socket, event: "user:signup:error" }) || console.log(error)
+            const message = handlePrismaError(error)
+            socket?.emit("user:signup:error", message)
+            return message
         }
     }
 
@@ -232,7 +235,9 @@ export class User {
                 console.log("user:update")
             }
         } catch (error) {
-            handlePrismaError(error, socket ? { socket, event: "user:update:error" } : undefined) || console.log(error)
+            const message = handlePrismaError(error)
+            socket?.emit("user:update:error", message)
+            return message
         }
     }
 
