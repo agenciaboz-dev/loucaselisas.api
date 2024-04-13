@@ -36,6 +36,7 @@ export type UserForm = Omit<
     creator: CreatorForm | null
     payment_cards: PaymentCardForm[]
 }
+export type PartialUser = Partial<User> & { id: string }
 export class User {
     id: string
     username: string
@@ -82,7 +83,7 @@ export class User {
         }
     }
 
-    static async update(data: Partial<UserPrisma> & { id: string }, socket: Socket) {
+    static async update(data: PartialUser, socket: Socket) {
         console.log(data)
         const user = new User(data.id)
         await user.init()
@@ -172,6 +173,7 @@ export class User {
         this.pronoun = data.pronoun
         this.uf = data.uf
         this.admin = data.admin
+        this.bio = data.bio
 
         this.instagram = data.instagram
         this.tiktok = data.tiktok
@@ -195,7 +197,7 @@ export class User {
         this.role = new Role(data.role)
     }
 
-    async update(data: Partial<UserPrisma>, socket?: Socket) {
+    async update(data: Partial<User>, socket?: Socket) {
         try {
             const user_prisma = await prisma.user.update({
                 where: { id: this.id },

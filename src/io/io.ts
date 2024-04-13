@@ -7,7 +7,7 @@ import { LoginForm } from "../types/shared/login"
 import { Creator, CreatorForm, User, UserForm, UserPrisma } from "../class"
 import { Role } from "../class/Role"
 import { Course, CourseForm } from "../class/Course"
-import { UserImageForm } from "../class/User"
+import { PartialUser, UserImageForm } from "../class/User"
 
 let io: SocketIoServer | null = null
 
@@ -37,7 +37,7 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:signup", (data: UserForm) => User.signup(data, socket))
     socket.on("user:list", () => User.list(socket))
     socket.on("user:login", (data: LoginForm) => User.login(data, socket))
-    socket.on("user:update", (data: Partial<UserPrisma> & { id: string }) => User.update(data, socket))
+    socket.on("user:update", (data: PartialUser) => User.update(data, socket))
     socket.on("user:image:update", (data: UserImageForm) => User.updateImage(data, socket))
 
     socket.on("creator:list", () => Creator.list(socket))
