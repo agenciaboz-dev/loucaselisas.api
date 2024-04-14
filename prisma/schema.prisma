@@ -10,9 +10,9 @@ generator client {
 }
 
 model User {
-  id                String        @id
-  username          String        @unique
-  email             String        @unique
+  id                String         @id
+  username          String         @unique
+  email             String         @unique
   password          String
   name              String
   cpf               String
@@ -20,23 +20,24 @@ model User {
   phone             String
   pronoun           String
   uf                String
-  admin             Boolean       @default(false)
+  admin             Boolean        @default(false)
   instagram         String?
   tiktok            String?
   profession        String?
-  image             String?       @db.Text
-  cover             String?       @db.Text
-  bio               String?       @db.Text
+  image             String?        @db.Text
+  cover             String?        @db.Text
+  bio               String?        @db.Text
   google_id         String?
-  google_token      String?       @db.Text
-  favorite_creators Creator[]     @relation(name: "favorite_creators")
-  favorite_courses  Course[]      @relation(name: "favorite_courses")
-  creator           Creator?      @relation(name: "CreatorToUser")
-  student           Student?      @relation(name: "StudentToUser")
-  role_id           Int           @default(1)
-  role              Role          @relation(name: "RoleToUser", fields: [role_id], references: [id], onDelete: Restrict)
-  payment_cards     Paymentcard[] @relation(name: "PaymentcardToUser")
-  plan              PlanContract? @relation(name: "PlanContractToUser")
+  google_token      String?        @db.Text
+  favorite_creators Creator[]      @relation(name: "favorite_creators")
+  favorite_courses  Course[]       @relation(name: "favorite_courses")
+  creator           Creator?       @relation(name: "CreatorToUser")
+  student           Student?       @relation(name: "StudentToUser")
+  role_id           Int            @default(1)
+  role              Role           @relation(name: "RoleToUser", fields: [role_id], references: [id], onDelete: Restrict)
+  payment_cards     Paymentcard[]  @relation(name: "PaymentcardToUser")
+  plan              PlanContract?  @relation(name: "PlanContractToUser")
+  plan_history      ContractLogs[] @relation(name: "ContractLogsToUser")
 }
 
 model Role {
@@ -182,6 +183,7 @@ model Plan {
   duration    String
   description String         @default("")
   contracts   PlanContract[] @relation(name: "PlanToPlanContract")
+  logs        ContractLogs[] @relation(name: "ContractLogsToPlan")
 }
 
 model PlanContract {
@@ -193,6 +195,17 @@ model PlanContract {
   plan_data  Plan   @relation(name: "PlanToPlanContract", fields: [plan_id], references: [id], onDelete: Cascade)
   user_id    String @unique
   user       User   @relation(name: "PlanContractToUser", fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model ContractLogs {
+  id         Int    @id @default(autoincrement())
+  start_date String
+  end_date   String
+  paid       Float
+  user_id    String
+  user       User   @relation(name: "ContractLogsToUser", fields: [user_id], references: [id], onDelete: Cascade)
+  plan_id    Int
+  plan       Plan   @relation(name: "ContractLogsToPlan", fields: [plan_id], references: [id], onDelete: Cascade)
 }
 
 model ProfilePermissions {

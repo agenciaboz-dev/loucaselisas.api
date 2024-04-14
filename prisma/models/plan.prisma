@@ -6,6 +6,7 @@ model Plan {
     description String      @default("")
 
     contracts   PlanContract[]
+    logs        ContractLogs[]
 
 }
 
@@ -25,4 +26,19 @@ model PlanContract {
 model User {
     id              String      @id
     plan            PlanContract?
+    plan_history    ContractLogs[]
+}
+
+model ContractLogs {
+    id          Int         @id @default(autoincrement())
+
+    start_date  String
+    end_date    String
+    paid        Float
+
+    user_id     String
+    user        User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    plan_id     Int
+    plan        Plan        @relation(fields: [plan_id], references: [id], onDelete: Cascade)
 }

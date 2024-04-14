@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express"
 import { PartialUser, User, UserImageForm } from "../../class/User"
 import { prisma } from "../../prisma"
+import { ContractLog } from "../../class/Plan"
 
 const router = express.Router()
 
@@ -39,6 +40,18 @@ router.delete("/", async (request: Request, response: Response) => {
         response.status(200).send()
     } catch (error) {
         console.log(error)
+        response.status(500).send(error)
+    }
+})
+
+router.get("/plan_logs", async (request: Request, response: Response) => {
+    const user_id = request.query.user_id as string
+
+    try {
+        const logs = await ContractLog.getUserLogs(user_id)
+        response.json(logs)
+        console.log(logs)
+    } catch (error) {
         response.status(500).send(error)
     }
 })

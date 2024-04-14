@@ -7,6 +7,9 @@ export type PlanPrisma = Prisma.PlanGetPayload<{}>
 export const plan_contract_include = Prisma.validator<Prisma.PlanContractInclude>()({ plan_data: true })
 export type PlanContractPrisma = Prisma.PlanContractGetPayload<{ include: typeof plan_contract_include }>
 
+export const contract_log_include = Prisma.validator<Prisma.ContractLogsInclude>()({ plan: true })
+export type ContractLogPrisma = Prisma.ContractLogsGetPayload<{ include: typeof contract_log_include }>
+
 export class PlanContract {
     id: number
     start_date: string
@@ -54,6 +57,16 @@ export class Plan {
             include: plan_contract_include,
         })
 
+        await prisma.contractLogs.create({
+            data: {
+                start_date: new_contract.start_date,
+                end_date: new_contract.end_date,
+                paid: new_contract.paid,
+                plan_id: plan.id,
+                user_id: data.user_id,
+            },
+        })
+
         const plan_contract = new PlanContract(new_contract)
         return plan_contract
     }
@@ -76,5 +89,27 @@ export class Plan {
         if (plan_prisma) {
             this.load(plan_prisma)
         }
+    }
+}
+
+export class ContractLog {
+    id: number
+    start_date: string
+    end_date: string
+    paid: number
+    plan: Plan
+
+    static async getUserLogs(user_id: string) {
+        const contract_logs_prisma = await prisma.contractLogs.findMany({ where: { user_id }, include: contract_log_include })
+        const logs = contract_logs_prisma.map((item) => new ContractLog(item))
+        return logs
+    }
+
+    constructor(data: ContractLogPrisma) {
+        this.id = data.id
+        this.end_date = data.end_date
+        this.paid = data.paid
+        this.plan = new Plan(0, data.plan)
+        this.start_date = data.start_date
     }
 }

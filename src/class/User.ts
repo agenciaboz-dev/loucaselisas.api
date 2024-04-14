@@ -10,7 +10,7 @@ import { saveFile } from "../tools/saveFile"
 import { handlePrismaError } from "../prisma/errors"
 import { Creator, CreatorForm, Student, creator_include } from "./index"
 import { Role, role_include } from "./Role"
-import { Plan, PlanContract, plan_contract_include } from "./Plan"
+import { ContractLog, Plan, PlanContract, contract_log_include, plan_contract_include } from "./Plan"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
@@ -32,6 +32,7 @@ export type UserForm = Omit<
     WithoutFunctions<User>,
     | "id"
     | "plan"
+    | "plan_history"
     | "admin"
     | "favorite_creators"
     | "favorite_courses"
@@ -125,6 +126,7 @@ export class User {
                     role: { connect: { id: 1 } },
                     payment_cards: {},
                     plan: {},
+                    plan_history: {},
 
                     id: uid(),
                 },
@@ -234,6 +236,7 @@ export class User {
                     student: {},
                     role: {},
                     plan: {},
+                    plan_history: {},
                     role_id: undefined,
                 },
                 include: user_include,
