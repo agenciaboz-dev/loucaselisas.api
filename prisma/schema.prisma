@@ -36,6 +36,7 @@ model User {
   role_id           Int           @default(1)
   role              Role          @relation(name: "RoleToUser", fields: [role_id], references: [id], onDelete: Restrict)
   payment_cards     Paymentcard[] @relation(name: "PaymentcardToUser")
+  plan              PlanContract? @relation(name: "PlanContractToUser")
 }
 
 model Role {
@@ -172,6 +173,26 @@ model Message {
   video_timestamp String?
   chat_id         String
   chat            Chat    @relation(name: "ChatToMessage", fields: [chat_id], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id          Int            @id @default(autoincrement())
+  name        String
+  price       Float
+  duration    String
+  description String         @default("")
+  contracts   PlanContract[] @relation(name: "PlanToPlanContract")
+}
+
+model PlanContract {
+  id         Int    @id @default(autoincrement())
+  start_date String
+  end_date   String
+  paid       Float
+  plan_id    Int
+  plan_data  Plan   @relation(name: "PlanToPlanContract", fields: [plan_id], references: [id], onDelete: Cascade)
+  user_id    String @unique
+  user       User   @relation(name: "PlanContractToUser", fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model ProfilePermissions {

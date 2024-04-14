@@ -10,6 +10,7 @@ import { saveFile } from "../tools/saveFile"
 import { handlePrismaError } from "../prisma/errors"
 import { Creator, CreatorForm, Student, creator_include } from "./index"
 import { Role, role_include } from "./Role"
+import { Plan, PlanContract, plan_contract_include } from "./Plan"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
@@ -18,6 +19,7 @@ export const user_include = Prisma.validator<Prisma.UserInclude>()({
     favorite_creators: { include: creator_include },
     payment_cards: true,
     role: { include: role_include },
+    plan: { include: plan_contract_include },
 })
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
 export interface UserImageForm {
@@ -28,7 +30,18 @@ export interface UserImageForm {
 
 export type UserForm = Omit<
     WithoutFunctions<User>,
-    "id" | "admin" | "favorite_creators" | "favorite_courses" | "payment_cards" | "creator" | "student" | "role" | "cover" | "image" | "payment_cards"
+    | "id"
+    | "plan"
+    | "admin"
+    | "favorite_creators"
+    | "favorite_courses"
+    | "payment_cards"
+    | "creator"
+    | "student"
+    | "role"
+    | "cover"
+    | "image"
+    | "payment_cards"
 > & {
     image: FileUpload | null
     cover: FileUpload | null
@@ -68,6 +81,7 @@ export class User {
     creator: Creator | null
     student: Student | null
 
+    plan: PlanContract | null
     role: Role
 
     constructor(id: string, user_prisma?: UserPrisma) {
@@ -110,6 +124,7 @@ export class User {
                     student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
                     payment_cards: {},
+                    plan: {},
 
                     id: uid(),
                 },
@@ -195,6 +210,7 @@ export class User {
         this.student = data.student ? new Student(data.student.id, data.student) : null
 
         this.role = new Role(data.role)
+        this.plan = data.plan ? new PlanContract(data.plan) : null
     }
 
     async update(data: Partial<User>, socket?: Socket) {
@@ -217,6 +233,7 @@ export class User {
                     creator: {},
                     student: {},
                     role: {},
+                    plan: {},
                     role_id: undefined,
                 },
                 include: user_include,

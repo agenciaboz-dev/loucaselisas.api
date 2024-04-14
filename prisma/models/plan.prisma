@@ -1,0 +1,28 @@
+model Plan {
+    id          Int         @id @default(autoincrement())
+    name        String
+    price       Float
+    duration    String
+    description String      @default("")
+
+    contracts   PlanContract[]
+
+}
+
+model PlanContract {
+    id          Int         @id @default(autoincrement())
+    start_date  String
+    end_date    String
+    paid        Float
+
+    plan_id     Int
+    plan_data   Plan        @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+
+    user_id     String      @unique
+    user        User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id              String      @id
+    plan            PlanContract?
+}
