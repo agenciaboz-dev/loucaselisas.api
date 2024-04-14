@@ -26,7 +26,7 @@ export type CoursePrisma = Prisma.CourseGetPayload<{ include: typeof course_incl
 
 export type CourseForm = Omit<
     WithoutFunctions<Course>,
-    "id" | "favorited_by" | "lessons" | "cover" | "owner" | "gallery" | "categories" | "creators" | "chat"
+    "id" | "favorited_by" | "lessons" | "cover" | "owner" | "gallery" | "categories" | "creators" | "chat" | "published"
 > & {
     lessons: LessonForm[]
     cover?: FileUpload
