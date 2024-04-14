@@ -11,7 +11,7 @@ export class PaymentCard {
     owner: string
     validity: string
     cvc: string
-    type: string
+    type: "CREDIT" | "DEBIT"
 
     constructor(data: PaymentCardPrisma) {
         this.id = data.id

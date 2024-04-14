@@ -137,14 +137,14 @@ model Gallery {
 }
 
 model Paymentcard {
-  id       String @id
+  id       String   @id
   number   String
   owner    String
   validity String
   cvc      String
-  type     String
+  type     CardType
   user_id  String
-  user     User   @relation(name: "PaymentcardToUser", fields: [user_id], references: [id], onDelete: Cascade)
+  user     User     @relation(name: "PaymentcardToUser", fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Image {
@@ -234,4 +234,9 @@ model GeneralPermissions {
   roles         Role[]  @relation(name: "GeneralPermissionsToRole")
   editProfile   Boolean @default(false)
   deleteProfile Boolean @default(false)
+}
+
+enum CardType {
+  CREDIT
+  DEBIT
 }

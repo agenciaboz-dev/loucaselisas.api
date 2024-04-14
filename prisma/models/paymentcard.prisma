@@ -1,10 +1,15 @@
+enum CardType {
+    CREDIT
+    DEBIT
+}
+
 model Paymentcard {
     id          String          @id
     number      String
     owner       String
     validity    String
     cvc         String
-    type        String
+    type        CardType
 
     user_id     String
     user        User            @relation(references: [id], fields: [user_id], onDelete: Cascade)
