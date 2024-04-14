@@ -15,6 +15,7 @@ export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
 export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_include }>
 export type CreatorType = WithoutFunctions<Creator>
 export type CreatorForm = Omit<WithoutFunctions<Creator>, "active" | "courses" | "id">
+export type PartialCreator = Partial<Creator> & { id: string }
 
 export class Creator {
     id: string
@@ -92,6 +93,7 @@ export class Creator {
         this.active = data.active
         this.language = data.language
         this.nickname = data.nickname
+        this.user_id = data.user_id
         if (data.courses) {
             this.courses = data.courses.map((course) => new Course(course))
         }
@@ -100,5 +102,25 @@ export class Creator {
         }
         this.description = data.description
         this.favorited_by = data.favorited_by?.length || 0
+    }
+
+    async update(data: PartialCreator) {
+        try {
+            const updated_creator = await prisma.creator.update({
+                where: { id: this.id },
+                data: {
+                    ...data,
+                    id: undefined,
+                    favorited_by: {},
+                    owned_courses: {},
+                    courses: {},
+                },
+                include: creator_include,
+            })
+            this.load(updated_creator)
+            return this
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
