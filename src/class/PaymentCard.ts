@@ -6,12 +6,15 @@ export type PaymentCardPrisma = Prisma.PaymentcardGetPayload<{}>
 export type PaymentCardForm = WithoutFunctions<PaymentCard> 
 
 export class PaymentCard {
-    id: string
+    id: number
     number: string
     owner: string
     validity: string
     cvc: string
     type: "CREDIT" | "DEBIT"
+
+    bank: string | null
+    flag: string | null
 
     constructor(data: PaymentCardPrisma) {
         this.id = data.id
@@ -20,5 +23,7 @@ export class PaymentCard {
         this.owner = data.owner
         this.type = data.type
         this.validity = data.validity
+        this.bank = data.bank
+        this.flag = data.flag
     }
 }

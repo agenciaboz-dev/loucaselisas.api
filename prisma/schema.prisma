@@ -137,12 +137,14 @@ model Gallery {
 }
 
 model Paymentcard {
-  id       String   @id
+  id       Int      @id @default(autoincrement())
   number   String
   owner    String
   validity String
   cvc      String
   type     CardType
+  bank     String?
+  flag     String?
   user_id  String
   user     User     @relation(name: "PaymentcardToUser", fields: [user_id], references: [id], onDelete: Cascade)
 }
