@@ -41,8 +41,8 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:image:update", (data: UserImageForm) => User.updateImage(data, socket))
 
     socket.on("creator:list", () => Creator.list(socket))
-    socket.on("creator:signup", (data: CreatorForm) => Creator.new(socket, data))
-    socket.on("creator:delete", (id: string) => Creator.delete(socket, id))
+    socket.on("creator:signup", (data: CreatorForm) => Creator.new(data, socket))
+    socket.on("creator:delete", (id: string) => Creator.delete(id, socket))
 
     socket.on("role:createdefault", () => Role.createDefault(socket))
 

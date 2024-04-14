@@ -3,6 +3,7 @@ import login from "./src/rest/user/login"
 import signup from "./src/rest/user/signup"
 import user from "./src/rest/user/user"
 import plan from "./src/rest/plan/plan"
+import creator from "./src/rest/creator/creator"
 
 export const router = express.Router()
 
@@ -14,3 +15,4 @@ router.use("/login", login)
 router.use("/signup", signup)
 router.use("/user", user)
 router.use("/plan", plan)
+router.use("/creator", creator)

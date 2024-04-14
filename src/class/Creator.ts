@@ -50,7 +50,7 @@ export class Creator {
         socket.emit("creator:list", creators)
     }
 
-    static async new(socket: Socket, data: CreatorForm) {
+    static async new(data: CreatorForm, socket?: Socket) {
         try {
             const creator_prisma = await prisma.creator.create({
                 data: {
@@ -64,20 +64,27 @@ export class Creator {
             const creator = new Creator(creator_prisma.id)
             await creator.init()
 
-            socket.emit("creator:signup", creator)
-            socket.broadcast.emit("creator:update", creator)
+            socket?.emit("creator:signup", creator)
+            socket?.broadcast.emit("creator:update", creator)
+
+            return creator
         } catch (error) {
-            handlePrismaError(error, { socket, event: "creator:signup:error" }) || console.log(error)
+            console.log(error)
+            const message = handlePrismaError(error)
+            socket?.emit("creator:signup:error", message)
         }
     }
 
-    static async delete(socket: Socket, id: string) {
+    static async delete(id: string, socket?: Socket) {
         try {
             const deleted = await prisma.creator.delete({ where: { id } })
-            socket.emit("creator:delete", deleted)
-            socket.broadcast.emit("creator:delete", deleted)
+            socket?.emit("creator:delete", deleted)
+            socket?.broadcast.emit("creator:delete", deleted)
+            return deleted
         } catch (error) {
-            handlePrismaError(error, { socket, event: "creator:delete:error" })
+            console.log(error)
+            const message = handlePrismaError(error)
+            socket?.emit("creator:delete:error", message)
         }
     }
 
