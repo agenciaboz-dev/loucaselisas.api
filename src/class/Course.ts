@@ -45,9 +45,11 @@ export class Course {
     language: string
     recorder: string | null
     favorited_by: number
+    price: number
 
     lessons: Lesson[]
     owner: Partial<Creator>
+    owner_id: string
     gallery: Gallery
     categories: Category[]
     creators: Partial<Creator>[]
@@ -69,14 +71,16 @@ export class Course {
         this.lessons = data.lessons.map((lesson) => new Lesson(lesson))
 
         this.owner = data.owner
+        this.owner_id = data.owner_id
         this.creators = data.creators
+        this.price = data.price
 
         if (data.chat) {
             this.chat = new Chat(data.chat)
         }
     }
 
-    static async new(socket: Socket, data: CourseForm) {
+    static async new(data: CourseForm, socket?: Socket) {
         console.log("new course")
         console.log(data)
         try {
@@ -145,11 +149,13 @@ export class Course {
 
             const course = new Course(course_prisma)
             console.log(course)
-            socket.emit("course:new", course)
-            socket.broadcast.emit("course:update", course)
+            socket?.emit("course:new", course)
+            socket?.broadcast.emit("course:update", course)
+
+            return course
         } catch (error) {
             console.log(error)
-            socket.emit("course:new:error", error?.toString())
+            socket?.emit("course:new:error", error?.toString())
         }
     }
 }

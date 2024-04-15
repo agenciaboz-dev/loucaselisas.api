@@ -43,4 +43,14 @@ router.patch("/", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/list", async (request: Request, response: Response) => {
+    try {
+        const creators = await Creator.list()
+        response.json(creators)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 export default router

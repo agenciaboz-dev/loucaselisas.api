@@ -46,7 +46,7 @@ export const handleSocket = (socket: Socket) => {
 
     socket.on("role:createdefault", () => Role.createDefault(socket))
 
-    socket.on("course:new", (data: CourseForm) => Course.new(socket, data))
+    socket.on("course:new", (data: CourseForm) => Course.new(data, socket))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }

@@ -12,6 +12,9 @@ yarn build
 echo 'Uploading build to server'
 scp -r dist ${user}@agencyboz:${path}/
 
+echo 'Uploading static to server'
+scp -r static ${user}@agencyboz:${path}/
+
 echo 'uploading .env to server'
 scp .env ${user}@agencyboz:${path}/
 

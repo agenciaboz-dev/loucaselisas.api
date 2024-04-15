@@ -11,6 +11,7 @@ model Course {
     description String          @db.Text
     language    String
     recorder    String?
+    price       Float
 
     
     owner       Creator         @relation(fields: [owner_id], references: [id], onDelete: Cascade, name: "course_owner")

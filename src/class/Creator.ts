@@ -43,12 +43,13 @@ export class Creator {
         }
     }
 
-    static async list(socket: Socket) {
+    static async list(socket?: Socket) {
         const creators_prisma = await prisma.creator.findMany({ include: creator_include })
 
         const creators = await Promise.all(creators_prisma.map(async (item) => new Creator(item.id, item)))
 
-        socket.emit("creator:list", creators)
+        socket?.emit("creator:list", creators)
+        return creators
     }
 
     static async new(data: CreatorForm, socket?: Socket) {
@@ -59,6 +60,7 @@ export class Creator {
                     favorited_by: {},
                     id: uid(),
                     owned_courses: {},
+                    active: true,
                 },
                 include: creator_include,
             })
@@ -90,6 +92,7 @@ export class Creator {
     }
 
     load(data: CreatorPrisma) {
+        console.log(data)
         this.active = data.active
         this.language = data.language
         this.nickname = data.nickname
