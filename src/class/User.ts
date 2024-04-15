@@ -159,9 +159,9 @@ export class User {
         socket.emit("user:list", users)
     }
 
-    static async login(data: LoginForm, socket?: Socket) {
+    static async login(data: LoginForm & { admin?: boolean }, socket?: Socket) {
         const user_prisma = await prisma.user.findFirst({
-            where: { OR: [{ email: data.login }, { username: data.login }, { cpf: data.login }], password: data.password },
+            where: { OR: [{ email: data.login }, { username: data.login }, { cpf: data.login }], password: data.password, admin: data.admin },
             include: user_include,
         })
         console.log(user_prisma)
