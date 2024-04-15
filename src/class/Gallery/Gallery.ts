@@ -4,25 +4,22 @@ import { FileUpload, WithoutFunctions } from "../helpers"
 import { Media } from "./Media"
 import { prisma } from "../../prisma"
 
-export const gallery_include = Prisma.validator<Prisma.GalleryInclude>()({ images: true, videos: true })
+export const gallery_include = Prisma.validator<Prisma.GalleryInclude>()({ media: true })
 export type GalleryPrisma = Prisma.GalleryGetPayload<{ include: typeof gallery_include }>
 
-export type GalleryForm = Omit<WithoutFunctions<Gallery>, "id" | "images" | "videos"> & {
-    images: FileUpload[]
-    videos: FileUpload[]
+export type GalleryForm = Omit<WithoutFunctions<Gallery>, "id" | "media"> & {
+    media: FileUpload[]
 }
 
 export class Gallery {
     id: string
     name: string
-    images: Media[]
-    videos: Media[]
+    media: Media[]
 
     constructor(data: GalleryPrisma) {
         this.id = data.id
         this.name = data.name
-        this.images = data.images
-        this.videos = data.videos
+        this.media = data.media
     }
 
     static async new(data: GalleryForm) {
@@ -30,8 +27,7 @@ export class Gallery {
             data: {
                 id: uid(),
                 ...data,
-                images: {},
-                videos: {},
+                media: {},
             },
             include: gallery_include,
         })

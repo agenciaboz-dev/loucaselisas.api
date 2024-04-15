@@ -133,8 +133,7 @@ model Gallery {
   course_id String?
   course    Course? @relation(name: "CourseToGallery")
   name      String
-  images    Image[] @relation(name: "GalleryToImage")
-  videos    Video[] @relation(name: "GalleryToVideo")
+  media     Media[] @relation(name: "GalleryToMedia")
   chat_id   String?
   chat      Chat?   @relation(name: "ChatToGallery")
 }
@@ -152,22 +151,25 @@ model Paymentcard {
   user     User     @relation(name: "PaymentcardToUser", fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model Image {
+model Media {
   id         String   @id
   url        String
   gallery_id String?
-  gallery    Gallery? @relation(name: "GalleryToImage", fields: [gallery_id], references: [id], onDelete: Cascade)
-  lesson_id  String?  @unique
-  lesson     Lesson?  @relation(name: "ImageToLesson", fields: [lesson_id], references: [id], onDelete: Cascade)
+  gallery    Gallery? @relation(name: "GalleryToMedia", fields: [gallery_id], references: [id], onDelete: Cascade)
+}
+
+model Image {
+  id        String  @id
+  url       String
+  lesson_id String? @unique
+  lesson    Lesson? @relation(name: "ImageToLesson", fields: [lesson_id], references: [id], onDelete: Cascade)
 }
 
 model Video {
-  id         String   @id
-  url        String
-  gallery_id String?
-  gallery    Gallery? @relation(name: "GalleryToVideo", fields: [gallery_id], references: [id], onDelete: Cascade)
-  lesson_id  String?  @unique
-  lesson     Lesson?  @relation(name: "LessonToVideo", fields: [lesson_id], references: [id], onDelete: Cascade)
+  id        String  @id
+  url       String
+  lesson_id String? @unique
+  lesson    Lesson? @relation(name: "LessonToVideo", fields: [lesson_id], references: [id], onDelete: Cascade)
 }
 
 model Message {

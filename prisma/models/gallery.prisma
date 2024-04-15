@@ -1,22 +1,13 @@
 model Gallery {
     id          String          @id
     name        String
-    images      Image[]
-    videos      Video[]
+    media       Media[]
 }
 
-model Image {
+model Media {
     id          String          @id
     url         String
     
-    gallery_id  String?
-    gallery     Gallery?        @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
-}
-
-model Video {
-    id          String          @id
-    url         String
-
     gallery_id  String?
     gallery     Gallery?        @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
 }

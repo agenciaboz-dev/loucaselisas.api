@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client"
 
-export type MediaPrisma = Prisma.ImageGetPayload<{}>
+export type MediaPrisma = Prisma.MediaGetPayload<{}>
 
 export class Media {
     id: string

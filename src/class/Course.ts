@@ -115,16 +115,14 @@ export class Course {
                 },
             })
 
-            const images_url = data.gallery.images.map((image) => saveFile(`courses/${new_course.id}/gallery/`, image))
-            const videos_url = data.gallery.videos.map((video) => saveFile(`courses/${new_course.id}/gallery/`, video))
+            const media_url = data.gallery.media.map((media) => saveFile(`courses/${new_course.id}/gallery/`, media))
 
             const course_prisma = await prisma.course.update({
                 where: { id: new_course.id },
                 data: {
                     gallery: {
                         update: {
-                            images: { create: images_url.map((url) => ({ id: uid(), url })) },
-                            videos: { create: videos_url.map((url) => ({ id: uid(), url })) },
+                            media: { create: media_url.map((url) => ({ id: uid(), url })) },
                         },
                     },
                     lessons: {
