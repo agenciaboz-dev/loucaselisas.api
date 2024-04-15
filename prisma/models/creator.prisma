@@ -1,9 +1,16 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
 model Creator {
     id          String          @id
     nickname    String
     language    String
-    description String
+    description String          @db.Text
     active      Boolean         @default(false)
+    image       String?         @db.Text
+    cover       String?         @db.Text
 
     categories  Category[]
     

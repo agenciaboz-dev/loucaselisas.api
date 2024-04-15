@@ -1,10 +1,11 @@
 import { Prisma } from "@prisma/client"
-import { WithoutFunctions } from "./helpers"
+import { FileUpload, WithoutFunctions } from "./helpers"
 import { Course, course_include } from "./Course"
 import { prisma } from "../prisma"
 import { Socket } from "socket.io"
 import { uid } from "uid"
 import { handlePrismaError } from "../prisma/errors"
+import { saveFile } from "../tools/saveFile"
 
 export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
     categories: true,
@@ -16,6 +17,11 @@ export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_i
 export type CreatorType = WithoutFunctions<Creator>
 export type CreatorForm = Omit<WithoutFunctions<Creator>, "active" | "courses" | "id">
 export type PartialCreator = Partial<Creator> & { id: string }
+export interface CreatorImageForm {
+    id: string
+    image?: FileUpload | null
+    cover?: FileUpload | null
+}
 
 export class Creator {
     id: string
@@ -26,6 +32,8 @@ export class Creator {
     active: boolean
     favorited_by: number
     owned_courses: Course[] = []
+    cover: string | null
+    image: string | null
 
     courses: Course[] = []
 
@@ -105,9 +113,11 @@ export class Creator {
         }
         this.description = data.description
         this.favorited_by = data.favorited_by?.length || 0
+        this.image = data.image
+        this.cover = data.cover
     }
 
-    async update(data: PartialCreator) {
+    async update(data: Partial<Creator>) {
         try {
             const updated_creator = await prisma.creator.update({
                 where: { id: this.id },
@@ -122,6 +132,22 @@ export class Creator {
             })
             this.load(updated_creator)
             return this
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async updateImage(data: CreatorImageForm, socket?: Socket) {
+        try {
+            if (data.image) {
+                const url = saveFile(`/users/${this.user_id}/creator`, data.image)
+                await this.update({ image: url })
+            }
+
+            if (data.cover) {
+                const url = saveFile(`/users/${this.user_id}/creator`, data.cover)
+                await this.update({ cover: url })
+            }
         } catch (error) {
             console.log(error)
         }

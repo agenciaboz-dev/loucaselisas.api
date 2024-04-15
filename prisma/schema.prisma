@@ -81,8 +81,10 @@ model Creator {
   favorited_by  User[]     @relation(name: "favorite_creators")
   nickname      String
   language      String
-  description   String
+  description   String     @db.Text
   active        Boolean    @default(false)
+  image         String?    @db.Text
+  cover         String?    @db.Text
   categories    Category[] @relation(name: "CategoryToCreator")
   owned_courses Course[]   @relation(name: "course_owner")
   courses       Course[]   @relation(name: "CourseToCreator")
