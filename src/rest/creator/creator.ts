@@ -3,6 +3,21 @@ import { Creator, CreatorForm, User } from "../../class"
 import { CreatorImageForm, PartialCreator } from "../../class/Creator"
 const router = express.Router()
 
+router.get("/", async (request: Request, response: Response) => {
+    const creator_id = request.query.id as string | undefined
+
+    try {
+        if (creator_id) {
+            const creator = new Creator(creator_id)
+            await creator.init()
+            response.json(creator)
+        }
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 router.post("/", async (request: Request, response: Response) => {
     const data = request.body as CreatorForm
     try {
