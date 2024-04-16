@@ -47,6 +47,18 @@ router.patch("/", async (request: Request, response: Response) => {
     }
 })
 
+router.delete("/", async (request: Request, response: Response) => {
+    const data = request.body as { course_id: string }
+    console.log(data)
+    try {
+        const deleted = await prisma.course.delete({ where: { id: data.course_id } })
+        response.json(deleted)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 router.get("/owner", async (request: Request, response: Response) => {
     const owner_id = request.query.owner_id as string | undefined
     console.log(`getting courses for owner ${owner_id}`)
