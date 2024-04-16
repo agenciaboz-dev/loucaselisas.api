@@ -4,9 +4,15 @@ model Gallery {
     media       Media[]
 }
 
+enum MediaType {
+    VIDEO
+    IMAGE
+}
+
 model Media {
     id          String          @id
     url         String
+    type        MediaType
     
     gallery_id  String?
     gallery     Gallery?        @relation(fields: [gallery_id], references: [id], onDelete: Cascade)

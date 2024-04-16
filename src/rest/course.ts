@@ -23,6 +23,7 @@ router.post("/", async (request: Request, response: Response) => {
 
 router.get("/owner", async (request: Request, response: Response) => {
     const owner_id = request.query.owner_id as string | undefined
+    console.log(`getting courses for owner ${owner_id}`)
 
     if (owner_id) {
         try {

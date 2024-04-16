@@ -1,14 +1,16 @@
 import { Prisma } from "@prisma/client"
 import { uid } from "uid"
 import { FileUpload, WithoutFunctions } from "../helpers"
-import { Media } from "./Media"
+import { Media, MediaForm } from "./Media"
 import { prisma } from "../../prisma"
+import { saveFile } from "../../tools/saveFile"
+import { deleteFile } from "../../tools/deleteFile"
 
 export const gallery_include = Prisma.validator<Prisma.GalleryInclude>()({ media: true })
 export type GalleryPrisma = Prisma.GalleryGetPayload<{ include: typeof gallery_include }>
 
 export type GalleryForm = Omit<WithoutFunctions<Gallery>, "id" | "media"> & {
-    media: FileUpload[]
+    media: MediaForm[]
 }
 
 export class Gallery {
@@ -17,9 +19,7 @@ export class Gallery {
     media: Media[]
 
     constructor(data: GalleryPrisma) {
-        this.id = data.id
-        this.name = data.name
-        this.media = data.media
+        this.load(data)
     }
 
     static async new(data: GalleryForm) {
@@ -32,6 +32,51 @@ export class Gallery {
             include: gallery_include,
         })
 
-        return new Gallery(new_gallery)
+        const gallery = new Gallery(new_gallery)
+
+        if (gallery.media) {
+            await gallery.updateMedia(data.media)
+        }
+
+        return gallery
+    }
+
+    load(data: GalleryPrisma) {
+        this.id = data.id
+        this.name = data.name
+        this.media = data.media
+    }
+
+    async updateMedia(list: MediaForm[]) {
+        const new_media_list = list
+            .filter((item) => !item.id)
+            .map((item) => {
+                const url = saveFile(`/galleries/`, item)
+
+                return { ...item, url }
+            })
+
+        const keep_media_list = list.filter((item) => !!item.id && !!item.url)
+
+        await prisma.gallery.update({
+            where: { id: this.id },
+            data: {
+                media: {
+                    deleteMany: { gallery_id: this.id },
+                    create: keep_media_list.map((item) => ({ id: item.id!, type: item.type, url: item.url! })),
+                },
+            },
+        })
+        const updated_gallery = await prisma.gallery.update({
+            where: { id: this.id },
+            data: {
+                media: {
+                    create: new_media_list.map((item) => ({ id: uid(), type: item.type, url: item.url })),
+                },
+            },
+            include: gallery_include,
+        })
+
+        this.load(updated_gallery)
     }
 }

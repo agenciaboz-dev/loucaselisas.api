@@ -152,10 +152,11 @@ model Paymentcard {
 }
 
 model Media {
-  id         String   @id
+  id         String    @id
   url        String
+  type       MediaType
   gallery_id String?
-  gallery    Gallery? @relation(name: "GalleryToMedia", fields: [gallery_id], references: [id], onDelete: Cascade)
+  gallery    Gallery?  @relation(name: "GalleryToMedia", fields: [gallery_id], references: [id], onDelete: Cascade)
 }
 
 model Image {
@@ -246,4 +247,9 @@ model GeneralPermissions {
 enum CardType {
   CREDIT
   DEBIT
+}
+
+enum MediaType {
+  VIDEO
+  IMAGE
 }

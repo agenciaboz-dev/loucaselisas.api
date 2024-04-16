@@ -6,6 +6,7 @@ import plan from "./src/rest/plan/plan"
 import creator from "./src/rest/creator/creator"
 import category from "./src/rest/category"
 import course from "./src/rest/course"
+import card from "./src/rest/card"
 
 export const router = express.Router()
 
@@ -20,3 +21,4 @@ router.use("/plan", plan)
 router.use("/creator", creator)
 router.use("/category", category)
 router.use("/course", course)
+router.use("/card", card)

@@ -56,10 +56,55 @@ export class Course {
     chat: Chat | null
 
     constructor(data: CoursePrisma) {
+        this.load(data)
+    }
+
+    static async new(data: CourseForm, socket?: Socket) {
+        console.log("new course")
+        try {
+            const gallery = await Gallery.new(data.gallery)
+            console.log(gallery)
+            const new_course = await prisma.course.create({
+                data: {
+                    ...data,
+
+                    id: uid(),
+                    cover: "",
+                    lessons: {},
+                    published: new Date().getTime().toString(),
+                    categories: { connect: data.categories },
+                    creators: { connect: data.creators },
+                    gallery: undefined,
+                    gallery_id: gallery.id,
+                    favorited_by: {},
+                    chat: {},
+                    students: {},
+                },
+                include: course_include,
+            })
+
+            const course = new Course(new_course)
+            console.log(course)
+
+            if (data.cover) {
+                await course.updateCover(data.cover)
+            }
+
+            socket?.emit("course:new", course)
+            socket?.broadcast.emit("course:update", course)
+
+            return course
+        } catch (error) {
+            console.log(error)
+            socket?.emit("course:new:error", error?.toString())
+        }
+    }
+
+    load(data: CoursePrisma) {
         this.id = data.id
         this.cover = data.cover
         this.description = data.description
-        this.gallery = data.gallery
+        this.gallery = new Gallery(data.gallery)
         this.language = data.language
         this.name = data.name
         this.published = data.published
@@ -80,80 +125,9 @@ export class Course {
         }
     }
 
-    static async new(data: CourseForm, socket?: Socket) {
-        console.log("new course")
-        console.log(data)
-        try {
-            const gallery = await Gallery.new(data.gallery)
-            console.log(gallery)
-            const new_course = await prisma.course.create({
-                data: {
-                    ...data,
-
-                    id: uid(),
-                    cover: "",
-                    lessons: {
-                        create: data.lessons.map((lesson) => {
-                            return {
-                                ...lesson,
-                                id: uid(),
-                                cover: undefined,
-                                image: undefined,
-                                video: undefined,
-                                published: new Date().getTime().toString(),
-                            }
-                        }),
-                    },
-                    published: new Date().getTime().toString(),
-                    categories: { connect: data.categories },
-                    creators: { connect: data.creators },
-                    gallery: undefined,
-                    gallery_id: gallery.id,
-                    favorited_by: {},
-                    chat: {},
-                    students: {},
-                },
-            })
-
-            const media_url = data.gallery.media.map((media) => saveFile(`courses/${new_course.id}/gallery/`, media))
-
-            const course_prisma = await prisma.course.update({
-                where: { id: new_course.id },
-                data: {
-                    gallery: {
-                        update: {
-                            media: { create: media_url.map((url) => ({ id: uid(), url })) },
-                        },
-                    },
-                    lessons: {
-                        create: data.lessons.map((lesson) => {
-                            let image_url = lesson.image ? saveFile(`courses/${new_course.id}/lessons/`, lesson.image) : undefined
-                            let video_url = lesson.video ? saveFile(`courses/${new_course.id}/lessons/`, lesson.video) : undefined
-                            let cover_url = lesson.cover ? saveFile(`courses/${new_course.id}/lessons/`, lesson.cover) : undefined
-
-                            return {
-                                ...lesson,
-                                id: uid(),
-                                image: image_url ? { create: { id: uid(), url: image_url } } : {},
-                                video: video_url ? { create: { id: uid(), url: video_url } } : {},
-                                cover: cover_url,
-                                published: new Date().getTime().toString(),
-                            }
-                        }),
-                    },
-                },
-                include: course_include,
-            })
-
-            const course = new Course(course_prisma)
-            console.log(course)
-            socket?.emit("course:new", course)
-            socket?.broadcast.emit("course:update", course)
-
-            return course
-        } catch (error) {
-            console.log(error)
-            socket?.emit("course:new:error", error?.toString())
-        }
+    async updateCover(cover: FileUpload) {
+        const url = saveFile(`courses/${this.id}`, cover)
+        const data = await prisma.course.update({ where: { id: this.id }, data: { cover: url }, include: course_include })
+        this.load(data)
     }
 }

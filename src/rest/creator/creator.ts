@@ -6,15 +6,17 @@ const router = express.Router()
 router.get("/", async (request: Request, response: Response) => {
     const creator_id = request.query.id as string | undefined
 
-    try {
-        if (creator_id) {
+    if (creator_id) {
+        try {
             const creator = new Creator(creator_id)
             await creator.init()
             response.json(creator)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
         }
-    } catch (error) {
-        console.log(error)
-        response.status(500).send(error)
+    } else {
+        response.status(400).send("missing creator_id")
     }
 })
 
