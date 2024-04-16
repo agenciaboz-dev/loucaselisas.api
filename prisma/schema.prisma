@@ -58,6 +58,7 @@ model Course {
   favorited_by User[]     @relation(name: "favorite_courses")
   name         String
   cover        String     @db.Text
+  cover_type   CoverType  @default(image)
   published    String
   description  String     @db.Text
   language     String
@@ -242,6 +243,11 @@ model GeneralPermissions {
   roles         Role[]  @relation(name: "GeneralPermissionsToRole")
   editProfile   Boolean @default(false)
   deleteProfile Boolean @default(false)
+}
+
+enum CoverType {
+  video
+  image
 }
 
 enum CardType {

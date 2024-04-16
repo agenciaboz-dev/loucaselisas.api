@@ -1,8 +1,24 @@
 import express, { Express, Request, Response } from "express"
-import { Course, CourseForm, course_include } from "../class/Course"
+import { Course, CourseForm, PartialCourse, course_include } from "../class/Course"
 import { User } from "../class"
 import { prisma } from "../prisma"
 const router = express.Router()
+
+router.get("/", async (request: Request, response: Response) => {
+    const course_id = request.query.course_id as string | undefined
+    if (course_id) {
+        try {
+            const course = new Course(course_id)
+            await course.init()
+            response.json(course)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("missing course id")
+    }
+})
 
 router.post("/", async (request: Request, response: Response) => {
     const data = request.body as CourseForm
@@ -10,11 +26,21 @@ router.post("/", async (request: Request, response: Response) => {
     try {
         const course = await Course.new(data)
         console.log(course)
-        if (course?.owner.user_id) {
-            const user = new User(course.owner.user_id)
-            await user.init()
-            response.json(user)
-        }
+        response.status(200).send()
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
+router.patch("/", async (request: Request, response: Response) => {
+    const data = request.body as PartialCourse
+    console.log(data.price)
+    try {
+        const course = new Course(data.id)
+        await course.init()
+        await course.update(data)
+        response.status(200).send()
     } catch (error) {
         console.log(error)
         response.status(500).send(error)
@@ -28,7 +54,7 @@ router.get("/owner", async (request: Request, response: Response) => {
     if (owner_id) {
         try {
             const courses_prisma = await prisma.course.findMany({ where: { owner_id: owner_id }, include: course_include })
-            const courses = courses_prisma.map((item) => new Course(item))
+            const courses = courses_prisma.map((item) => new Course("", item))
             console.log(courses)
             response.json(courses)
         } catch (error) {

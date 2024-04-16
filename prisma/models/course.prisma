@@ -3,10 +3,16 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum CoverType {
+    video
+    image
+}
+
 model Course {
     id          String          @id
     name        String
     cover       String          @db.Text
+    cover_type  CoverType       @default(image)
     published   String
     description String          @db.Text
     language    String

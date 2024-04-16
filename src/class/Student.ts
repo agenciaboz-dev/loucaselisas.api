@@ -18,7 +18,7 @@ export class Student {
     }
 
     load(data: StudentPrisma) {
-        this.courses = data.courses.map((course) => new Course(course))
+        this.courses = data.courses.map((course) => new Course("", course))
         this.user_id = data.user_id
     }
 }
