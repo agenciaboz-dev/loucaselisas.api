@@ -80,7 +80,7 @@ router.get("/all", async (request: Request, response: Response) => {
     try {
         const prisma_courses = await prisma.course.findMany({ include: course_include })
         const courses = prisma_courses.map((item) => new Course("", item))
-        response.json(course_include)
+        response.json(courses)
     } catch (error) {
         console.log(error)
         response.status(500).send(error)
