@@ -63,7 +63,14 @@ export class Gallery {
             data: {
                 media: {
                     deleteMany: { gallery_id: this.id },
-                    create: keep_media_list.map((item) => ({ id: item.id!, type: item.type, url: item.url! })),
+                    create: keep_media_list.map((item) => ({
+                        id: item.id!,
+                        type: item.type,
+                        url: item.url!,
+                        position: item.position,
+                        height: item.height,
+                        width: item.width,
+                    })),
                 },
             },
         })
@@ -71,7 +78,14 @@ export class Gallery {
             where: { id: this.id },
             data: {
                 media: {
-                    create: new_media_list.map((item) => ({ id: uid(), type: item.type, url: item.url })),
+                    create: new_media_list.map((item) => ({
+                        id: uid(),
+                        type: item.type,
+                        url: item.url,
+                        position: item.position,
+                        height: item.height,
+                        width: item.width,
+                    })),
                 },
             },
             include: gallery_include,

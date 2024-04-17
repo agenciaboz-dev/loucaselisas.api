@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Media` ADD COLUMN `position` INTEGER NOT NULL DEFAULT 1;

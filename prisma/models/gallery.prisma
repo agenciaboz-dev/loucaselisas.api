@@ -13,6 +13,9 @@ model Media {
     id          String          @id
     url         String
     type        MediaType
+    position    Int             @default(1)
+    width       Int             @default(1920)
+    height      Int             @default(980)
     
     gallery_id  String?
     gallery     Gallery?        @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
