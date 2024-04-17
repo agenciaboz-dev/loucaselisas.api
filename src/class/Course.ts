@@ -19,7 +19,7 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     owner: { include: { user: true } },
     students: true,
     favorited_by: true,
-    lessons: { include: lesson_include },
+    lessons: { include: { _count: true } },
 })
 
 export type CoursePrisma = Prisma.CourseGetPayload<{ include: typeof course_include }>
@@ -52,7 +52,7 @@ export class Course {
     favorited_by: number
     price: number
 
-    lessons: Lesson[]
+    lessons: number
     owner: Partial<Creator>
     owner_id: string
     gallery: Gallery
@@ -120,7 +120,7 @@ export class Course {
         this.cover = data.cover
         this.cover_type = data.cover_type
         this.description = data.description
-        this.gallery = new Gallery(data.gallery)
+        this.gallery = new Gallery("", data.gallery)
         this.language = data.language
         this.name = data.name
         this.published = data.published
@@ -129,7 +129,8 @@ export class Course {
         this.favorited_by = data.favorited_by.length
 
         this.categories = data.categories.map((category) => new Category(category))
-        this.lessons = data.lessons.map((lesson) => new Lesson(lesson))
+        this.lessons = 0
+        console.log(data.lessons)
 
         this.owner = data.owner
         this.owner_id = data.owner_id
@@ -148,8 +149,15 @@ export class Course {
     }
 
     async update(data: PartialCourse) {
-        if (data.gallery) {
-            // const gallery = new Gallery({...data.gallery, media: []})
+        if (data.gallery?.id) {
+            const gallery = new Gallery(data.gallery.id)
+            await gallery.init()
+            await gallery.updateMedia(data.gallery.media)
+        }
+
+        if (data.cover?.file.file || data.cover?.file.base64) {
+            console.log(data.cover)
+            await this.updateCover(data.cover)
         }
 
         const prisma_data = await prisma.course.update({

@@ -10,6 +10,7 @@ export const gallery_include = Prisma.validator<Prisma.GalleryInclude>()({ media
 export type GalleryPrisma = Prisma.GalleryGetPayload<{ include: typeof gallery_include }>
 
 export type GalleryForm = Omit<WithoutFunctions<Gallery>, "id" | "media"> & {
+    id?: string
     media: MediaForm[]
 }
 
@@ -18,8 +19,9 @@ export class Gallery {
     name: string
     media: Media[]
 
-    constructor(data: GalleryPrisma) {
-        this.load(data)
+    constructor(id: string, data?: GalleryPrisma) {
+        this.id = id
+        if (data) this.load(data)
     }
 
     static async new(data: GalleryForm) {
@@ -32,13 +34,18 @@ export class Gallery {
             include: gallery_include,
         })
 
-        const gallery = new Gallery(new_gallery)
+        const gallery = new Gallery("", new_gallery)
 
         if (gallery.media) {
             await gallery.updateMedia(data.media)
         }
 
         return gallery
+    }
+
+    async init() {
+        const data = await prisma.gallery.findUnique({ where: { id: this.id }, include: gallery_include })
+        if (data) this.load(data)
     }
 
     load(data: GalleryPrisma) {

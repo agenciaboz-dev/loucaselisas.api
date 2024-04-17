@@ -15,7 +15,7 @@ model User {
   email             String         @unique
   password          String
   name              String
-  cpf               String
+  cpf               String         @unique
   birth             String
   phone             String
   pronoun           String

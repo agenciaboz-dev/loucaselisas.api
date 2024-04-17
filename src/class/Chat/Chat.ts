@@ -14,7 +14,7 @@ export class Chat {
     constructor(data: ChatPrisma) {
         this.id = data.id
         this.description = data.description
-        this.media = data.media
+        this.media = new Gallery("", data.media)
         this.messages = data.messages
     }
 }
