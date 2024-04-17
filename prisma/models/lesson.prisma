@@ -8,25 +8,26 @@ model Lesson {
     published   String
     name        String
     info        String          @db.Text
-    cover       String?         @db.Text
-    
-    image       Image?
+    thumb       String          @db.Text
     pdf         String?
-    video       Video?          
+    active      Boolean         @default(true)
+    user_views  User[]          @relation(name: "views-relation")
+    user_likes  User[]
+    user_downloads  User[]      @relation(name: "downloads-relation")
+
+    media_id    String          @unique
+    media       Media           @relation(fields: [media_id], references: [id], onDelete: Cascade)
 }
 
-model Image {
+model Media {
     id          String          @id
-    url         String
-    
-    lesson_id  String?          @unique
-    lesson     Lesson?          @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+    lesson_id   String?
+    lesson      Lesson?
 }
 
-model Video {
-    id          String          @id
-    url         String
-
-    lesson_id  String?          @unique
-    lesson     Lesson?          @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+model User {
+    id          String              @id
+    lessons_views   Lesson[]        @relation(name: "views-relation")
+    lessons_likes   Lesson[]
+    lessons_downloads   Lesson[]    @relation(name: "downloads-relation")
 }

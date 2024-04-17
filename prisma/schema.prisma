@@ -36,6 +36,9 @@ model User {
   role_id           Int            @default(1)
   role              Role           @relation(name: "RoleToUser", fields: [role_id], references: [id], onDelete: Restrict)
   payment_cards     Paymentcard[]  @relation(name: "PaymentcardToUser")
+  lessons_views     Lesson[]       @relation(name: "views-relation")
+  lessons_likes     Lesson[]       @relation(name: "LessonToUser")
+  lessons_downloads Lesson[]       @relation(name: "downloads-relation")
   plan              PlanContract?  @relation(name: "PlanContractToUser")
   plan_history      ContractLogs[] @relation(name: "ContractLogsToUser")
 }
@@ -107,16 +110,20 @@ model Category {
 }
 
 model Lesson {
-  id        String  @id
-  course_id String
-  course    Course  @relation(name: "CourseToLesson", fields: [course_id], references: [id], onDelete: Cascade)
-  published String
-  name      String
-  info      String  @db.Text
-  cover     String? @db.Text
-  image     Image?  @relation(name: "ImageToLesson")
-  pdf       String?
-  video     Video?  @relation(name: "LessonToVideo")
+  id             String  @id
+  course_id      String
+  course         Course  @relation(name: "CourseToLesson", fields: [course_id], references: [id], onDelete: Cascade)
+  published      String
+  name           String
+  info           String  @db.Text
+  thumb          String  @db.Text
+  pdf            String?
+  active         Boolean @default(true)
+  user_views     User[]  @relation(name: "views-relation")
+  user_likes     User[]  @relation(name: "LessonToUser")
+  user_downloads User[]  @relation(name: "downloads-relation")
+  media_id       String  @unique
+  media          Media   @relation(name: "LessonToMedia", fields: [media_id], references: [id], onDelete: Cascade)
 }
 
 model Chat {
@@ -161,20 +168,8 @@ model Media {
   height     Int       @default(980)
   gallery_id String?
   gallery    Gallery?  @relation(name: "GalleryToMedia", fields: [gallery_id], references: [id], onDelete: Cascade)
-}
-
-model Image {
-  id        String  @id
-  url       String
-  lesson_id String? @unique
-  lesson    Lesson? @relation(name: "ImageToLesson", fields: [lesson_id], references: [id], onDelete: Cascade)
-}
-
-model Video {
-  id        String  @id
-  url       String
-  lesson_id String? @unique
-  lesson    Lesson? @relation(name: "LessonToVideo", fields: [lesson_id], references: [id], onDelete: Cascade)
+  lesson_id  String?
+  lesson     Lesson?   @relation(name: "LessonToMedia")
 }
 
 model Message {

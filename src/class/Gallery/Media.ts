@@ -1,5 +1,8 @@
 import { Prisma } from "@prisma/client"
 import { FileUpload, WithoutFunctions } from "../helpers"
+import { prisma } from "../../prisma"
+import { uid } from "uid"
+import { saveFile } from "../../tools/saveFile"
 
 export type MediaPrisma = Prisma.MediaGetPayload<{}>
 export type MediaForm = FileUpload &
@@ -17,6 +20,20 @@ export class Media {
     position: number
     width: number
     height: number
+
+    static async new(data: MediaForm, pathdir: string) {
+        const url = saveFile(pathdir, data)
+        const media_prisma = await prisma.media.create({
+            data: {
+                ...data,
+                id: uid(),
+                url,
+            },
+        })
+
+        const media = new Media(media_prisma)
+        return media
+    }
 
     constructor(data: MediaPrisma) {
         this.id = data.id
