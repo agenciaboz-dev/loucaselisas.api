@@ -25,7 +25,10 @@ export class Media {
         const url = saveFile(pathdir, data)
         const media_prisma = await prisma.media.create({
             data: {
-                ...data,
+                type: data.type,
+                position: data.position,
+                width: data.width,
+                height: data.height,
                 id: uid(),
                 url,
             },

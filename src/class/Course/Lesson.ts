@@ -7,7 +7,7 @@ import { saveFile } from "../../tools/saveFile"
 
 export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({ media: true, user_downloads: { include: { _count: true } } })
 export type LessonPrisma = Prisma.LessonGetPayload<{ include: typeof lesson_include }>
-export type LessonForm = Omit<WithoutFunctions<Lesson>, "id" | "published" | "thumb" | "user_views" | "user_likes" | "user_downloads"> & {
+export type LessonForm = Omit<WithoutFunctions<Lesson>, "id" | "published" | "thumb" | "user_views" | "user_likes" | "user_downloads" | "active"> & {
     thumb: FileUpload
     media: FileUpload
 }
