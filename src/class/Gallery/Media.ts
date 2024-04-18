@@ -38,6 +38,20 @@ export class Media {
         return media
     }
 
+    static async update(id: string, data: MediaForm, pathdir: string) {
+        const url = saveFile(pathdir, data)
+        const media_prisma = await prisma.media.update({
+            where: { id },
+            data: {
+                ...data,
+                url,
+            },
+        })
+
+        const media = new Media(media_prisma)
+        return media
+    }
+
     constructor(data: MediaPrisma) {
         this.id = data.id
         this.url = data.url

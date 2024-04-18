@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client"
-import { Media } from "../Gallery/Media"
+import { Media, MediaForm } from "../Gallery/Media"
 import { FileUpload, WithoutFunctions } from "../helpers"
 import { prisma } from "../../prisma"
 import { uid } from "uid"
@@ -9,7 +9,7 @@ export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({ media: 
 export type LessonPrisma = Prisma.LessonGetPayload<{ include: typeof lesson_include }>
 export type LessonForm = Omit<WithoutFunctions<Lesson>, "id" | "published" | "thumb" | "user_views" | "user_likes" | "user_downloads" | "active"> & {
     thumb: FileUpload
-    media: FileUpload
+    media: MediaForm
 }
 
 export class Lesson {
@@ -52,6 +52,11 @@ export class Lesson {
         if (data) this.load(data)
     }
 
+    async init() {
+        const data = await prisma.lesson.findUnique({ where: { id: this.id }, include: lesson_include })
+        if (data) this.load(data)
+    }
+
     load(data: LessonPrisma) {
         this.id = data.id
         this.thumb = data.thumb
@@ -59,11 +64,35 @@ export class Lesson {
         this.pdf = data.pdf
         this.published = data.published
         this.active = data.active
-        this.media = data.media
+        this.media = new Media(data.media)
         this.course_id = data.course_id
         this.info = data.info
         // this.user_views = data.user_views
         // this.user_likes = data.user_likes
         // this.user_downloads = data.user_downloads
+    }
+
+    async updateMedia(media: MediaForm, thumb: FileUpload) {
+        this.media = await Media.update(this.media.id, media, `course/lessons/${this.course_id}`)
+        const thumb_url = saveFile(`course/lessons/${this.course_id}`, thumb)
+        await prisma.lesson.update({ where: { id: this.id }, data: { thumb: thumb_url } })
+    }
+
+    async update(data: Partial<LessonForm>) {
+        if (data.media && data.thumb) {
+            await this.updateMedia(data.media, data.thumb)
+        }
+
+        const prisma_data = await prisma.lesson.update({
+            where: { id: this.id },
+            data: {
+                ...data,
+                media: undefined,
+                thumb: undefined,
+            },
+            include: lesson_include,
+        })
+
+        this.load(prisma_data)
     }
 }

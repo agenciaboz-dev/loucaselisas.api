@@ -32,4 +32,30 @@ router.post("/", async (request: Request, response: Response) => {
     }
 })
 
+router.patch("/", async (request: Request, response: Response) => {
+    const data = request.body as Partial<LessonForm> & { id: string }
+
+    try {
+        const lesson = new Lesson(data.id)
+        await lesson.init()
+        await lesson.update(data)
+
+        response.json(lesson)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
+router.delete("/", async (request: Request, response: Response) => {
+    const data = request.body as { lesson_id: string }
+    try {
+        const deleted = await prisma.lesson.delete({ where: { id: data.lesson_id } })
+        response.json(deleted)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 export default router
