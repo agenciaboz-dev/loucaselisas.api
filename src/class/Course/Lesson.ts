@@ -53,7 +53,6 @@ export class Lesson {
     }
 
     load(data: LessonPrisma) {
-        console.log(data)
         this.id = data.id
         this.thumb = data.thumb
         this.name = data.name
@@ -62,6 +61,7 @@ export class Lesson {
         this.active = data.active
         this.media = data.media
         this.course_id = data.course_id
+        this.info = data.info
         // this.user_views = data.user_views
         // this.user_likes = data.user_likes
         // this.user_downloads = data.user_downloads

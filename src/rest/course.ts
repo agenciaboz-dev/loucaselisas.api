@@ -67,7 +67,6 @@ router.get("/owner", async (request: Request, response: Response) => {
         try {
             const courses_prisma = await prisma.course.findMany({ where: { owner_id: owner_id }, include: course_include })
             const courses = courses_prisma.map((item) => new Course("", item))
-            console.log(courses)
             response.json(courses)
         } catch (error) {
             console.log(error)

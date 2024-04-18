@@ -19,17 +19,22 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     owner: { include: { user: true } },
     students: true,
     favorited_by: true,
-    lessons: { include: { _count: true } },
+    _count: { select: { lessons: true, favorited_by: true, students: true } },
 })
 
 export type CoursePrisma = Prisma.CourseGetPayload<{ include: typeof course_include }>
 export type CoverForm = { file: FileUpload; type: "image" | "video"; url?: string }
+
 export type PartialCourse = Partial<
-    Omit<WithoutFunctions<Course>, "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published">
+    Omit<
+        WithoutFunctions<Course>,
+        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students"
+    >
 > & { id: string; cover?: CoverForm; gallery: GalleryForm; creators: { id: string }[] }
+
 export type CourseForm = Omit<
     WithoutFunctions<Course>,
-    "id" | "favorited_by" | "lessons" | "cover" | "cover_type" | "owner" | "gallery" | "categories" | "creators" | "chat" | "published"
+    "id" | "favorited_by" | "lessons" | "cover" | "cover_type" | "owner" | "gallery" | "categories" | "creators" | "chat" | "published" | "students"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
@@ -49,16 +54,19 @@ export class Course {
     description: string
     language: string
     recorder: string | null
-    favorited_by: number
     price: number
 
-    lessons: number
     owner: Partial<Creator>
     owner_id: string
     gallery: Gallery
     categories: Category[]
     creators: Partial<Creator>[]
     chat: Chat | null
+
+    // ? {_count: }
+    favorited_by: number
+    lessons: number
+    students: number
 
     constructor(id: string, data?: CoursePrisma) {
         this.id = id
@@ -116,6 +124,7 @@ export class Course {
     }
 
     load(data: CoursePrisma) {
+        console.log(data)
         this.id = data.id
         this.cover = data.cover
         this.cover_type = data.cover_type
@@ -126,11 +135,7 @@ export class Course {
         this.published = data.published
         this.recorder = data.recorder
 
-        this.favorited_by = data.favorited_by.length
-
         this.categories = data.categories.map((category) => new Category(category))
-        this.lessons = 0
-        console.log(data.lessons)
 
         this.owner = data.owner
         this.owner_id = data.owner_id
@@ -140,6 +145,10 @@ export class Course {
         if (data.chat) {
             this.chat = new Chat(data.chat)
         }
+
+        this.favorited_by = data._count.favorited_by
+        this.students = data._count.students
+        this.lessons = data._count.lessons
     }
 
     async updateCover(cover: CoverForm) {
