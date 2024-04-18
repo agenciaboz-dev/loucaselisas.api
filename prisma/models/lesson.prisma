@@ -4,19 +4,19 @@ datasource db {
 }
 
 model Lesson {
-    id          String          @id
-    published   String
-    name        String
-    info        String          @db.Text
-    thumb       String          @db.Text
-    pdf         String?
-    active      Boolean         @default(true)
-    user_views  User[]          @relation(name: "views-relation")
-    user_likes  User[]
-    user_downloads  User[]      @relation(name: "downloads-relation")
+    id              String          @id
+    published       String
+    name            String
+    info            String          @db.Text
+    thumb           String          @db.Text
+    pdf             String?
+    active          Boolean         @default(true)
+    user_likes      User[]
+    user_views      User[]          @relation(name: "views-relation")
+    user_downloads  User[]          @relation(name: "downloads-relation")
 
-    media_id    String          @unique
-    media       Media           @relation(fields: [media_id], references: [id], onDelete: Cascade)
+    media_id        String          @unique
+    media           Media           @relation(fields: [media_id], references: [id], onDelete: Cascade)
 }
 
 model Media {
@@ -26,8 +26,8 @@ model Media {
 }
 
 model User {
-    id          String              @id
-    lessons_views   Lesson[]        @relation(name: "views-relation")
-    lessons_likes   Lesson[]
-    lessons_downloads   Lesson[]    @relation(name: "downloads-relation")
+    id                  String          @id
+    lessons_likes       Lesson[]
+    lessons_views       Lesson[]        @relation(name: "views-relation")
+    lessons_downloads   Lesson[]        @relation(name: "downloads-relation")
 }

@@ -19,7 +19,6 @@ model Course {
     recorder    String?
     price       Float
 
-    
     owner       Creator         @relation(fields: [owner_id], references: [id], onDelete: Cascade, name: "course_owner")
     owner_id    String
 
@@ -27,11 +26,19 @@ model Course {
     gallery     Gallery         @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
 
     categories  Category[]
-    lessons     Lesson[]
     creators    Creator[]
+    lessons     Lesson[]
+
+    views       User[]         
+
 
     chat_id     String?         
     chat        Chat?
+}
+
+model User {
+    id              String      @id
+    viewed_courses  Course[]   
 }
 
 model Lesson {
@@ -48,10 +55,10 @@ model Chat {
 }
 
 model Creator {
-    id          String          @id
+    id              String          @id
 
     owned_courses   Course[]    @relation(name: "course_owner")
-    courses     Course[]
+    courses         Course[]
 
 }
 

@@ -17,9 +17,8 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     creators: { include: { user: true } },
     gallery: { include: gallery_include },
     owner: { include: { user: true } },
-    students: true,
     favorited_by: true,
-    _count: { select: { lessons: true, favorited_by: true, students: true } },
+    _count: { select: { lessons: true, favorited_by: true, students: true, views: true } },
 })
 
 export type CoursePrisma = Prisma.CourseGetPayload<{ include: typeof course_include }>
@@ -28,13 +27,25 @@ export type CoverForm = { file: FileUpload; type: "image" | "video"; url?: strin
 export type PartialCourse = Partial<
     Omit<
         WithoutFunctions<Course>,
-        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students"
+        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views"
     >
 > & { id: string; cover?: CoverForm; gallery: GalleryForm; creators: { id: string }[] }
 
 export type CourseForm = Omit<
     WithoutFunctions<Course>,
-    "id" | "favorited_by" | "lessons" | "cover" | "cover_type" | "owner" | "gallery" | "categories" | "creators" | "chat" | "published" | "students"
+    | "id"
+    | "favorited_by"
+    | "lessons"
+    | "cover"
+    | "cover_type"
+    | "owner"
+    | "gallery"
+    | "categories"
+    | "creators"
+    | "chat"
+    | "published"
+    | "students"
+    | "views"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
@@ -67,6 +78,7 @@ export class Course {
     favorited_by: number
     lessons: number
     students: number
+    views: number
 
     constructor(id: string, data?: CoursePrisma) {
         this.id = id
@@ -149,6 +161,7 @@ export class Course {
         this.favorited_by = data._count.favorited_by
         this.students = data._count.students
         this.lessons = data._count.lessons
+        this.views = data._count.views
     }
 
     async updateCover(cover: CoverForm) {
