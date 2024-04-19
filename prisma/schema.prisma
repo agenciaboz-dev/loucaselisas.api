@@ -47,6 +47,7 @@ model User {
 model Role {
   id                     Int                @id @default(autoincrement())
   user                   User[]             @relation(name: "RoleToUser")
+  courses                Course[]           @relation(name: "CourseToRole")
   name                   String
   profile_permissions_id String
   profile_permissions    ProfilePermissions @relation(name: "ProfilePermissionsToRole", fields: [profile_permissions_id], references: [id], onDelete: Cascade)
@@ -74,6 +75,7 @@ model Course {
   gallery      Gallery    @relation(name: "CourseToGallery", fields: [gallery_id], references: [id], onDelete: Cascade)
   categories   Category[] @relation(name: "CategoryToCourse")
   creators     Creator[]  @relation(name: "CourseToCreator")
+  roles        Role[]     @relation(name: "CourseToRole")
   lessons      Lesson[]   @relation(name: "CourseToLesson")
   views        User[]     @relation(name: "CourseToUser")
   chat_id      String?

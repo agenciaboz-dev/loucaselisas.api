@@ -10,6 +10,7 @@ import { prisma } from "../prisma"
 import { uid } from "uid"
 import { saveFile } from "../tools/saveFile"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import { Role, role_include } from "./Role"
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     categories: true,
@@ -18,6 +19,8 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     gallery: { include: gallery_include },
     owner: { include: { user: true } },
     favorited_by: true,
+    roles: { include: role_include },
+
     _count: { select: { lessons: true, favorited_by: true, students: true, views: true } },
 })
 
@@ -46,6 +49,7 @@ export type CourseForm = Omit<
     | "published"
     | "students"
     | "views"
+    | "roles"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
@@ -73,6 +77,7 @@ export class Course {
     categories: Category[]
     creators: Partial<Creator>[]
     chat: Chat | null
+    roles: Role[]
 
     // ? {_count: }
     favorited_by: number
@@ -105,6 +110,7 @@ export class Course {
                     favorited_by: {},
                     chat: {},
                     students: {},
+                    roles: { connect: { id: 1 } },
                 },
                 include: course_include,
             })
@@ -153,6 +159,7 @@ export class Course {
         this.owner_id = data.owner_id
         this.creators = data.creators
         this.price = data.price
+        this.roles = data.roles.map((item) => new Role(item))
 
         if (data.chat) {
             this.chat = new Chat(data.chat)
@@ -194,6 +201,8 @@ export class Course {
                 chat: undefined,
                 cover: undefined,
                 lessons: undefined,
+                // TODO
+                roles: data.roles ? {} : undefined,
             },
             include: course_include,
         })

@@ -27,8 +27,9 @@ model Course {
 
     categories  Category[]
     creators    Creator[]
-    lessons     Lesson[]
+    roles       Role[]
 
+    lessons     Lesson[]
     views       User[]         
 
 
@@ -39,6 +40,11 @@ model Course {
 model User {
     id              String      @id
     viewed_courses  Course[]   
+}
+
+model Role {
+    id          Int         @id @default(autoincrement())
+    courses     Course[]
 }
 
 model Lesson {
