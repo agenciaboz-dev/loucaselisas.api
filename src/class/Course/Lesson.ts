@@ -11,6 +11,7 @@ export type LessonForm = Omit<WithoutFunctions<Lesson>, "id" | "published" | "th
     thumb: FileUpload
     media: MediaForm
 }
+export type PartialLesson = Partial<Lesson> & {id: string}
 
 export class Lesson {
     id: string
