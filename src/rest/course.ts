@@ -86,4 +86,28 @@ router.get("/all", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/user", async (request: Request, response: Response) => {
+    const user_id = request.query.user_id as string | undefined
+
+    if (user_id) {
+        try {
+            const user = new User(user_id)
+            await user.init()
+            const prisma_courses = await prisma.course.findMany({
+                where: {
+                    roles: { some: { id: { equals: user.role.id } } },
+                },
+                include: course_include,
+            })
+            const courses = prisma_courses.map((item) => new Course("", item))
+            response.json(courses)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("user_id query param is required")
+    }
+})
+
 export default router
