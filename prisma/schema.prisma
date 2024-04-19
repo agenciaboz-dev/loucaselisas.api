@@ -112,20 +112,20 @@ model Category {
 }
 
 model Lesson {
-  id             String  @id
-  course_id      String
-  course         Course  @relation(name: "CourseToLesson", fields: [course_id], references: [id], onDelete: Cascade)
-  published      String
-  name           String
-  info           String  @db.Text
-  thumb          String  @db.Text
-  pdf            String?
-  active         Boolean @default(true)
-  user_likes     User[]  @relation(name: "LessonToUser")
-  user_views     User[]  @relation(name: "views-relation")
-  user_downloads User[]  @relation(name: "downloads-relation")
-  media_id       String  @unique
-  media          Media   @relation(name: "LessonToMedia", fields: [media_id], references: [id], onDelete: Cascade)
+  id        String  @id
+  course_id String
+  course    Course  @relation(name: "CourseToLesson", fields: [course_id], references: [id], onDelete: Cascade)
+  published String
+  name      String
+  info      String  @db.Text
+  thumb     String  @db.Text
+  pdf       String?
+  active    Boolean @default(true)
+  likes     User[]  @relation(name: "LessonToUser")
+  views     User[]  @relation(name: "views-relation")
+  downloads User[]  @relation(name: "downloads-relation")
+  media_id  String  @unique
+  media     Media   @relation(name: "LessonToMedia", fields: [media_id], references: [id], onDelete: Cascade)
 }
 
 model Chat {

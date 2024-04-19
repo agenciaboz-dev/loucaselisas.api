@@ -11,9 +11,9 @@ model Lesson {
     thumb           String          @db.Text
     pdf             String?
     active          Boolean         @default(true)
-    user_likes      User[]
-    user_views      User[]          @relation(name: "views-relation")
-    user_downloads  User[]          @relation(name: "downloads-relation")
+    likes           User[]
+    views           User[]          @relation(name: "views-relation")
+    downloads       User[]          @relation(name: "downloads-relation")
 
     media_id        String          @unique
     media           Media           @relation(fields: [media_id], references: [id], onDelete: Cascade)

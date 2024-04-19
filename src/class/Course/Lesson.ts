@@ -5,13 +5,16 @@ import { prisma } from "../../prisma"
 import { uid } from "uid"
 import { saveFile } from "../../tools/saveFile"
 
-export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({ media: true, user_downloads: { include: { _count: true } } })
+export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
+    media: true,
+    _count: { select: { downloads: true, likes: true, views: true } },
+})
 export type LessonPrisma = Prisma.LessonGetPayload<{ include: typeof lesson_include }>
-export type LessonForm = Omit<WithoutFunctions<Lesson>, "id" | "published" | "thumb" | "user_views" | "user_likes" | "user_downloads" | "active"> & {
+export type LessonForm = Omit<WithoutFunctions<Lesson>, "id" | "published" | "thumb" | "views" | "likes" | "downloads" | "active"> & {
     thumb: FileUpload
     media: MediaForm
 }
-export type PartialLesson = Partial<Lesson> & {id: string}
+export type PartialLesson = Partial<Lesson> & { id: string }
 
 export class Lesson {
     id: string
@@ -21,9 +24,9 @@ export class Lesson {
     info: string
     active: boolean
     media: Media
-    user_views: number
-    user_likes: number
-    user_downloads: number
+    views: number
+    likes: number
+    downloads: number
     course_id: string
 
     pdf: string | null
@@ -68,9 +71,10 @@ export class Lesson {
         this.media = new Media(data.media)
         this.course_id = data.course_id
         this.info = data.info
-        // this.user_views = data.user_views
-        // this.user_likes = data.user_likes
-        // this.user_downloads = data.user_downloads
+
+        this.views = data._count.views
+        this.likes = data._count.likes
+        this.downloads = data._count.downloads
     }
 
     async updateMedia(media: MediaForm, thumb: FileUpload) {
