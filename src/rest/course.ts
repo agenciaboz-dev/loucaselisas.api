@@ -6,10 +6,17 @@ const router = express.Router()
 
 router.get("/", async (request: Request, response: Response) => {
     const course_id = request.query.course_id as string | undefined
+    const user_id = request.query.user_id as string | undefined
+
     if (course_id) {
         try {
             const course = new Course(course_id)
             await course.init()
+
+            if (user_id) {
+                await course.viewer(user_id)
+            }
+
             response.json(course)
         } catch (error) {
             console.log(error)
