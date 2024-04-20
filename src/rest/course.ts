@@ -117,4 +117,17 @@ router.get("/user", async (request: Request, response: Response) => {
     }
 })
 
+router.post("/favorite", async (request: Request, response: Response) => {
+    const data = request.body as { user_id: string; course_id: string; like?: boolean }
+
+    try {
+        const course = new Course(data.course_id)
+        await course.favorite(data.user_id, data.like)
+        response.json(course)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 export default router

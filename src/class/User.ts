@@ -15,7 +15,7 @@ import { ContractLog, Plan, PlanContract, contract_log_include, plan_contract_in
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
     student: { include: { user: true, courses: { include: course_include } } },
-    favorite_courses: true,
+    favorite_courses: { select: { id: true } },
     favorite_creators: true,
     payment_cards: true,
     role: { include: role_include },
@@ -75,7 +75,7 @@ export class User {
     google_token: string | null
 
     favorite_creators: string[] = []
-    favorite_courses: Course[] = []
+    favorite_courses: { id: string }[] = []
 
     payment_cards: PaymentCard[] = []
 
@@ -203,8 +203,7 @@ export class User {
 
         this.favorite_creators = data.favorite_creators.map((item) => item.id)
 
-        const favorite_courses: Course[] = []
-        this.favorite_courses = favorite_courses
+        this.favorite_courses = data.favorite_courses
 
         this.payment_cards = data.payment_cards.map((item) => new PaymentCard(item))
 
@@ -220,18 +219,14 @@ export class User {
             const user_prisma = await prisma.user.update({
                 where: { id: this.id },
                 data: {
-                    ...data,
-                    favorite_courses: {
-                        disconnect: data.favorite_courses?.map((course) => ({ id: course.id })),
-                        connect: data.favorite_courses?.map((course) => ({ id: course.id })),
-                    },
-                    favorite_creators: {},
-                    payment_cards: {},
-                    creator: {},
-                    student: {},
-                    role: {},
-                    plan: {},
-                    plan_history: {},
+                    favorite_courses: undefined,
+                    favorite_creators: undefined,
+                    payment_cards: undefined,
+                    creator: undefined,
+                    student: undefined,
+                    role: undefined,
+                    plan: undefined,
+                    plan_history: undefined,
                     role_id: undefined,
                 },
                 include: user_include,

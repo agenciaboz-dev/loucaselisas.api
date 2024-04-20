@@ -18,7 +18,7 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     creators: { include: { user: true } },
     gallery: { include: gallery_include },
     owner: { include: { user: true } },
-    favorited_by: true,
+    favorited_by: { select: { id: true } },
     roles: { include: role_include },
 
     _count: { select: { lessons: true, favorited_by: true, students: true, views: true } },
@@ -78,9 +78,10 @@ export class Course {
     creators: Partial<Creator>[]
     chat: Chat | null
     roles: Role[]
+    favorited_by: { id: string }[]
 
     // ? {_count: }
-    favorited_by: number
+    likes: number
     lessons: number
     students: number
     views: number
@@ -160,12 +161,13 @@ export class Course {
         this.creators = data.creators
         this.price = data.price
         this.roles = data.roles.map((item) => new Role(item))
+        this.favorited_by = data.favorited_by
 
         if (data.chat) {
             this.chat = new Chat(data.chat)
         }
 
-        this.favorited_by = data._count.favorited_by
+        this.likes = data._count.favorited_by
         this.students = data._count.students
         this.lessons = data._count.lessons
         this.views = data._count.views
@@ -218,7 +220,18 @@ export class Course {
             },
             include: course_include,
         })
-        console.log({ user_id, views: data._count.views })
+
+        this.load(data)
+    }
+
+    async favorite(user_id: string, like?: boolean) {
+        const data = await prisma.course.update({
+            where: { id: this.id },
+            data: {
+                favorited_by: like ? { connect: { id: user_id } } : { disconnect: { id: user_id } },
+            },
+            include: course_include,
+        })
 
         this.load(data)
     }
