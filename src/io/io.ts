@@ -8,6 +8,8 @@ import { Creator, CreatorForm, User, UserForm, UserPrisma } from "../class"
 import { Role } from "../class/Role"
 import { Course, CourseForm } from "../class/Course"
 import { PartialUser, UserImageForm } from "../class/User"
+import { Chat } from "../class/Chat/Chat"
+import { Message, MessageForm } from "../class/Chat/Message"
 
 let io: SocketIoServer | null = null
 
@@ -47,6 +49,10 @@ export const handleSocket = (socket: Socket) => {
     socket.on("role:createdefault", () => Role.createDefault(socket))
 
     socket.on("course:new", (data: CourseForm) => Course.new(data, socket))
+
+    // ? chat handling
+    socket.on("chat:join", (chat_id: string) => Chat.join(chat_id, socket))
+    socket.on("chat:message", (data: MessageForm) => Message.new(data, socket))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }

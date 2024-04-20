@@ -110,7 +110,17 @@ export class Course {
                     gallery: undefined,
                     gallery_id: gallery.id,
                     favorited_by: {},
-                    chat: {},
+                    chat: {
+                        create: {
+                            id: uid(),
+                            media: {
+                                create: {
+                                    id: uid(),
+                                    name: `Grupo de ${data.name}`,
+                                },
+                            },
+                        },
+                    },
                     students: {},
                     roles: { connect: { id: 1 } },
                 },

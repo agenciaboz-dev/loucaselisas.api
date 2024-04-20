@@ -40,6 +40,7 @@ model User {
   lessons_likes     Lesson[]       @relation(name: "LessonToUser")
   lessons_views     Lesson[]       @relation(name: "views-relation")
   lessons_downloads Lesson[]       @relation(name: "downloads-relation")
+  messages          Message[]      @relation(name: "MessageToUser")
   plan              PlanContract?  @relation(name: "PlanContractToUser")
   plan_history      ContractLogs[] @relation(name: "ContractLogsToUser")
 }
@@ -180,7 +181,8 @@ model Message {
   id              String  @id
   text            String  @db.Text
   datetime        String
-  user_id         String
+  user_id         String?
+  user            User?   @relation(name: "MessageToUser", fields: [user_id], references: [id], onDelete: SetNull)
   video_id        String?
   video_timestamp String?
   chat_id         String
