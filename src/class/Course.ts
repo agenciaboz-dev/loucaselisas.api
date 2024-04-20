@@ -50,6 +50,7 @@ export type CourseForm = Omit<
     | "students"
     | "views"
     | "roles"
+    | "likes"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
