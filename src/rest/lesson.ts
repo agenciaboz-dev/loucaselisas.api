@@ -4,6 +4,23 @@ import { prisma } from "../prisma"
 const router = express.Router()
 
 router.get("/", async (request: Request, response: Response) => {
+    const lesson_id = request.query.lesson_id as string | undefined
+
+    if (lesson_id) {
+        try {
+            const lesson = new Lesson(lesson_id)
+            await lesson.init()
+            response.json(lesson)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("lesson_id param required")
+    }
+})
+
+router.get("/course", async (request: Request, response: Response) => {
     const course_id = request.query.course_id as string | undefined
 
     if (course_id) {
@@ -52,6 +69,19 @@ router.delete("/", async (request: Request, response: Response) => {
     try {
         const deleted = await prisma.lesson.delete({ where: { id: data.lesson_id } })
         response.json(deleted)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
+router.post("/favorite", async (request: Request, response: Response) => {
+    const data = request.body as { user_id: string; lesson_id: string; like?: boolean }
+
+    try {
+        const lesson = new Lesson(data.lesson_id)
+        await lesson.favorite(data.user_id, data.like)
+        response.json(lesson)
     } catch (error) {
         console.log(error)
         response.status(500).send(error)

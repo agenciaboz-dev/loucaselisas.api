@@ -7,6 +7,7 @@ import { saveFile } from "../../tools/saveFile"
 
 export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
     media: true,
+    likes: true,
     _count: { select: { downloads: true, likes: true, views: true } },
 })
 export type LessonPrisma = Prisma.LessonGetPayload<{ include: typeof lesson_include }>
@@ -28,6 +29,7 @@ export class Lesson {
     likes: number
     downloads: number
     course_id: string
+    favorited_by: { id: string }[]
 
     pdf: string | null
 
@@ -75,6 +77,7 @@ export class Lesson {
         this.views = data._count.views
         this.likes = data._count.likes
         this.downloads = data._count.downloads
+        this.favorited_by = data.likes.map((item) => ({ id: item.id }))
     }
 
     async updateMedia(media: MediaForm, thumb: FileUpload) {
@@ -99,5 +102,17 @@ export class Lesson {
         })
 
         this.load(prisma_data)
+    }
+
+    async favorite(user_id: string, like?: boolean) {
+        const data = await prisma.lesson.update({
+            where: { id: this.id },
+            data: {
+                likes: like ? { connect: { id: user_id } } : { disconnect: { id: user_id } },
+            },
+            include: lesson_include,
+        })
+
+        this.load(data)
     }
 }
