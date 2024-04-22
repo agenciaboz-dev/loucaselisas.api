@@ -11,6 +11,7 @@ import { uid } from "uid"
 import { saveFile } from "../tools/saveFile"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Role, role_include } from "./Role"
+import { Message, message_include } from "./Chat/Message"
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     categories: true,
@@ -245,5 +246,18 @@ export class Course {
         })
 
         this.load(data)
+    }
+
+    async getLastMessage() {
+        const data = await prisma.message.findFirst({
+            where: { chat_id: this.chat?.id },
+            orderBy: { datetime: "desc" },
+            take: 1,
+            include: message_include,
+        })
+        if (data) {
+            const message = new Message(data)
+            return message
+        }
     }
 }

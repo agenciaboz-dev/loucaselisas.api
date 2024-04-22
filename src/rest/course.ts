@@ -130,4 +130,22 @@ router.post("/favorite", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/last_message", async (request: Request, response: Response) => {
+    const course_id = request.query.course_id as string | undefined
+
+    if (course_id) {
+        try {
+            const course = new Course(course_id)
+            await course.init()
+            const message = await course.getLastMessage()
+            response.json(message)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("course_id param is required")
+    }
+})
+
 export default router
