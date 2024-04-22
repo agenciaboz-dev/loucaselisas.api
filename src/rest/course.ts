@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from "express"
 import { Course, CourseForm, PartialCourse, course_include } from "../class/Course"
-import { User } from "../class"
+import { Creator, User } from "../class"
 import { prisma } from "../prisma"
 const router = express.Router()
 
@@ -72,8 +72,9 @@ router.get("/owner", async (request: Request, response: Response) => {
 
     if (owner_id) {
         try {
-            const courses_prisma = await prisma.course.findMany({ where: { owner_id: owner_id }, include: course_include })
-            const courses = courses_prisma.map((item) => new Course("", item))
+            const creator = new Creator(owner_id)
+            await creator.init()
+            const courses = await creator.getCourses()
             response.json(courses)
         } catch (error) {
             console.log(error)

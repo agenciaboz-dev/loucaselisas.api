@@ -248,6 +248,12 @@ export class Course {
         this.load(data)
     }
 
+    async getLessons() {
+        const data = await prisma.lesson.findMany({ where: { course_id: this.id }, include: lesson_include })
+        const lessons = data.map((item) => new Lesson("", item))
+        return lessons
+    }
+
     async getLastMessage() {
         const data = await prisma.message.findFirst({
             where: { chat_id: this.chat?.id },

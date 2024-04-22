@@ -85,4 +85,36 @@ router.get("/list", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/statistics", async (request: Request, response: Response) => {
+    const creator_id = request.query.creator_id as string | undefined
+
+    if (creator_id) {
+        try {
+            const creator = new Creator(creator_id)
+            await creator.init()
+            const statistics = await creator.getStatistics()
+            response.json(statistics)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("creator_id param is required")
+    }
+})
+
+router.get("/lessons", async (request: Request, response: Response) => {
+    const creator_id = request.query.creator_id as string | undefined
+    if (creator_id) {
+        try {
+            const creator = new Creator(creator_id)
+            await creator.init()
+            const lessons = await creator.getLessons()
+            response.json(lessons)
+        } catch (error) {}
+    } else {
+        response.status(400).send("creator_id param is required")
+    }
+})
+
 export default router

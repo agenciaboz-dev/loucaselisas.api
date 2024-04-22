@@ -6,6 +6,7 @@ import { Socket } from "socket.io"
 import { uid } from "uid"
 import { handlePrismaError } from "../prisma/errors"
 import { saveFile } from "../tools/saveFile"
+import { Lesson, lesson_include } from "./Course/Lesson"
 
 export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
     categories: true,
@@ -140,5 +141,32 @@ export class Creator {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    async getCourses() {
+        const courses_data = await prisma.course.findMany({ where: { owner_id: this.id }, include: course_include })
+        const courses = courses_data.map((item) => new Course("", item))
+        return courses
+    }
+
+    async getLessons() {
+        const courses = await this.getCourses()
+        const lessons_data = await Promise.all(
+            courses.map(async (item) => await prisma.lesson.findMany({ where: { course_id: item.id }, include: lesson_include }))
+        )
+        const lessons = lessons_data.flatMap((item) => item).map((item) => new Lesson("", item))
+        return lessons
+    }
+
+    async getStatistics() {
+        const courses = await this.getCourses()
+        const lessons = await this.getLessons()
+
+        const views = lessons.reduce((views, lesson) => (lesson.views += views), 0) + courses.reduce((views, course) => (course.views += views), 0)
+        const likes = lessons.reduce((likes, lesson) => (lesson.likes += likes), 0) + courses.reduce((likes, course) => (course.likes += likes), 0)
+        const downloads = lessons.reduce((downloads, course) => (course.downloads += downloads), 0)
+        const messages = courses.reduce((messages, course) => (course.chat!.messages += messages), 0)
+
+        return { views, likes, downloads, messages }
     }
 }

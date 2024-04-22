@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from "express"
 import { Lesson, LessonForm, lesson_include } from "../class/Course/Lesson"
 import { prisma } from "../prisma"
 import { User } from "../class"
+import { Course } from "../class/Course"
 const router = express.Router()
 
 router.get("/", async (request: Request, response: Response) => {
@@ -26,8 +27,9 @@ router.get("/course", async (request: Request, response: Response) => {
 
     if (course_id) {
         try {
-            const data = await prisma.lesson.findMany({ where: { course_id }, include: lesson_include })
-            const lessons = data.map((item) => new Lesson("", item))
+            const course = new Course(course_id)
+            await course.init()
+            const lessons = await course.getLessons()
             response.json(lessons)
         } catch (error) {
             console.log(error)
