@@ -11,6 +11,7 @@ import { handlePrismaError } from "../prisma/errors"
 import { Creator, CreatorForm, Student, creator_include } from "./index"
 import { Role, role_include } from "./Role"
 import { ContractLog, Plan, PlanContract, contract_log_include, plan_contract_include } from "./Plan"
+import { Lesson, lesson_include } from "./Course/Lesson"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
@@ -20,6 +21,7 @@ export const user_include = Prisma.validator<Prisma.UserInclude>()({
     payment_cards: true,
     role: { include: role_include },
     plan: { include: plan_contract_include },
+    _count: { select: { lessons_likes: true } },
 })
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
 export interface UserImageForm {
@@ -43,6 +45,7 @@ export type UserForm = Omit<
     | "cover"
     | "image"
     | "payment_cards"
+    | "liked_lessons"
 > & {
     image: FileUpload | null
     cover: FileUpload | null
@@ -84,6 +87,8 @@ export class User {
 
     plan: PlanContract | null
     role: Role
+
+    liked_lessons: number
 
     constructor(id: string, user_prisma?: UserPrisma) {
         user_prisma ? this.load(user_prisma) : (this.id = id)
@@ -212,6 +217,8 @@ export class User {
 
         this.role = new Role(data.role)
         this.plan = data.plan ? new PlanContract(data.plan) : null
+
+        this.liked_lessons = data._count.lessons_likes
     }
 
     async update(data: Partial<User>, socket?: Socket) {
@@ -267,6 +274,20 @@ export class User {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    async getLikedLessons() {
+        const data = await prisma.lesson.findMany({ where: { likes: { some: { id: this.id } } }, include: lesson_include })
+        const lessons = data.map((item) => new Lesson("", item))
+
+        const courses_data = await prisma.course.findMany({
+            where: { lessons: { some: { id: { in: lessons.map((item) => item.id) } } } },
+            include: course_include,
+        })
+
+        const courses = courses_data.map(item => new Course("", item))
+
+        return {lessons, courses}
     }
 }
 

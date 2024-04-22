@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express"
 import { Lesson, LessonForm, lesson_include } from "../class/Course/Lesson"
 import { prisma } from "../prisma"
+import { User } from "../class"
 const router = express.Router()
 
 router.get("/", async (request: Request, response: Response) => {
@@ -34,6 +35,19 @@ router.get("/course", async (request: Request, response: Response) => {
         }
     } else {
         response.status(400).send("missing course_id param")
+    }
+})
+
+router.get("/liked", async (request: Request, response: Response) => {
+    const user_id = request.query.user_id as string | undefined
+
+    if (user_id) {
+        const user = new User(user_id)
+        await user.init()
+        const data = await user.getLikedLessons()
+        response.json(data)
+    } else {
+        response.status(400).send("user_id param is required")
     }
 })
 
