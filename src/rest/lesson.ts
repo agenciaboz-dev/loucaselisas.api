@@ -22,6 +22,12 @@ router.get("/", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/all", async (request: Request, response: Response) => {
+    const data = await prisma.lesson.findMany({ include: lesson_include })
+    const lessons = data.map((item) => new Lesson("", item))
+    response.json(lessons)
+})
+
 router.get("/course", async (request: Request, response: Response) => {
     const course_id = request.query.course_id as string | undefined
 
@@ -54,15 +60,19 @@ router.get("/liked", async (request: Request, response: Response) => {
 })
 
 router.post("/", async (request: Request, response: Response) => {
+    console.log("aaa")
     const data = request.body as LessonForm
+    console.log(request.files)
+    console.log(request.body)
+    response.status(500).send()
 
-    try {
-        const lesson = Lesson.new(data)
-        response.json(lesson)
-    } catch (error) {
-        console.log(error)
-        response.status(500).send(error)
-    }
+    // try {
+    //     const lesson = Lesson.new(data)
+    //     response.json(lesson)
+    // } catch (error) {
+    //     console.log(error)
+    //     response.status(500).send(error)
+    // }
 })
 
 router.patch("/", async (request: Request, response: Response) => {
