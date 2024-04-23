@@ -149,8 +149,8 @@ export class Creator {
         return courses
     }
 
-    async getLessons() {
-        const courses = await this.getCourses()
+    async getLessons(course_list?: Course[]) {
+        const courses = course_list || (await this.getCourses())
         const lessons_data = await Promise.all(
             courses.map(async (item) => await prisma.lesson.findMany({ where: { course_id: item.id }, include: lesson_include }))
         )
@@ -160,7 +160,7 @@ export class Creator {
 
     async getStatistics() {
         const courses = await this.getCourses()
-        const lessons = await this.getLessons()
+        const lessons = await this.getLessons(courses)
 
         const views = lessons.reduce((views, lesson) => (lesson.views += views), 0) + courses.reduce((views, course) => (course.views += views), 0)
         const likes = lessons.reduce((likes, lesson) => (lesson.likes += likes), 0) + courses.reduce((likes, course) => (course.likes += likes), 0)
