@@ -97,6 +97,12 @@ export class Course {
         if (data) this.load(data)
     }
 
+    static async search(text: string) {
+        const data = await prisma.course.findMany({ where: { name: { contains: text } }, include: course_include })
+        const courses = data.map((item) => new Course("", item))
+        return courses
+    }
+
     static async new(data: CourseForm, socket?: Socket) {
         console.log("new course")
         try {

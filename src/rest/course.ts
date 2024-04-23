@@ -149,4 +149,20 @@ router.get("/last_message", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/search", async (request: Request, response: Response) => {
+    const text = request.query.text as string | undefined
+
+    if (text) {
+        try {
+            const result = await Course.search(text)
+            response.json(result)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("text param is required")
+    }
+})
+
 export default router
