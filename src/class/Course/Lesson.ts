@@ -12,7 +12,10 @@ export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
     _count: { select: { downloads: true, likes: true, views: true } },
 })
 export type LessonPrisma = Prisma.LessonGetPayload<{ include: typeof lesson_include }>
-export type LessonForm = Omit<WithoutFunctions<Lesson>, "id" | "published" | "thumb" | "views" | "likes" | "downloads" | "active"> & {
+export type LessonForm = Omit<
+    WithoutFunctions<Lesson>,
+    "id" | "published" | "thumb" | "views" | "likes" | "downloads" | "active" | "course" | "favorited_by"
+> & {
     thumb: FileUpload
     media: MediaForm
 }

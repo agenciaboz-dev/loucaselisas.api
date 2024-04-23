@@ -3,6 +3,7 @@ import { Lesson, LessonForm, lesson_include } from "../class/Course/Lesson"
 import { prisma } from "../prisma"
 import { User } from "../class"
 import { Course } from "../class/Course"
+import { UploadedFile } from "express-fileupload"
 const router = express.Router()
 
 router.get("/", async (request: Request, response: Response) => {
@@ -60,19 +61,20 @@ router.get("/liked", async (request: Request, response: Response) => {
 })
 
 router.post("/", async (request: Request, response: Response) => {
-    console.log("aaa")
-    const data = request.body as LessonForm
-    console.log(request.files)
-    console.log(request.body)
-    response.status(500).send()
-
-    // try {
-    //     const lesson = Lesson.new(data)
-    //     response.json(lesson)
-    // } catch (error) {
-    //     console.log(error)
-    //     response.status(500).send(error)
-    // }
+    try {
+        const data = JSON.parse(request.body.data) as LessonForm
+        const media = request.files?.media as UploadedFile
+        const thumb = request.files?.thumb as UploadedFile
+        data.media.file = media.data
+        data.media.name = media.name
+        data.thumb.file = thumb.data
+        data.thumb.name = thumb.name
+        const lesson = Lesson.new(data)
+        response.json(lesson)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
 })
 
 router.patch("/", async (request: Request, response: Response) => {

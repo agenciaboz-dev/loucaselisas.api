@@ -8,6 +8,7 @@ import https from "https"
 import http from "http"
 import fs from "fs"
 import { handleSocket, initializeIoServer } from "./src/io/io"
+import fileUpload from "express-fileupload"
 import { setProd } from "./src/env"
 
 dotenv.config()
@@ -19,6 +20,7 @@ app.use(cors())
 app.use(bodyParser.json({ limit: "100mb" }))
 app.use(bodyParser.urlencoded({ extended: false, limit: "100mb" }))
 app.use(cookieParser())
+app.use(fileUpload())
 app.use("/api", router)
 app.use("/static", express.static("static"))
 

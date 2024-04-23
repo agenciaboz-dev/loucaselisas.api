@@ -14,6 +14,7 @@ const getBuffer = (file: FileUpload) => {
 
 export const saveFile = (path: string, file: FileUpload) => {
     const buffer = getBuffer(file)
+    console.log({ buffer })
     const uploadDir = `static/${path}`
     if (!existsSync(uploadDir)) {
         mkdirSync(uploadDir, { recursive: true })
