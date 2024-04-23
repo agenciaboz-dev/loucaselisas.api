@@ -226,6 +226,7 @@ export class User {
             const user_prisma = await prisma.user.update({
                 where: { id: this.id },
                 data: {
+                    ...data,
                     favorite_courses: undefined,
                     favorite_creators: undefined,
                     payment_cards: undefined,
