@@ -21,6 +21,7 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     owner: { include: { user: true } },
     favorited_by: { select: { id: true } },
     roles: { include: role_include },
+    lessons: { include: { _count: { select: { downloads: true } } } },
 
     _count: { select: { lessons: true, favorited_by: true, students: true, views: true } },
 })
@@ -31,7 +32,7 @@ export type CoverForm = { file: FileUpload; type: "image" | "video"; url?: strin
 export type PartialCourse = Partial<
     Omit<
         WithoutFunctions<Course>,
-        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views"
+        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views" | ""
     >
 > & { id: string; cover?: CoverForm; gallery: GalleryForm; creators: { id: string }[] }
 
@@ -52,6 +53,7 @@ export type CourseForm = Omit<
     | "views"
     | "roles"
     | "likes"
+    | "downloads"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
@@ -87,6 +89,7 @@ export class Course {
     lessons: number
     students: number
     views: number
+    downloads: number
 
     constructor(id: string, data?: CoursePrisma) {
         this.id = id
@@ -183,6 +186,7 @@ export class Course {
         this.students = data._count.students
         this.lessons = data._count.lessons
         this.views = data._count.views
+        this.downloads = data.lessons.reduce((downloads, lesson) => (lesson._count.downloads += downloads), 0)
     }
 
     async updateCover(cover: CoverForm) {
