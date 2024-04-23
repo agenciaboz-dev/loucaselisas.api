@@ -12,6 +12,7 @@ import { saveFile } from "../tools/saveFile"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Role, role_include } from "./Role"
 import { Message, message_include } from "./Chat/Message"
+import { User } from "./User"
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     categories: true,
@@ -75,7 +76,7 @@ export class Course {
     recorder: string | null
     price: number
 
-    owner: Partial<Creator>
+    owner: Partial<Creator> & { user: Partial<User> }
     owner_id: string
     gallery: Gallery
     categories: Category[]
