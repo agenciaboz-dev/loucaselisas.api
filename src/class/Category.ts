@@ -3,6 +3,7 @@ import { prisma } from "../prisma"
 import { FileUpload, WithoutFunctions } from "./helpers"
 import { saveFile } from "../tools/saveFile"
 import { uid } from "uid"
+import { Course, course_include } from "./Course"
 
 export const category_include = Prisma.validator<Prisma.CategoryInclude>()({})
 export type CategoryPrisma = Prisma.CategoryGetPayload<{ include: typeof category_include }>
@@ -15,13 +16,13 @@ export class Category {
 
     static async list() {
         const categories_prisma = await prisma.category.findMany({ include: category_include })
-        const categories = categories_prisma.map((item) => new Category(item))
+        const categories = categories_prisma.map((item) => new Category("", item))
         return categories
     }
 
     static async new(data: CategoryForm) {
         const category_prisma = await prisma.category.create({ data: { ...data, id: uid(), cover: "" } })
-        const category = new Category(category_prisma)
+        const category = new Category("", category_prisma)
 
         if (data.cover) {
             await category.updateCover(data.cover)
@@ -30,8 +31,14 @@ export class Category {
         return category
     }
 
-    constructor(data: CategoryPrisma) {
-        this.load(data)
+    constructor(id: string, data?: CategoryPrisma) {
+        this.id = id
+        if (data) this.load(data)
+    }
+
+    async init() {
+        const data = await prisma.category.findUnique({ where: { id: this.id }, include: category_include })
+        if (data) this.load(data)
     }
 
     load(data: CategoryPrisma) {
@@ -44,5 +51,11 @@ export class Category {
         const url = saveFile(`categories/${this.id}`, cover)
         const data = await prisma.category.update({ where: { id: this.id }, data: { cover: url } })
         this.load(data)
+    }
+
+    async getCourses() {
+        const data = await prisma.course.findMany({ where: { categories: { some: { id: this.id } } }, include: course_include })
+        const courses = data.map((item) => new Course("", item))
+        return courses
     }
 }

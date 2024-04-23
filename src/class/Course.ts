@@ -166,7 +166,7 @@ export class Course {
         this.published = data.published
         this.recorder = data.recorder
 
-        this.categories = data.categories.map((category) => new Category(category))
+        this.categories = data.categories.map((category) => new Category("", category))
 
         this.owner = data.owner
         this.owner_id = data.owner_id

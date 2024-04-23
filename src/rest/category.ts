@@ -24,4 +24,22 @@ router.post("/", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/courses", async (request: Request, response: Response) => {
+    const category_id = request.query.category_id as string | undefined
+
+    if (category_id) {
+        try {
+            const category = new Category(category_id)
+            await category.init()
+            const courses = await category.getCourses()
+            response.json(courses)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("category_id param is required")
+    }
+})
+
 export default router
