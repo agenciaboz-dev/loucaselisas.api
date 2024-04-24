@@ -43,7 +43,10 @@ export class Media {
         const media_prisma = await prisma.media.update({
             where: { id },
             data: {
-                ...data,
+                height: data.height,
+                position: data.position,
+                type: data.type,
+                width: data.width,
                 url,
             },
         })

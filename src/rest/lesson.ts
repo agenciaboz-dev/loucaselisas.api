@@ -65,10 +65,14 @@ router.post("/", async (request: Request, response: Response) => {
         const data = JSON.parse(request.body.data) as LessonForm
         const media = request.files?.media as UploadedFile
         const thumb = request.files?.thumb as UploadedFile
-        data.media.file = media.data
-        data.media.name = media.name
-        data.thumb.file = thumb.data
-        data.thumb.name = thumb.name
+        if (media && data.media) {
+            data.media.file = media.data
+            data.media.name = media.name
+        }
+        if (thumb && data.thumb) {
+            data.thumb.file = thumb.data
+            data.thumb.name = thumb.name
+        }
         const lesson = Lesson.new(data)
         response.json(lesson)
     } catch (error) {
@@ -78,9 +82,19 @@ router.post("/", async (request: Request, response: Response) => {
 })
 
 router.patch("/", async (request: Request, response: Response) => {
-    const data = request.body as Partial<LessonForm> & { id: string }
-
     try {
+        const data = JSON.parse(request.body.data) as Partial<LessonForm> & { id: string }
+        console.log(data)
+        const media = request.files?.media as UploadedFile
+        const thumb = request.files?.thumb as UploadedFile
+        if (media && data.media) {
+            data.media.file = media.data
+            data.media.name = media.name
+        }
+        if (thumb && data.thumb) {
+            data.thumb.file = thumb.data
+            data.thumb.name = thumb.name
+        }
         const lesson = new Lesson(data.id)
         await lesson.init()
         await lesson.update(data)
