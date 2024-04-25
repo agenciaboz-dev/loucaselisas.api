@@ -22,6 +22,16 @@ router.get("/", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/all", async (request: Request, response: Response) => {
+    try {
+        const users = await User.list()
+        response.json(users)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 router.patch("/", async (request: Request, response: Response) => {
     const data = request.body as PartialUser
     console.log(data)

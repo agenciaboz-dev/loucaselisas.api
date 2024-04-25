@@ -116,6 +116,12 @@ export class User {
         user.updateImage(data, socket)
     }
 
+    static async list() {
+        const data = await prisma.user.findMany({ include: user_include })
+        const users = data.map((item) => new User("", item))
+        return users
+    }
+
     static async signup(data: UserForm, socket?: Socket) {
         try {
             if (!(await Role.existsDefault())) {
@@ -152,16 +158,6 @@ export class User {
             socket?.emit("user:signup:error", message)
             return message
         }
-    }
-
-    static async list(socket: Socket) {
-        const users_prisma = await prisma.user.findMany({ include: user_include })
-        const users = users_prisma.map((item) => {
-            const user = item.creator ? new Creator(item.creator.id, { ...item.creator, ...item }) : new User(item.id, item)
-            return user
-        })
-
-        socket.emit("user:list", users)
     }
 
     static async login(data: LoginForm & { admin?: boolean }, socket?: Socket) {
@@ -286,9 +282,9 @@ export class User {
             include: course_include,
         })
 
-        const courses = courses_data.map(item => new Course("", item))
+        const courses = courses_data.map((item) => new Course("", item))
 
-        return {lessons, courses}
+        return { lessons, courses }
     }
 }
 
