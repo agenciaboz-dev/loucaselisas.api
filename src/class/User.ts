@@ -46,6 +46,7 @@ export type UserForm = Omit<
     | "image"
     | "payment_cards"
     | "liked_lessons"
+    | "created_at"
 > & {
     image: FileUpload | null
     cover: FileUpload | null
@@ -65,6 +66,7 @@ export class User {
     phone: string
     pronoun: string
     uf: string
+    created_at: string
 
     admin: boolean
     instagram: string | null
@@ -132,6 +134,7 @@ export class User {
                     ...data,
                     image: null,
                     cover: null,
+                    created_at: new Date().getTime().toString(),
                     creator: data.creator ? { create: { id: uid(), ...data.creator, favorited_by: undefined, owned_courses: {} } } : {},
                     student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
