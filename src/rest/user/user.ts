@@ -2,12 +2,11 @@ import express, { Express, Request, Response } from "express"
 import { PartialUser, User, UserImageForm } from "../../class/User"
 import { prisma } from "../../prisma"
 import { ContractLog } from "../../class/Plan"
-import { PaymentCardForm } from "../../class/PaymentCard"
-import axios from "axios"
-import binlookup from "../../api/binlookup"
-import { uid } from "uid"
+import forgot_password from "./forgot_password"
 
 const router = express.Router()
+
+router.use("/forgot_password", forgot_password)
 
 router.get("/", async (request: Request, response: Response) => {
     const id = request.query.id as string

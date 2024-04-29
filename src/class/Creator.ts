@@ -96,7 +96,6 @@ export class Creator {
     }
 
     load(data: CreatorPrisma) {
-        console.log(data)
         this.active = data.active
         this.language = data.language
         this.nickname = data.nickname
