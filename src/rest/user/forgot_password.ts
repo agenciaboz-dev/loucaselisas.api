@@ -3,6 +3,7 @@ import { User, user_include } from "../../class"
 import { prisma } from "../../prisma"
 import { sendMail } from "../../tools/mail"
 import { website_url } from "../../env"
+import templates from "../../templates"
 
 const router = express.Router()
 
@@ -18,7 +19,7 @@ router.post("/", async (request: Request, response: Response) => {
             const user = new User("", user_prisma)
             const url = `${website_url}/redefinir-senha/${user.id}/${new Date().getTime()}`
             console.log(url)
-            sendMail([user.email], "Loucas & Lisas - Redefinir senha", url, `<a href='${url}'>Redefinir senha</a>`)
+            sendMail([user.email], "Loucas & Lisas - Redefinir senha", url, templates.email.recover_password(url))
         }
 
         response.status(200).send()
