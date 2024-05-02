@@ -37,7 +37,7 @@ export const handleSocket = (socket: Socket) => {
     socket.on("google:link", (user) => google.person.link(socket, user))
 
     socket.on("user:signup", (data: UserForm) => User.signup(data, socket))
-    socket.on("user:list", () => User.list(socket))
+    socket.on("user:list", () => User.list())
     socket.on("user:login", (data: LoginForm) => User.login(data, socket))
     socket.on("user:update", (data: PartialUser) => User.update(data, socket))
     socket.on("user:image:update", (data: UserImageForm) => User.updateImage(data, socket))

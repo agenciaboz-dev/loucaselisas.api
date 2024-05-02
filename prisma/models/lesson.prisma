@@ -3,6 +3,13 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum Status {
+    active
+    pending
+    disabled
+    declined
+}
+
 model Lesson {
     id              String          @id
     published       String
@@ -17,6 +24,8 @@ model Lesson {
 
     media_id        String          @unique
     media           Media           @relation(fields: [media_id], references: [id], onDelete: Cascade)
+    status          Status          @default(pending)
+    declined_reason String?
 }
 
 model Media {

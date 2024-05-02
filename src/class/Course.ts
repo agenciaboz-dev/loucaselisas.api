@@ -9,10 +9,11 @@ import { Socket } from "socket.io"
 import { prisma } from "../prisma"
 import { uid } from "uid"
 import { saveFile } from "../tools/saveFile"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Role, role_include } from "./Role"
 import { Message, message_include } from "./Chat/Message"
 import { User } from "./User"
+
+export type Status = "active" | "pending" | "disabled" | "declined"
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     categories: true,
@@ -33,7 +34,7 @@ export type CoverForm = { file: FileUpload; type: "image" | "video"; url?: strin
 export type PartialCourse = Partial<
     Omit<
         WithoutFunctions<Course>,
-        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views" | ""
+        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views"
     >
 > & { id: string; cover?: CoverForm; gallery: GalleryForm; creators: { id: string }[] }
 
@@ -55,6 +56,8 @@ export type CourseForm = Omit<
     | "roles"
     | "likes"
     | "downloads"
+    | "status"
+    | "declined_reason"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
@@ -63,6 +66,7 @@ export type CourseForm = Omit<
     creators: { id: string }[]
     owner_id: string
     id?: string
+    declined_reason?: string
 }
 
 export class Course {
@@ -84,6 +88,9 @@ export class Course {
     chat: Chat | null
     roles: Role[]
     favorited_by: { id: string }[]
+
+    status: Status
+    declined_reason: string | null
 
     // ? {_count: }
     likes: number
@@ -194,6 +201,8 @@ export class Course {
         this.lessons = data._count.lessons
         this.views = data._count.views
         this.downloads = data.lessons.reduce((downloads, lesson) => (lesson._count.downloads += downloads), 0)
+        this.status = data.status
+        this.declined_reason = data.declined_reason
     }
 
     async updateCover(cover: CoverForm) {
@@ -238,9 +247,7 @@ export class Course {
     async viewer(user_id: string) {
         const data = await prisma.course.update({
             where: { id: this.id },
-            data: {
-                views: { connect: { id: user_id } },
-            },
+            data: { views: { connect: { id: user_id } } },
             include: course_include,
         })
 

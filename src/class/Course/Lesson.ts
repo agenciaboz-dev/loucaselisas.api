@@ -4,6 +4,7 @@ import { FileUpload, WithoutFunctions } from "../helpers"
 import { prisma } from "../../prisma"
 import { uid } from "uid"
 import { saveFile } from "../../tools/saveFile"
+import { Status } from "../Course"
 
 export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
     media: true,
@@ -14,10 +15,11 @@ export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
 export type LessonPrisma = Prisma.LessonGetPayload<{ include: typeof lesson_include }>
 export type LessonForm = Omit<
     WithoutFunctions<Lesson>,
-    "id" | "published" | "thumb" | "views" | "likes" | "downloads" | "active" | "course" | "favorited_by" | "media"
+    "id" | "published" | "thumb" | "views" | "likes" | "downloads" | "active" | "course" | "favorited_by" | "media" | "declined_reason" | "status"
 > & {
     thumb?: FileUpload
     media?: MediaForm
+    declined_reason?: string
 }
 export type PartialLesson = Partial<Lesson> & { id: string }
 
@@ -37,6 +39,8 @@ export class Lesson {
     favorited_by: { id: string }[]
 
     pdf: string | null
+    status: Status
+    declined_reason: string | null
 
     static async new(data: LessonForm) {
         if (!data.media) throw "media required"
@@ -87,6 +91,8 @@ export class Lesson {
         this.likes = data._count.likes
         this.downloads = data._count.downloads
         this.favorited_by = data.likes.map((item) => ({ id: item.id }))
+        this.status = data.status
+        this.declined_reason = data.declined_reason
     }
 
     async updateMedia(media: MediaForm) {

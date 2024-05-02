@@ -8,6 +8,13 @@ enum CoverType {
     image
 }
 
+enum Status {
+    active
+    pending
+    disabled
+    declined
+}
+
 model Course {
     id          String          @id
     name        String
@@ -35,6 +42,9 @@ model Course {
 
     chat_id     String?         
     chat        Chat?
+    status      Status          @default(pending)
+    declined_reason String?
+    
 }
 
 model User {
