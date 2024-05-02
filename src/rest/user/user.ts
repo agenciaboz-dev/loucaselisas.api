@@ -3,10 +3,21 @@ import { PartialUser, User, UserImageForm } from "../../class/User"
 import { prisma } from "../../prisma"
 import { ContractLog } from "../../class/Plan"
 import forgot_password from "./forgot_password"
+import { Role } from "../../class/Role"
 
 const router = express.Router()
 
 router.use("/forgot_password", forgot_password)
+
+router.get("/types", async (request: Request, response: Response) => {
+    try {
+        const roles = await Role.list()
+        response.json(roles)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
 
 router.get("/", async (request: Request, response: Response) => {
     const id = request.query.id as string

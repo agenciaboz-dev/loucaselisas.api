@@ -18,6 +18,12 @@ export class Role {
         this.load(data)
     }
 
+    static async list() {
+        const data = await prisma.role.findMany({ include: role_include })
+        const roles = data.map((item) => new Role(item))
+        return roles
+    }
+
     static async existsDefault() {
         const default_role = await prisma.role.findUnique({ where: { id: 1 }, include: role_include })
         return !!default_role
