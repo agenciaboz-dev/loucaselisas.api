@@ -1,18 +1,15 @@
 import { Prisma } from "@prisma/client"
-import { AdminPermissions, GeneralPermissions, ProfilePermissions } from "./Permissions"
 import { Socket } from "socket.io"
 import { prisma } from "../prisma"
-import { uid } from "uid"
+import { Permissions } from "./Permissions"
 
-export const role_include = Prisma.validator<Prisma.RoleInclude>()({ admin_permissions: true, general_permissions: true, profile_permissions: true })
+export const role_include = Prisma.validator<Prisma.RoleInclude>()({ permissions: true })
 export type RolePrisma = Prisma.RoleGetPayload<{ include: typeof role_include }>
 
 export class Role {
     id: number
     name: string
-    profile_permissions: ProfilePermissions
-    admin_permissions: AdminPermissions
-    general_permissions: GeneralPermissions
+    permissions: Permissions
 
     constructor(data: RolePrisma) {
         this.load(data)
@@ -31,16 +28,13 @@ export class Role {
 
     static async createDefault(socket?: Socket) {
         try {
-            const admin = await prisma.adminPermissions.create({ data: { id: uid() } })
-            const general = await prisma.generalPermissions.create({ data: { id: uid() } })
-            const profile = await prisma.profilePermissions.create({ data: { id: uid() } })
+            const permissions = await Permissions.createDefault()
+
             const role = await prisma.role.create({
                 data: {
                     id: 1,
                     name: "padrão",
-                    admin_permissions_id: admin.id,
-                    general_permissions_id: general.id,
-                    profile_permissions_id: profile.id,
+                    permissions_id: permissions.id,
                 },
                 include: role_include,
             })
@@ -55,9 +49,7 @@ export class Role {
     load(data: RolePrisma) {
         this.id = data.id
         this.name = data.name
-        this.admin_permissions = new AdminPermissions(data.admin_permissions)
-        this.general_permissions = new GeneralPermissions(data.general_permissions)
-        this.profile_permissions = new ProfilePermissions(data.profile_permissions)
+        this.permissions = new Permissions(data.permissions)
     }
 
     async update(data: Partial<Role>) {
@@ -67,9 +59,7 @@ export class Role {
                 data: {
                     ...data,
                     id: undefined,
-                    admin_permissions: data.admin_permissions ? { update: { ...data.admin_permissions } } : {},
-                    profile_permissions: data.profile_permissions ? { update: { ...data.profile_permissions } } : {},
-                    general_permissions: data.general_permissions ? { update: { ...data.general_permissions } } : {},
+                    permissions: data.permissions ? { update: { ...data.permissions } } : undefined,
                 },
                 include: role_include,
             })
