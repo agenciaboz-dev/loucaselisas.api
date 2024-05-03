@@ -10,13 +10,13 @@ export type MediaForm = FileUpload &
         position: number
         width: number
         height: number
-        type: "IMAGE" | "VIDEO"
+        type: "image" | "video"
     }
 
 export class Media {
     id: string
     url: string
-    type: "IMAGE" | "VIDEO"
+    type: "image" | "video"
     position: number
     width: number
     height: number

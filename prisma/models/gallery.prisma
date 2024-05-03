@@ -5,8 +5,8 @@ model Gallery {
 }
 
 enum MediaType {
-    VIDEO
-    IMAGE
+    video
+    image
 }
 
 model Media {

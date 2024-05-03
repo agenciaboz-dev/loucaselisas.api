@@ -229,6 +229,6 @@ enum CardType {
 	DEBIT
 }
 enum MediaType {
-	VIDEO
-	IMAGE
+	video
+	image
 }
