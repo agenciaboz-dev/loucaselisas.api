@@ -29,7 +29,6 @@ export class Lesson {
     name: string
     thumb: string | null
     info: string
-    active: boolean
     media: Media
     views: number
     likes: number
@@ -81,7 +80,6 @@ export class Lesson {
         this.name = data.name
         this.pdf = data.pdf
         this.published = data.published
-        this.active = data.active
         this.media = new Media(data.media)
         this.course_id = data.course_id
         this.course = data.course

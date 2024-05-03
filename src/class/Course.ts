@@ -14,6 +14,13 @@ import { Message, message_include } from "./Chat/Message"
 import { User } from "./User"
 
 export type Status = "active" | "pending" | "disabled" | "declined"
+export interface StatusForm {
+    id: string
+    status: Status
+    declined_reason?: string
+    price?: number
+}
+
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     categories: true,

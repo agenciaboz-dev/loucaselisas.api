@@ -17,7 +17,6 @@ model Lesson {
     info            String          @db.Text
     thumb           String          @db.Text
     pdf             String?
-    active          Boolean         @default(true)
     likes           User[]
     views           User[]          @relation(name: "views-relation")
     downloads       User[]          @relation(name: "downloads-relation")
