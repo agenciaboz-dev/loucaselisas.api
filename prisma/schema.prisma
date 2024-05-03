@@ -48,12 +48,8 @@ model Role {
 	user User[] @relation(name: "RoleToUser")
 	courses Course[] @relation(name: "CourseToRole")
 	name String 
-	profile_permissions_id String 
-	profile_permissions ProfilePermissions @relation(name: "ProfilePermissionsToRole", fields: [profile_permissions_id], references: [id], onDelete: Cascade)
-	admin_permissions_id String 
-	admin_permissions AdminPermissions @relation(name: "AdminPermissionsToRole", fields: [admin_permissions_id], references: [id], onDelete: Cascade)
-	general_permissions_id String 
-	general_permissions GeneralPermissions @relation(name: "GeneralPermissionsToRole", fields: [general_permissions_id], references: [id], onDelete: Cascade)
+	permissions_id Int @unique
+	permissions Permissions @relation(name: "PermissionsToRole", fields: [permissions_id], references: [id], onDelete: Cascade)
 }
 model Course {
 	id String @id
@@ -209,30 +205,15 @@ model ContractLogs {
 	plan_id Int 
 	plan Plan @relation(name: "ContractLogsToPlan", fields: [plan_id], references: [id], onDelete: Cascade)
 }
-model ProfilePermissions {
-	id String @id
-	roles Role[] @relation(name: "ProfilePermissionsToRole")
-	viewMembers Boolean @default(false)
-	privacyProfile Boolean @default(false)
-	viewPrivacyProfile Boolean @default(false)
-	indexProfile Boolean @default(false)
-}
-model AdminPermissions {
-	id String @id
-	roles Role[] @relation(name: "AdminPermissionsToRole")
-	panelAdm Boolean @default(false)
-	panelCreator Boolean @default(false)
-	createChats Boolean @default(false)
-	deleteComments Boolean @default(false)
-	panelStatistics Boolean @default(false)
-	updateUsers Boolean @default(false)
-	deleteUsers Boolean @default(false)
-}
-model GeneralPermissions {
-	id String @id
-	roles Role[] @relation(name: "GeneralPermissionsToRole")
-	editProfile Boolean @default(false)
-	deleteProfile Boolean @default(false)
+model Permissions {
+	id Int @id @default(autoincrement())
+	role_id Int? 
+	role Role? @relation(name: "PermissionsToRole")
+	panelTab Boolean 
+	creatorTab Boolean 
+	searchTab Boolean 
+	favoritesTab Boolean 
+	configTab Boolean 
 }
 enum CoverType {
 	video

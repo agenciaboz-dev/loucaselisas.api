@@ -1,60 +1,39 @@
 import { Prisma } from "@prisma/client"
+import { prisma } from "../prisma"
 
-export type ProfilePermissionsPrisma = Prisma.ProfilePermissionsGetPayload<{}>
-export type AdminPermissionsPrisma = Prisma.AdminPermissionsGetPayload<{}>
-export type GeneralPermissionsPrisma = Prisma.GeneralPermissionsGetPayload<{}>
+export type PermissionsPrimsa = Prisma.PermissionsGetPayload<{}>
 
 export class Permissions {
-    id: string
+    id: number
+    role_id: number | null
+    panelTab: boolean
+    creatorTab: boolean
+    searchTab: boolean
+    favoritesTab: boolean
+    configTab: boolean
 
-    constructor({ id }: { id: string }) {
-        this.id = id
+    static async createDefault() {
+        const data = await prisma.permissions.create({
+            data: {
+                configTab: true,
+                creatorTab: true,
+                favoritesTab: true,
+                panelTab: true,
+                searchTab: true,
+            },
+        })
+
+        const permissions = new Permissions(data)
+        return permissions
     }
-}
 
-export class ProfilePermissions extends Permissions {
-    viewMembers: boolean
-    privacyProfile: boolean
-    viewPrivacyProfile: boolean
-    indexProfile: boolean
-
-    constructor(data: ProfilePermissionsPrisma) {
-        super(data)
-        this.indexProfile = data.indexProfile
-        this.privacyProfile = data.privacyProfile
-        this.viewMembers = data.viewMembers
-        this.viewPrivacyProfile = data.viewPrivacyProfile
-    }
-}
-
-export class AdminPermissions extends Permissions {
-    panelAdm: boolean
-    panelCreator: boolean
-    createChats: boolean
-    deleteComments: boolean
-    panelStatistics: boolean
-    updateUsers: boolean
-    deleteUsers: boolean
-
-    constructor(data: AdminPermissionsPrisma) {
-        super(data)
-        this.panelAdm = data.panelAdm
-        this.createChats = data.createChats
-        this.deleteUsers = data.deleteUsers
-        this.deleteComments = data.deleteComments
-        this.panelCreator = data.panelCreator
-        this.panelStatistics = data.panelStatistics
-        this.updateUsers = data.updateUsers
-    }
-}
-
-export class GeneralPermissions extends Permissions {
-    editProfile: boolean
-    deleteProfile: boolean
-
-    constructor(data: GeneralPermissionsPrisma) {
-        super(data)
-        this.deleteProfile = data.deleteProfile
-        this.editProfile = data.editProfile
+    constructor(data: PermissionsPrimsa) {
+        this.id = data.id
+        this.configTab = data.configTab
+        this.creatorTab = data.creatorTab
+        this.favoritesTab = data.favoritesTab
+        this.panelTab = data.panelTab
+        this.role_id = data.role_id
+        this.searchTab = data.searchTab
     }
 }
