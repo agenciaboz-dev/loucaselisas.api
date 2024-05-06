@@ -13,3 +13,9 @@ export type Diff<T extends keyof any, U extends keyof any> = {
 }[T]
 
 export type PickDiff<T, U> = Pick<T, Diff<keyof T, keyof U>>
+
+type Primitive = string | boolean | number | null
+
+export type FilterPrimitive<T> = {
+    [P in keyof T as T[P] extends Primitive ? P : never]: T[P]
+}

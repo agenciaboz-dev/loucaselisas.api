@@ -1,8 +1,9 @@
 import { Prisma } from "@prisma/client"
 import { Socket } from "socket.io"
-import { WithoutFunctions } from "../helpers"
+import { FilterPrimitive, WithoutFunctions } from "../helpers"
 import { prisma } from "../../prisma"
 import { uid } from "uid"
+import { User } from "../User"
 
 export const message_include = Prisma.validator<Prisma.MessageInclude>()({ user: true })
 export type MessagePrisma = Prisma.MessageGetPayload<{ include: { user: true } }>
@@ -14,7 +15,7 @@ export class Message {
     text: string
     datetime: string
     user_id: string | null
-    user: any | null
+    user: FilterPrimitive<User> | null
 
     chat_id: string
 
@@ -46,7 +47,7 @@ export class Message {
         this.datetime = data.datetime
         this.text = data.text
         this.user_id = data.user_id
-        this.user = data.user
+        this.user = data.user ? { ...data.user, liked_lessons: 0 } : null
         this.video_id = data.video_id
         this.video_timestamp = data.video_timestamp
         this.chat_id = data.chat_id
