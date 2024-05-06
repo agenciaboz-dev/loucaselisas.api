@@ -71,7 +71,9 @@ export class Lesson {
 
     async init() {
         const data = await prisma.lesson.findUnique({ where: { id: this.id }, include: lesson_include })
-        if (data) this.load(data)
+        if (!data) throw "lição não encontrada"
+
+        this.load(data)
     }
 
     load(data: LessonPrisma) {
