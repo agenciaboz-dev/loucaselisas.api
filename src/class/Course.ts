@@ -205,7 +205,8 @@ export class Course {
 
         this.likes = data._count.favorited_by
         this.students = data._count.students
-        this.lessons = data._count.lessons
+        // this.lessons = data._count.lessons
+        this.lessons = data.lessons.reduce((count, lesson) => (lesson.status == "active" ? (count += 1) : count), 0)
         this.views = data._count.views
         this.downloads = data.lessons.reduce((downloads, lesson) => (lesson._count.downloads += downloads), 0)
         this.status = data.status
