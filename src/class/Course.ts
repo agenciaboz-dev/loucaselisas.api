@@ -184,7 +184,6 @@ export class Course {
     }
 
     load(data: CoursePrisma) {
-        console.log(data)
         this.id = data.id
         this.cover = data.cover
         this.cover_type = data.cover_type
