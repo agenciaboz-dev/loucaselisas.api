@@ -125,7 +125,6 @@ export class Course {
         console.log("new course")
         try {
             const gallery = await Gallery.new(data.gallery)
-            console.log(gallery)
             const new_course = await prisma.course.create({
                 data: {
                     ...data,
