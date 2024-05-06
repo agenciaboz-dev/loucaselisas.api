@@ -35,6 +35,7 @@ model Course {
     categories  Category[]
     creators    Creator[]
     roles       Role[]
+    plans       Plan[]
 
     lessons     Lesson[]
     views       User[]         
@@ -45,6 +46,11 @@ model Course {
     status      Status          @default(pending)
     declined_reason String?
     
+}
+
+model Plan {
+    id          Int         @id @default(autoincrement())
+    courses     Course[]
 }
 
 model User {

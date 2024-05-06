@@ -12,6 +12,7 @@ import { saveFile } from "../tools/saveFile"
 import { Role, role_include } from "./Role"
 import { Message, message_include } from "./Chat/Message"
 import { User } from "./User"
+import { Plan } from "./Plan"
 
 export type Status = "active" | "pending" | "disabled" | "declined"
 export interface StatusForm {
@@ -20,7 +21,6 @@ export interface StatusForm {
     declined_reason?: string
     price?: number
 }
-
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     categories: true,
@@ -31,6 +31,7 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     favorited_by: { select: { id: true } },
     roles: { include: role_include },
     lessons: { include: { _count: { select: { downloads: true } } } },
+    plans: true,
 
     _count: { select: { lessons: true, favorited_by: true, students: true, views: true } },
 })
@@ -65,6 +66,7 @@ export type CourseForm = Omit<
     | "downloads"
     | "status"
     | "declined_reason"
+    | "plans"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
@@ -94,6 +96,7 @@ export class Course {
     creators: Partial<Creator>[]
     chat: Chat | null
     roles: Role[]
+    plans: Plan[]
     favorited_by: { id: string }[]
 
     status: Status
@@ -148,6 +151,7 @@ export class Course {
                     },
                     students: {},
                     roles: { connect: { id: 1 } },
+                    plans: { connect: { id: 1 } },
                 },
                 include: course_include,
             })
@@ -197,6 +201,7 @@ export class Course {
         this.creators = data.creators
         this.price = data.price
         this.roles = data.roles.map((item) => new Role(item))
+        this.plans = data.plans.map((item) => new Plan(0, item))
         this.favorited_by = data.favorited_by
 
         if (data.chat) {
@@ -243,6 +248,7 @@ export class Course {
                 chat: undefined,
                 cover: undefined,
                 lessons: undefined,
+                plans: data.plans ? { set: [], connect: data.plans.map((item) => ({ id: item.id })) } : undefined,
                 // TODO
                 roles: data.roles ? {} : undefined,
             },

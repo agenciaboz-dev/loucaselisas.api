@@ -70,6 +70,7 @@ model Course {
 	categories Category[] @relation(name: "CategoryToCourse")
 	creators Creator[] @relation(name: "CourseToCreator")
 	roles Role[] @relation(name: "CourseToRole")
+	plans Plan[] @relation(name: "CourseToPlan")
 	lessons Lesson[] @relation(name: "CourseToLesson")
 	views User[] @relation(name: "CourseToUser")
 	chat_id String? 
@@ -104,6 +105,16 @@ model Category {
 	name String 
 	cover String @db.Text
 	courses Course[] @relation(name: "CategoryToCourse")
+}
+model Plan {
+	id Int @id @default(autoincrement())
+	courses Course[] @relation(name: "CourseToPlan")
+	name String 
+	price Float 
+	duration String 
+	description String @default("")
+	contracts PlanContract[] @relation(name: "PlanToPlanContract")
+	logs ContractLogs[] @relation(name: "ContractLogsToPlan")
 }
 model Lesson {
 	id String @id
@@ -174,15 +185,6 @@ model Message {
 	video_timestamp String? 
 	chat_id String 
 	chat Chat @relation(name: "ChatToMessage", fields: [chat_id], references: [id], onDelete: Cascade)
-}
-model Plan {
-	id Int @id @default(autoincrement())
-	name String 
-	price Float 
-	duration String 
-	description String @default("")
-	contracts PlanContract[] @relation(name: "PlanToPlanContract")
-	logs ContractLogs[] @relation(name: "ContractLogsToPlan")
 }
 model PlanContract {
 	id Int @id @default(autoincrement())
