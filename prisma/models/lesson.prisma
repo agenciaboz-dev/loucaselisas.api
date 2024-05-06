@@ -18,7 +18,7 @@ model Lesson {
     thumb           String          @db.Text
     pdf             String?
     likes           User[]
-    views           User[]          @relation(name: "views-relation")
+    views           Int             @default(0)
     downloads       User[]          @relation(name: "downloads-relation")
 
     media_id        String          @unique
@@ -36,6 +36,5 @@ model Media {
 model User {
     id                  String          @id
     lessons_likes       Lesson[]
-    lessons_views       Lesson[]        @relation(name: "views-relation")
     lessons_downloads   Lesson[]        @relation(name: "downloads-relation")
 }

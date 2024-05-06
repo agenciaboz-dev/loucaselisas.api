@@ -8,11 +8,17 @@ const router = express.Router()
 
 router.get("/", async (request: Request, response: Response) => {
     const lesson_id = request.query.lesson_id as string | undefined
+    const user_id = request.query.user_id as string | undefined
 
     if (lesson_id) {
         try {
             const lesson = new Lesson(lesson_id)
             await lesson.init()
+
+            if (user_id) {
+                await lesson.addView()
+            }
+
             response.json(lesson)
         } catch (error) {
             console.log(error)
@@ -83,7 +89,7 @@ router.post("/", async (request: Request, response: Response) => {
 
 router.patch("/", async (request: Request, response: Response) => {
     try {
-        const data = JSON.parse(request.body.data) as Partial<LessonForm> & { id: string }
+        const data = (request.body.data ? JSON.parse(request.body.data) : request.body) as Partial<LessonForm> & { id: string }
         console.log(data)
         const media = request.files?.media as UploadedFile
         const thumb = request.files?.thumb as UploadedFile
