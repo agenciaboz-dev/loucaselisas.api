@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from "express"
 import { Course, CourseForm, PartialCourse, course_include } from "../class/Course"
 import { Creator, User } from "../class"
 import { prisma } from "../prisma"
+import { Category } from "@prisma/client"
 const router = express.Router()
 
 router.get("/", async (request: Request, response: Response) => {
@@ -162,6 +163,27 @@ router.get("/search", async (request: Request, response: Response) => {
         }
     } else {
         response.status(400).send("text param is required")
+    }
+})
+
+router.get("/categories", async (request: Request, response: Response) => {
+    const categories = request.query.categories as Category[]
+
+    if (categories) {
+        try {
+            const data = await prisma.course.findMany({
+                where: { categories: { some: { id: { in: categories.map((category) => category.id) } } } },
+                include: course_include,
+            })
+            console.log(data)
+            const courses = data.map((item) => new Course("", item))
+            response.json(courses)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("categories param is required")
     }
 })
 
