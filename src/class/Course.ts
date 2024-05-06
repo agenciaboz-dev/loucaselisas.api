@@ -67,6 +67,7 @@ export type CourseForm = Omit<
     | "status"
     | "declined_reason"
     | "plans"
+    | "price"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
@@ -130,6 +131,7 @@ export class Course {
                     ...data,
 
                     id: uid(),
+                    price: 0,
                     cover: "",
                     lessons: {},
                     published: new Date().getTime().toString(),
