@@ -20,6 +20,7 @@ export interface StatusForm {
     status: Status
     declined_reason?: string
     price?: number
+    plans?: Plan[]
 }
 
 export const course_include = Prisma.validator<Prisma.CourseInclude>()({
