@@ -10,7 +10,7 @@ export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
     media: true,
     likes: true,
     course: true,
-    _count: { select: { downloads: true, likes: true } },
+    _count: { select: { downloads: true, likes: true, views: true } },
 })
 export type LessonPrisma = Prisma.LessonGetPayload<{ include: typeof lesson_include }>
 export type LessonForm = Omit<
@@ -87,7 +87,7 @@ export class Lesson {
         this.course = data.course
         this.info = data.info
 
-        this.views = data.views
+        this.views = data._count.views
         this.likes = data._count.likes
         this.downloads = data._count.downloads
         this.favorited_by = data.likes.map((item) => ({ id: item.id }))
@@ -138,10 +138,10 @@ export class Lesson {
         this.load(data)
     }
 
-    async addView() {
+    async addView(user_id: string) {
         const data = await prisma.lesson.update({
             where: { id: this.id },
-            data: { views: { increment: 1 } },
+            data: { views: { create: { datetime: new Date().getTime().toString(), user_id } } },
             include: lesson_include,
         })
 

@@ -8,7 +8,7 @@ enum CoverType {
     image
 }
 
-enum Status {
+enum CStatus {
     active
     pending
     disabled
@@ -43,7 +43,7 @@ model Course {
 
     chat_id     String?         
     chat        Chat?
-    status      Status          @default(pending)
+    status      CStatus          @default(pending)
     declined_reason String?
     
 }

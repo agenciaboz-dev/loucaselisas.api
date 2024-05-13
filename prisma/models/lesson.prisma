@@ -18,13 +18,24 @@ model Lesson {
     thumb           String          @db.Text
     pdf             String?
     likes           User[]
-    views           Int             @default(0)
+    views           LessonView[]
     downloads       User[]          @relation(name: "downloads-relation")
 
     media_id        String          @unique
     media           Media           @relation(fields: [media_id], references: [id], onDelete: Cascade)
     status          Status          @default(pending)
     declined_reason String?
+}
+
+model LessonView {
+    id          Int         @id @default(autoincrement())
+    datetime    String
+
+    lesson_id   String
+    lesson      Lesson      @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+
+    user_id     String
+    user        User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Media {
@@ -35,6 +46,7 @@ model Media {
 
 model User {
     id                  String          @id
+    lessons_views       LessonView[]
     lessons_likes       Lesson[]
     lessons_downloads   Lesson[]        @relation(name: "downloads-relation")
 }

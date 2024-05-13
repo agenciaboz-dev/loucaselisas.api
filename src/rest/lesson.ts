@@ -16,7 +16,7 @@ router.get("/", async (request: Request, response: Response) => {
             await lesson.init()
 
             if (user_id) {
-                await lesson.addView()
+                await lesson.addView(user_id)
             }
 
             response.json(lesson)
