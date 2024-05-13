@@ -45,7 +45,7 @@ export type PartialCourse = Partial<
         WithoutFunctions<Course>,
         "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views"
     >
-> & { id: string; cover?: CoverForm; gallery: GalleryForm; creators: { id: string }[] }
+> & { id: string; cover?: CoverForm; gallery?: GalleryForm; creators?: { id: string }[] }
 
 export type CourseForm = Omit<
     WithoutFunctions<Course>,
