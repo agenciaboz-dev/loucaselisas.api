@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from "express"
 import { Category, CategoryForm, PartialCategory } from "../class/Category"
+import { UploadedFile } from "express-fileupload"
 const router = express.Router()
 
 router.get("/list", async (request: Request, response: Response) => {
@@ -13,10 +14,15 @@ router.get("/list", async (request: Request, response: Response) => {
 })
 
 router.post("/", async (request: Request, response: Response) => {
-    const data = request.body as CategoryForm
-
     try {
-        const category = Category.new(data)
+        const data = JSON.parse(request.body.data) as CategoryForm
+        const category = await Category.new(data)
+
+        if (request.files) {
+            const file = request.files.file as UploadedFile
+            await category.updateCover(file)
+        }
+
         response.json(category)
     } catch (error) {
         console.log(error)
@@ -25,11 +31,16 @@ router.post("/", async (request: Request, response: Response) => {
 })
 
 router.patch("/", async (request: Request, response: Response) => {
-    const data = request.body as PartialCategory
-
     try {
+        const data = JSON.parse(request.body.data) as PartialCategory
         const category = new Category(data.id)
         await category.init()
+
+        if (request.files) {
+            const file = request.files.file as UploadedFile
+            await category.updateCover(file)
+        }
+
         await category.update(data)
         response.json(category)
     } catch (error) {
