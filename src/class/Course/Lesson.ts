@@ -66,10 +66,10 @@ export class Lesson {
 
     static async list() {
         const data = await prisma.lesson.findMany({ include: lesson_include })
-    const lessons = data.map((item) => new Lesson("", item))
-    return lessons
+        const lessons = data.map((item) => new Lesson("", item))
+        return lessons
     }
-    
+
     constructor(id: string, data?: LessonPrisma) {
         this.id = id
         if (data) this.load(data)
@@ -132,7 +132,7 @@ export class Lesson {
         this.load(prisma_data)
     }
 
-    async favorite(user_id: string, like?: boolean) {
+    async addLike(user_id: string, like?: boolean) {
         const data = await prisma.lesson.update({
             where: { id: this.id },
             data: {

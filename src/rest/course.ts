@@ -124,7 +124,7 @@ router.post("/favorite", async (request: Request, response: Response) => {
 
     try {
         const course = new Course(data.course_id)
-        await course.favorite(data.user_id, data.like)
+        await course.addLike(data.user_id, data.like)
         response.json(course)
     } catch (error) {
         console.log(error)

@@ -279,7 +279,7 @@ export class Course {
         this.load(data)
     }
 
-    async favorite(user_id: string, like?: boolean) {
+    async addLike(user_id: string, like?: boolean) {
         const data = await prisma.course.update({
             where: { id: this.id },
             data: {
@@ -314,4 +314,8 @@ export class Course {
         const views = await prisma.course.findUnique({ where: { id: this.id }, select: { views: true } })
         return views?.views
     }
+
+    // async getLikes() {
+    //     const likes = await prisma.
+    // }
 }
