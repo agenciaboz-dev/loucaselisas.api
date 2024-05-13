@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client"
 import { prisma } from "../prisma"
 import { PlanPurchaseForm } from "../types/shared/PlanPurchaseForm"
+import { WithoutFunctions } from "./helpers"
 
 export type PlanPrisma = Prisma.PlanGetPayload<{}>
 
@@ -9,6 +10,8 @@ export type PlanContractPrisma = Prisma.PlanContractGetPayload<{ include: typeof
 
 export const contract_log_include = Prisma.validator<Prisma.ContractLogsInclude>()({ plan: true })
 export type ContractLogPrisma = Prisma.ContractLogsGetPayload<{ include: typeof contract_log_include }>
+
+export type PlanForm = Omit<WithoutFunctions<Plan>, "id">
 
 export class PlanContract {
     id: number
@@ -69,6 +72,12 @@ export class Plan {
 
         const plan_contract = new PlanContract(new_contract)
         return plan_contract
+    }
+
+    static async new(data: PlanForm) {
+        const prisma_plan = await prisma.plan.create({ data: { ...data } })
+        const plan = new Plan(0, prisma_plan)
+        return plan
     }
 
     constructor(id: number, data?: PlanPrisma) {
