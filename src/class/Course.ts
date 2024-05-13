@@ -115,15 +115,19 @@ export class Course {
         this.id = id
         if (data) this.load(data)
     }
-    
+
     static async list() {
         const prisma_courses = await prisma.course.findMany({ include: course_include })
         const courses = prisma_courses.map((item) => new Course("", item))
         return courses
     }
 
-    static async search(text: string) {
-        const data = await prisma.course.findMany({ where: { name: { contains: text } }, include: course_include })
+    static async search(role_id: number, text: string) {
+        console.log(text)
+        const data = await prisma.course.findMany({
+            where: { name: { contains: text.trim() }, status: "active", roles: { some: { id: { equals: role_id } } } },
+            include: course_include,
+        })
         const courses = data.map((item) => new Course("", item))
         return courses
     }

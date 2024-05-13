@@ -103,6 +103,7 @@ router.get("/user", async (request: Request, response: Response) => {
             await user.init()
             const prisma_courses = await prisma.course.findMany({
                 where: {
+                    status: "active",
                     roles: { some: { id: { equals: user.role.id } } },
                 },
                 include: course_include,
@@ -151,17 +152,20 @@ router.get("/last_message", async (request: Request, response: Response) => {
 
 router.get("/search", async (request: Request, response: Response) => {
     const text = request.query.text as string | undefined
+    const user_id = request.query.user_id as string | undefined
 
-    if (text) {
+    if (text !== undefined && user_id) {
         try {
-            const result = await Course.search(text)
+            const user = new User(user_id)
+            await user.init()
+            const result = await Course.search(user.role.id, text)
             response.json(result)
         } catch (error) {
             console.log(error)
             response.status(500).send(error)
         }
     } else {
-        response.status(400).send("text param is required")
+        response.status(400).send("text and user_id params are required")
     }
 })
 
