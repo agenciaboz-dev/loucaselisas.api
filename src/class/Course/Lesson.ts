@@ -64,6 +64,12 @@ export class Lesson {
         return lesson
     }
 
+    static async list() {
+        const data = await prisma.lesson.findMany({ include: lesson_include })
+    const lessons = data.map((item) => new Lesson("", item))
+    return lessons
+    }
+    
     constructor(id: string, data?: LessonPrisma) {
         this.id = id
         if (data) this.load(data)
@@ -146,5 +152,10 @@ export class Lesson {
         })
 
         this.load(data)
+    }
+
+    async getViews() {
+        const views = await prisma.lesson.findUnique({ where: { id: this.id }, select: { views: true } })
+        return views?.views
     }
 }

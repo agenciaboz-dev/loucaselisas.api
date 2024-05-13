@@ -8,6 +8,7 @@ import category from "./src/rest/category"
 import course from "./src/rest/course"
 import card from "./src/rest/card"
 import lesson from "./src/rest/lesson"
+import stats from "./src/rest/stats"
 
 export const router = express.Router()
 
@@ -24,3 +25,4 @@ router.use("/category", category)
 router.use("/course", course)
 router.use("/card", card)
 router.use("/lesson", lesson)
+router.use("/stats", stats)

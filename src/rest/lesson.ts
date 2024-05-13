@@ -30,8 +30,7 @@ router.get("/", async (request: Request, response: Response) => {
 })
 
 router.get("/all", async (request: Request, response: Response) => {
-    const data = await prisma.lesson.findMany({ include: lesson_include })
-    const lessons = data.map((item) => new Lesson("", item))
+    const lessons = await Lesson.list()
     response.json(lessons)
 })
 

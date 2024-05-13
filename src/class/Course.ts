@@ -115,6 +115,12 @@ export class Course {
         this.id = id
         if (data) this.load(data)
     }
+    
+    static async list() {
+        const prisma_courses = await prisma.course.findMany({ include: course_include })
+        const courses = prisma_courses.map((item) => new Course("", item))
+        return courses
+    }
 
     static async search(text: string) {
         const data = await prisma.course.findMany({ where: { name: { contains: text } }, include: course_include })
@@ -298,5 +304,10 @@ export class Course {
             const message = new Message(data)
             return message
         }
+    }
+
+    async getViews() {
+        const views = await prisma.course.findUnique({ where: { id: this.id }, select: { views: true } })
+        return views?.views
     }
 }
