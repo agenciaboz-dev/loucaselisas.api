@@ -8,6 +8,7 @@ import { Course, course_include } from "./Course"
 export const category_include = Prisma.validator<Prisma.CategoryInclude>()({})
 export type CategoryPrisma = Prisma.CategoryGetPayload<{ include: typeof category_include }>
 export type CategoryForm = Omit<WithoutFunctions<Category>, "id" | "cover"> & { cover?: FileUpload }
+export type PartialCategory = Partial<CategoryForm> & { id: string }
 
 export class Category {
     id: string
@@ -57,5 +58,14 @@ export class Category {
         const data = await prisma.course.findMany({ where: { categories: { some: { id: this.id } } }, include: course_include })
         const courses = data.map((item) => new Course("", item))
         return courses
+    }
+
+    async update(data: PartialCategory) {
+        if (data.cover) {
+            await this.updateCover(data.cover)
+        }
+
+        const updated = await prisma.category.update({ where: { id: this.id }, data: { ...data, cover: undefined }, include: category_include })
+        this.load(updated)
     }
 }
