@@ -12,6 +12,7 @@ export const contract_log_include = Prisma.validator<Prisma.ContractLogsInclude>
 export type ContractLogPrisma = Prisma.ContractLogsGetPayload<{ include: typeof contract_log_include }>
 
 export type PlanForm = Omit<WithoutFunctions<Plan>, "id">
+export type PartialPlan = Partial<PlanForm> & { id: number }
 
 export class PlanContract {
     id: number
@@ -98,6 +99,11 @@ export class Plan {
         if (plan_prisma) {
             this.load(plan_prisma)
         }
+    }
+
+    async update(data: PartialPlan) {
+        const updated = await prisma.plan.update({ where: { id: this.id }, data: { ...data } })
+        this.load(updated)
     }
 }
 

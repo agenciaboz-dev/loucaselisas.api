@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from "express"
-import { Plan, PlanForm } from "../../class/Plan"
+import { PartialPlan, Plan, PlanForm } from "../../class/Plan"
 import { PlanPurchaseForm } from "../../types/shared/PlanPurchaseForm"
 import { User } from "../../class"
 const router = express.Router()
@@ -18,6 +18,20 @@ router.post("/", async (request: Request, response: Response) => {
 
     try {
         const plan = await Plan.new(data)
+        response.json(plan)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
+router.patch("/", async (request: Request, response: Response) => {
+    const data = request.body as PartialPlan
+
+    try {
+        const plan = new Plan(data.id)
+        await plan.init()
+        await plan.update(data)
         response.json(plan)
     } catch (error) {
         console.log(error)
