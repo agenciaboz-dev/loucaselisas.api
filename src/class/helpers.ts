@@ -4,6 +4,7 @@ export declare type WithoutFunctions<T> = {
 
 export declare interface FileUpload {
     file?: ArrayBuffer | File
+    data?: ArrayBuffer
     base64?: string
     name: string
 }

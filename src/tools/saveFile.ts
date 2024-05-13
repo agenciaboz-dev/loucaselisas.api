@@ -9,7 +9,7 @@ const getBuffer = (file: FileUpload) => {
         return Buffer.from(file.base64, "base64")
     }
 
-    return Buffer.from(file.file as ArrayBuffer)
+    return Buffer.from((file.file as ArrayBuffer) || file.data)
 }
 
 export const saveFile = (path: string, file: FileUpload) => {
