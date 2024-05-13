@@ -262,7 +262,7 @@ export class Course {
     async viewer(user_id: string) {
         const data = await prisma.course.update({
             where: { id: this.id },
-            data: { views: { connect: { id: user_id } } },
+            data: { views: { create: { user_id, datetime: new Date().getTime().toString() } } },
             include: course_include,
         })
 

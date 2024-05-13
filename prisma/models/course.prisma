@@ -38,7 +38,7 @@ model Course {
     plans       Plan[]
 
     lessons     Lesson[]
-    views       User[]         
+    views       CourseView[]         
 
 
     chat_id     String?         
@@ -48,6 +48,17 @@ model Course {
     
 }
 
+model CourseView {
+    id          Int         @id @default(autoincrement())
+    datetime    String
+
+    course_id   String
+    course      Course      @relation(fields: [course_id], references: [id], onDelete: Cascade)
+
+    user_id     String
+    user        User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
 model Plan {
     id          Int         @id @default(autoincrement())
     courses     Course[]
@@ -55,7 +66,7 @@ model Plan {
 
 model User {
     id              String      @id
-    viewed_courses  Course[]   
+    viewed_courses  CourseView[]   
 }
 
 model Role {

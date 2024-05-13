@@ -34,7 +34,7 @@ model User {
 	student Student? @relation(name: "StudentToUser")
 	role_id Int @default(1)
 	role Role @relation(name: "RoleToUser", fields: [role_id], references: [id], onDelete: Restrict)
-	viewed_courses Course[] @relation(name: "CourseToUser")
+	viewed_courses CourseView[] @relation(name: "CourseViewToUser")
 	payment_cards Paymentcard[] @relation(name: "PaymentcardToUser")
 	lessons_likes Lesson[] @relation(name: "LessonToUser")
 	lessons_downloads Lesson[] @relation(name: "downloads-relation")
@@ -71,7 +71,7 @@ model Course {
 	roles Role[] @relation(name: "CourseToRole")
 	plans Plan[] @relation(name: "CourseToPlan")
 	lessons Lesson[] @relation(name: "CourseToLesson")
-	views User[] @relation(name: "CourseToUser")
+	views CourseView[] @relation(name: "CourseToCourseView")
 	chat_id String? 
 	chat Chat? @relation(name: "ChatToCourse")
 	status Status @default(pending)
@@ -104,6 +104,14 @@ model Category {
 	name String 
 	cover String @db.Text
 	courses Course[] @relation(name: "CategoryToCourse")
+}
+model CourseView {
+	id Int @id @default(autoincrement())
+	datetime String 
+	course_id String 
+	course Course @relation(name: "CourseToCourseView", fields: [course_id], references: [id], onDelete: Cascade)
+	user_id String 
+	user User @relation(name: "CourseViewToUser", fields: [user_id], references: [id], onDelete: Cascade)
 }
 model Plan {
 	id Int @id @default(autoincrement())
