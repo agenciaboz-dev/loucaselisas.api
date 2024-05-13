@@ -195,6 +195,7 @@ export class User {
         this.uf = data.uf
         this.admin = data.admin
         this.bio = data.bio
+        this.created_at = data.created_at
 
         this.instagram = data.instagram
         this.tiktok = data.tiktok
