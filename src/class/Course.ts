@@ -45,7 +45,7 @@ export type PartialCourse = Partial<
         WithoutFunctions<Course>,
         "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views" | "plans"
     >
-> & { id: string; cover?: CoverForm; gallery?: GalleryForm; creators?: { id: string }[]; plans: Partial<Plan>[] }
+> & { id: string; cover?: CoverForm; gallery?: GalleryForm; creators?: { id: string }[]; plans: number[] }
 
 export type CourseForm = Omit<
     WithoutFunctions<Course>,
@@ -259,7 +259,7 @@ export class Course {
                 chat: undefined,
                 cover: undefined,
                 lessons: undefined,
-                plans: data.plans ? { set: [], connect: data.plans.map((item) => ({ id: item.id })) } : undefined,
+                plans: data.plans ? { set: [], connect: data.plans.map((id) => ({ id })) } : undefined,
                 // TODO
                 roles: data.roles ? {} : undefined,
             },
