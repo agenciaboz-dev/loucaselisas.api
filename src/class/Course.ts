@@ -43,9 +43,9 @@ export type CoverForm = { file: FileUpload; type: "image" | "video"; url?: strin
 export type PartialCourse = Partial<
     Omit<
         WithoutFunctions<Course>,
-        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views"
+        "favorited_by" | "cover" | "cover_type" | "owner" | "gallery" | "creators" | "chat" | "published" | "lessons" | "students" | "views" | "plans"
     >
-> & { id: string; cover?: CoverForm; gallery?: GalleryForm; creators?: { id: string }[] }
+> & { id: string; cover?: CoverForm; gallery?: GalleryForm; creators?: { id: string }[]; plans: Partial<Plan>[] }
 
 export type CourseForm = Omit<
     WithoutFunctions<Course>,
