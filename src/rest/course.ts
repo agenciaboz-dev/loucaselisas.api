@@ -170,7 +170,7 @@ router.get("/search", async (request: Request, response: Response) => {
 })
 
 router.get("/categories", async (request: Request, response: Response) => {
-    const categories = request.query.categories as Category[]
+    const categories = request.query.categories as unknown as Category[]
 
     if (categories) {
         try {
