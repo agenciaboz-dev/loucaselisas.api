@@ -4,6 +4,7 @@ model Plan {
     price       Float
     duration    String
     description String      @default("")
+    active      Boolean     @default(true)
 
     contracts   PlanContract[]
     logs        ContractLogs[]

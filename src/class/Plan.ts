@@ -37,6 +37,7 @@ export class Plan {
     price: number
     duration: string
     description: string
+    active: boolean
 
     static async list() {
         const plans = await prisma.plan.findMany()
@@ -92,6 +93,7 @@ export class Plan {
         this.name = data.name
         this.price = data.price
         this.description = data.description
+        this.active = data.active
     }
 
     async init() {

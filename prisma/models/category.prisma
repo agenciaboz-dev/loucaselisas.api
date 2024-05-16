@@ -7,4 +7,5 @@ model Category {
     id          String          @id
     name        String
     cover       String          @db.Text
+    active      Boolean         @default(true)
 }

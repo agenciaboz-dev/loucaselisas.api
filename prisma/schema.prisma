@@ -111,6 +111,7 @@ model Category {
   creators Creator[] @relation(name: "CategoryToCreator")
   name     String
   cover    String    @db.Text
+  active   Boolean   @default(true)
   courses  Course[]  @relation(name: "CategoryToCourse")
 }
 
@@ -130,6 +131,7 @@ model Plan {
   price       Float
   duration    String
   description String         @default("")
+  active      Boolean        @default(true)
   contracts   PlanContract[] @relation(name: "PlanToPlanContract")
   logs        ContractLogs[] @relation(name: "ContractLogsToPlan")
 }

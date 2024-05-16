@@ -14,6 +14,7 @@ export class Category {
     id: string
     name: string
     cover: string
+    active: boolean
 
     static async list() {
         const categories_prisma = await prisma.category.findMany({ include: category_include })
@@ -46,6 +47,7 @@ export class Category {
         this.id = data.id
         this.name = data.name
         this.cover = data.cover
+        this.active = data.active
     }
 
     async updateCover(cover: FileUpload) {
