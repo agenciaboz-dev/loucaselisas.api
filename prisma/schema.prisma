@@ -198,6 +198,7 @@ model Media {
   gallery    Gallery?  @relation(name: "GalleryToMedia", fields: [gallery_id], references: [id], onDelete: Cascade)
   lesson_id  String?
   lesson     Lesson?   @relation(name: "LessonToMedia")
+  message    Message?  @relation(name: "MediaToMessage")
 }
 
 model LessonView {
@@ -219,6 +220,8 @@ model Message {
   video_timestamp String?
   chat_id         String
   chat            Chat    @relation(name: "ChatToMessage", fields: [chat_id], references: [id], onDelete: Cascade)
+  media_id        String? @unique
+  media           Media?  @relation(name: "MediaToMessage", fields: [media_id], references: [id], onDelete: Cascade)
 }
 
 model PlanContract {

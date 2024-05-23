@@ -8,7 +8,7 @@ const setDefaultPlans = async () => {
             await prisma.course.update({
                 where: { id: item.id },
                 data: {
-                    plans: { connect: { id: 1 } },
+                    plans: { set: [], connect: { id: 1 } },
                 },
             })
             console.log(`updated course ${course_identifier}`)

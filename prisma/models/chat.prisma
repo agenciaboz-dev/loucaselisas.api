@@ -34,6 +34,15 @@ model Message {
     chat_id             String
     chat                Chat            @relation(fields: [chat_id], references: [id], onDelete: Cascade)
 
+    media_id            String?         @unique
+    media               Media?          @relation(fields: [media_id], references: [id], onDelete: Cascade)
+
+
+}
+
+model Media {
+    id              String              @id
+    message         Message?
 }
 
 model User {
