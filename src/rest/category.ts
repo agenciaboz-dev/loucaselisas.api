@@ -3,6 +3,16 @@ import { Category, CategoryForm, PartialCategory } from "../class/Category"
 import { UploadedFile } from "express-fileupload"
 const router = express.Router()
 
+router.get("/list/admin", async (request: Request, response: Response) => {
+    try {
+        const categories = await Category.list(true)
+        response.json(categories)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 router.get("/list", async (request: Request, response: Response) => {
     try {
         const categories = await Category.list()

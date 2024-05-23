@@ -16,8 +16,8 @@ export class Category {
     cover: string
     active: boolean
 
-    static async list() {
-        const categories_prisma = await prisma.category.findMany({ include: category_include })
+    static async list(all?: boolean) {
+        const categories_prisma = await prisma.category.findMany({ where: { active: !!all }, include: category_include })
         const categories = categories_prisma.map((item) => new Category("", item))
         return categories
     }
