@@ -278,7 +278,10 @@ export class User {
     }
 
     async getLikedLessons() {
-        const data = await prisma.lesson.findMany({ where: { likes: { some: { id: this.id } } }, include: lesson_include })
+        const data = await prisma.lesson.findMany({
+            where: { AND: [{ status: "active" }, { course: { status: "active" } }, { likes: { some: { id: this.id } } }] },
+            include: lesson_include,
+        })
         const lessons = data.map((item) => new Lesson("", item))
 
         const courses_data = await prisma.course.findMany({

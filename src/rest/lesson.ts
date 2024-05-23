@@ -59,6 +59,7 @@ router.get("/liked", async (request: Request, response: Response) => {
         const user = new User(user_id)
         await user.init()
         const data = await user.getLikedLessons()
+        console.log(data)
         response.json(data)
     } else {
         response.status(400).send("user_id param is required")
