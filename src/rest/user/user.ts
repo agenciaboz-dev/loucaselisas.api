@@ -93,5 +93,23 @@ router.get("/plan_logs", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/message", async (request: Request, response: Response) => {
+    const user_id = request.query.user_id as string | undefined
+
+    if (user_id) {
+        try {
+            const user = await new User(user_id)
+            await user.init()
+            const message = await user.getMessages()
+            console.log(message)
+            return response.json(message)
+        } catch (error) {
+            console.log("entrou")
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("user_id param is required")
+    }
+})
 
 export default router

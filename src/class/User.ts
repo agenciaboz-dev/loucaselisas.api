@@ -12,6 +12,7 @@ import { Creator, CreatorForm, Student, creator_include } from "./index"
 import { Role, role_include } from "./Role"
 import { ContractLog, Plan, PlanContract, contract_log_include, plan_contract_include } from "./Plan"
 import { Lesson, lesson_include } from "./Course/Lesson"
+import { message_include } from "./Chat/Message"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
@@ -135,7 +136,9 @@ export class User {
                     image: null,
                     cover: null,
                     created_at: new Date().getTime().toString(),
-                    creator: data.creator ? { create: { id: uid(), ...data.creator, favorited_by: undefined, owned_courses: {} } } : {},
+                    creator: data.creator
+                        ? { create: { id: uid(), ...data.creator, favorited_by: undefined, owned_courses: {} } }
+                        : {},
                     student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
                     payment_cards: {},
@@ -165,7 +168,11 @@ export class User {
 
     static async login(data: LoginForm & { admin?: boolean }, socket?: Socket) {
         const user_prisma = await prisma.user.findFirst({
-            where: { OR: [{ email: data.login }, { username: data.login }, { cpf: data.login }], password: data.password, admin: data.admin },
+            where: {
+                OR: [{ email: data.login }, { username: data.login }, { cpf: data.login }],
+                password: data.password,
+                admin: data.admin,
+            },
             include: user_include,
         })
         console.log(user_prisma)
@@ -180,6 +187,15 @@ export class User {
         }
 
         return null
+    }
+
+    async getMessages() {
+        const data = await prisma.message.findMany({
+            where: { user_id: this.id },
+            orderBy: { datetime: "desc" },
+            include: message_include,
+        })
+        return data
     }
 
     load(data: UserPrisma) {
@@ -294,4 +310,3 @@ export class User {
         return { lessons, courses }
     }
 }
-
