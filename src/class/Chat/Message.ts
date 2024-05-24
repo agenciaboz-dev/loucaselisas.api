@@ -6,7 +6,11 @@ import { uid } from "uid"
 import { User } from "../User"
 import { Media, MediaForm } from "../Gallery/Media"
 
-export const message_include = Prisma.validator<Prisma.MessageInclude>()({ user: true, media: true, chat: true })
+export const message_include = Prisma.validator<Prisma.MessageInclude>()({
+    user: true,
+    media: true,
+    chat: { include: { course: true } },
+})
 export type MessagePrisma = Prisma.MessageGetPayload<{ include: typeof message_include }>
 
 export type MessageForm = Omit<WithoutFunctions<Message>, "id" | "user" | "datetime" | "media_id" | "media"> & {
