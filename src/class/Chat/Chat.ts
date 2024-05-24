@@ -4,7 +4,11 @@ import { Socket } from "socket.io"
 import { prisma } from "../../prisma"
 import { Message, message_include } from "./Message"
 
-export const chat_include = Prisma.validator<Prisma.ChatInclude>()({ media: { include: gallery_include }, _count: { select: { messages: true } } })
+export const chat_include = Prisma.validator<Prisma.ChatInclude>()({
+    media: { include: gallery_include },
+    _count: { select: { messages: true } },
+    course: true,
+})
 export type ChatPrisma = Prisma.ChatGetPayload<{ include: typeof chat_include }>
 
 export class Chat {
