@@ -46,6 +46,31 @@ export class Role {
         }
     }
 
+    static async new(role: Partial<Role>) {
+        try {
+            if (role) {
+                const data = await prisma.role.create({
+                    data: {
+                        name: role.name ? role.name : "",
+                        permissions: {
+                            create: role.permissions && {
+                                configTab: role.permissions?.configTab,
+                                creatorTab: role.permissions.creatorTab,
+                                favoritesTab: role.permissions.favoritesTab,
+                                panelTab: role.permissions.panelTab,
+                                searchTab: role.permissions.searchTab,
+                            },
+                        },
+                    },
+                    include: role_include,
+                })
+
+                const new_role = await new Role(data)
+                console.log(new_role)
+            }
+        } catch (error) {}
+    }
+
     load(data: RolePrisma) {
         this.id = data.id
         this.name = data.name
