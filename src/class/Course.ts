@@ -116,8 +116,8 @@ export class Course {
         if (data) this.load(data)
     }
 
-    static async list() {
-        const prisma_courses = await prisma.course.findMany({ include: course_include })
+    static async list(all?: boolean) {
+        const prisma_courses = await prisma.course.findMany({ where: { status: all ? undefined : "active" }, include: course_include })
         const courses = prisma_courses.map((item) => new Course("", item))
         return courses
     }

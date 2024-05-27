@@ -84,6 +84,16 @@ router.get("/owner", async (request: Request, response: Response) => {
     }
 })
 
+router.get("/admin", async (request: Request, response: Response) => {
+    try {
+        const courses = await Course.list(true)
+        response.json(courses)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 router.get("/all", async (request: Request, response: Response) => {
     try {
         const courses = await Course.list()
@@ -175,7 +185,7 @@ router.get("/categories", async (request: Request, response: Response) => {
     if (categories) {
         try {
             const data = await prisma.course.findMany({
-                where: { categories: { some: { id: { in: categories.map((category) => category.id) } } } },
+                where: { status: "active", categories: { some: { id: { in: categories.map((category) => category.id) } } } },
                 include: course_include,
             })
             console.log(data)
