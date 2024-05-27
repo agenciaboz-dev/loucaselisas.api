@@ -12,7 +12,7 @@ import { Creator, CreatorForm, Student, creator_include } from "./index"
 import { Role, role_include } from "./Role"
 import { ContractLog, Plan, PlanContract, contract_log_include, plan_contract_include } from "./Plan"
 import { Lesson, lesson_include } from "./Course/Lesson"
-import { message_include } from "./Chat/Message"
+import { Message, message_include } from "./Chat/Message"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
@@ -136,9 +136,7 @@ export class User {
                     image: null,
                     cover: null,
                     created_at: new Date().getTime().toString(),
-                    creator: data.creator
-                        ? { create: { id: uid(), ...data.creator, favorited_by: undefined, owned_courses: {} } }
-                        : {},
+                    creator: data.creator ? { create: { id: uid(), ...data.creator, favorited_by: undefined, owned_courses: {} } } : {},
                     student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
                     payment_cards: {},
@@ -187,15 +185,6 @@ export class User {
         }
 
         return null
-    }
-
-    async getMessages() {
-        const data = await prisma.message.findMany({
-            where: { user_id: this.id },
-            orderBy: { datetime: "desc" },
-            include: message_include,
-        })
-        return data
     }
 
     load(data: UserPrisma) {
@@ -308,5 +297,16 @@ export class User {
         const courses = courses_data.map((item) => new Course("", item))
 
         return { lessons, courses }
+    }
+
+    async getMessages() {
+        const data = await prisma.message.findMany({
+            where: { user_id: this.id },
+            orderBy: { datetime: "desc" },
+            include: message_include,
+        })
+
+        const messages = data.map((item) => new Message(item))
+        return messages
     }
 }

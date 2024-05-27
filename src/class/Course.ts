@@ -116,6 +116,16 @@ export class Course {
         if (data) this.load(data)
     }
 
+    static async getFromChat(id: string) {
+        const chat = await prisma.chat.findFirst({ where: { id } })
+        if (!chat) throw "chat não encontrado"
+
+        const data = await prisma.course.findFirst({ where: { id: chat.course_id }, include: course_include })
+        if (!data) throw "curso não encontrado"
+        const course = new Course("", data)
+        return course
+    }
+
     static async list(all?: boolean) {
         const prisma_courses = await prisma.course.findMany({ where: { status: all ? undefined : "active" }, include: course_include })
         const courses = prisma_courses.map((item) => new Course("", item))

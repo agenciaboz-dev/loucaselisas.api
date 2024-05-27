@@ -4,6 +4,7 @@ import { prisma } from "../../prisma"
 import { ContractLog } from "../../class/Plan"
 import forgot_password from "./forgot_password"
 import { Role } from "../../class/Role"
+import { Course } from "../../class/Course"
 
 const router = express.Router()
 
@@ -93,16 +94,26 @@ router.get("/plan_logs", async (request: Request, response: Response) => {
     }
 })
 
-router.get("/message", async (request: Request, response: Response) => {
+router.get("/messages", async (request: Request, response: Response) => {
     const user_id = request.query.user_id as string | undefined
 
     if (user_id) {
         try {
             const user = await new User(user_id)
             await user.init()
-            const message = await user.getMessages()
-            console.log(message)
-            return response.json(message)
+            const messages = await user.getMessages()
+            console.log(messages)
+
+            const data = await Promise.all(
+                messages.map(async (item) => {
+                    const course = await Course.getFromChat(item.chat_id)
+                    return course ? { message: item, course } : null
+                })
+            )
+
+            const valid_data = data.filter((item) => !!item)
+
+            response.json(valid_data)
         } catch (error) {
             console.log("entrou")
             response.status(500).send(error)

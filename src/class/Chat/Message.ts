@@ -9,7 +9,6 @@ import { Media, MediaForm } from "../Gallery/Media"
 export const message_include = Prisma.validator<Prisma.MessageInclude>()({
     user: true,
     media: true,
-    chat: { include: { course: true } },
 })
 export type MessagePrisma = Prisma.MessageGetPayload<{ include: typeof message_include }>
 
