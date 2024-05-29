@@ -123,4 +123,37 @@ router.get("/messages", async (request: Request, response: Response) => {
     }
 })
 
+router.post("/lesson_watchtime", async (request: Request, response: Response) => {
+    const data = request.body as { user_id: string; lesson_id: string; watched: number }
+
+    try {
+        const user = new User(data.user_id)
+        await user.init()
+        const watchedData = await user.saveWatchedTime(data.lesson_id, data.watched)
+        response.json(watchedData)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
+router.get("/lesson_watchtime", async (request: Request, response: Response) => {
+    const user_id = request.query.user_id as string | undefined
+    const lesson_id = request.query.lesson_id as string | undefined
+
+    if (user_id && lesson_id) {
+        try {
+            const user = new User(user_id)
+            await user.init()
+            const watchedTime = await user.getWatchedTime(lesson_id)
+            response.json(watchedTime)
+        } catch (error) {
+            console.log(error)
+            response.status(500).send(error)
+        }
+    } else {
+        response.status(400).send("user_id and lesson_id params are required")
+    }
+})
+
 export default router

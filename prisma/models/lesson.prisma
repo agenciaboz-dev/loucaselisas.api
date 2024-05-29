@@ -19,12 +19,24 @@ model Lesson {
     pdf             String?
     likes           User[]
     views           LessonView[]
+    watchedTimes    LessonWatched[]
     downloads       User[]          @relation(name: "downloads-relation")
 
     media_id        String          @unique
     media           Media           @relation(fields: [media_id], references: [id], onDelete: Cascade)
     status          Status          @default(pending)
     declined_reason String?
+}
+
+model LessonWatched {
+    id          Int         @id @default(autoincrement())
+    watchedTime String
+
+    lesson_id   String
+    lesson      Lesson      @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+
+    user_id     String
+    user        User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model LessonView {
@@ -49,4 +61,5 @@ model User {
     lessons_views       LessonView[]
     lessons_likes       Lesson[]
     lessons_downloads   Lesson[]        @relation(name: "downloads-relation")
+    lessons_watchtime   LessonWatched[]
 }

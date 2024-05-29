@@ -309,4 +309,20 @@ export class User {
         const messages = data.map((item) => new Message(item))
         return messages
     }
+
+    async getWatchedTime(lesson_id: string) {
+        const data = await prisma.lessonWatched.findFirst({ where: { lesson_id, user_id: this.id } })
+        return data?.watchedTime
+    }
+
+    async saveWatchedTime(lesson_id: string, watchedTime: number) {
+        const exists = await prisma.lessonWatched.findFirst({ where: { lesson_id, user_id: this.id } })
+        if (exists) {
+            const data = await prisma.lessonWatched.update({ where: { id: exists.id }, data: { watchedTime: watchedTime.toString() } })
+            return data
+        }
+
+        const data = await prisma.lessonWatched.create({ data: { watchedTime: watchedTime.toString(), lesson_id, user_id: this.id } })
+        return data
+    }
 }
