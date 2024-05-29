@@ -194,6 +194,7 @@ model Media {
   url        String
   type       MediaType
   position   Int       @default(1)
+  duration   Float     @default(0)
   width      Int       @default(1920)
   height     Int       @default(980)
   gallery_id String?

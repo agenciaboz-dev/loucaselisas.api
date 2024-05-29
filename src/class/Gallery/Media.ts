@@ -6,16 +6,18 @@ import { saveFile } from "../../tools/saveFile"
 
 export type MediaPrisma = Prisma.MediaGetPayload<{}>
 export type MediaForm = FileUpload &
-    Omit<WithoutFunctions<Partial<Media>>, "position" | "height" | "width" | "type"> & {
+    Omit<WithoutFunctions<Partial<Media>>, "position" | "height" | "width" | "type" | "duration"> & {
         position: number
         width: number
         height: number
         type: "image" | "video"
+        duration?: number
     }
 
 export class Media {
     id: string
     url: string
+    duration: number
     type: "image" | "video"
     position: number
     width: number
@@ -29,6 +31,7 @@ export class Media {
                 position: data.position,
                 width: data.width,
                 height: data.height,
+                duration: data.duration,
                 id: uid(),
                 url,
             },
@@ -47,6 +50,7 @@ export class Media {
                 position: data.position,
                 type: data.type,
                 width: data.width,
+                duration: data.duration,
                 url,
             },
         })
@@ -62,5 +66,6 @@ export class Media {
         this.position = data.position
         this.width = data.width
         this.height = data.height
+        this.duration = data.duration
     }
 }
