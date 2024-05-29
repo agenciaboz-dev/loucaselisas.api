@@ -232,12 +232,12 @@ export class User {
                 where: { id: this.id },
                 data: {
                     ...data,
+                    role: data.role ? { connect: { id: data.role.id } } : undefined,
                     favorite_courses: undefined,
                     favorite_creators: undefined,
                     payment_cards: undefined,
                     creator: undefined,
                     student: undefined,
-                    role: undefined,
                     plan: undefined,
                     plan_history: undefined,
                     role_id: undefined,
