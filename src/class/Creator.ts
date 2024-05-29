@@ -14,7 +14,7 @@ export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
 })
 export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_include }>
 export type CreatorType = WithoutFunctions<Creator>
-export type CreatorForm = Omit<WithoutFunctions<Creator>, "active" | "courses" | "id" | "favorited_by">
+export type CreatorForm = Omit<WithoutFunctions<Creator>, "active" | "courses" | "id" | "favorited_by" | "need_send_data">
 export type PartialCreator = Partial<Creator> & { id: string }
 export interface CreatorImageForm {
     id: string
@@ -32,6 +32,7 @@ export class Creator {
     favorited_by: number
     cover: string | null
     image: string | null
+    need_send_data: boolean
 
     constructor(id: string, data?: CreatorPrisma) {
         this.id = id
@@ -105,6 +106,7 @@ export class Creator {
         this.favorited_by = data.favorited_by?.length || 0
         this.image = data.image
         this.cover = data.cover
+        this.need_send_data = data.need_send_data
     }
 
     async update(data: Partial<Creator>) {

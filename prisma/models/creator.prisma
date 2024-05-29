@@ -12,6 +12,7 @@ model Creator {
     image       String?         @db.Text
     cover       String?         @db.Text
     created_at  String          @default("")
+    need_send_data  Boolean     @default(true)
 
     categories  Category[]
     

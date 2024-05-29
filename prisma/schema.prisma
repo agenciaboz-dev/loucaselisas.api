@@ -85,20 +85,21 @@ model Course {
 }
 
 model Creator {
-  id            String     @id
-  user_id       String     @unique
-  user          User       @relation(name: "CreatorToUser", fields: [user_id], references: [id], onDelete: Cascade)
-  favorited_by  User[]     @relation(name: "favorite_creators")
-  nickname      String
-  language      String
-  description   String     @db.Text
-  active        Boolean    @default(false)
-  image         String?    @db.Text
-  cover         String?    @db.Text
-  created_at    String     @default("")
-  categories    Category[] @relation(name: "CategoryToCreator")
-  owned_courses Course[]   @relation(name: "course_owner")
-  courses       Course[]   @relation(name: "CourseToCreator")
+  id             String     @id
+  user_id        String     @unique
+  user           User       @relation(name: "CreatorToUser", fields: [user_id], references: [id], onDelete: Cascade)
+  favorited_by   User[]     @relation(name: "favorite_creators")
+  nickname       String
+  language       String
+  description    String     @db.Text
+  active         Boolean    @default(false)
+  image          String?    @db.Text
+  cover          String?    @db.Text
+  created_at     String     @default("")
+  need_send_data Boolean    @default(true)
+  categories     Category[] @relation(name: "CategoryToCreator")
+  owned_courses  Course[]   @relation(name: "course_owner")
+  courses        Course[]   @relation(name: "CourseToCreator")
 }
 
 model Student {
