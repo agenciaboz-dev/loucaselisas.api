@@ -11,11 +11,10 @@ model Creator {
     active      Boolean         @default(false)
     image       String?         @db.Text
     cover       String?         @db.Text
+    created_at  String          @default("")
 
     categories  Category[]
     
-
-
     user_id     String          @unique
     user        User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

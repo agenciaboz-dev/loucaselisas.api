@@ -14,7 +14,7 @@ export const creator_include = Prisma.validator<Prisma.CreatorInclude>()({
 })
 export type CreatorPrisma = Prisma.CreatorGetPayload<{ include: typeof creator_include }>
 export type CreatorType = WithoutFunctions<Creator>
-export type CreatorForm = Omit<WithoutFunctions<Creator>, "active" | "courses" | "id">
+export type CreatorForm = Omit<WithoutFunctions<Creator>, "active" | "courses" | "id" | "favorited_by">
 export type PartialCreator = Partial<Creator> & { id: string }
 export interface CreatorImageForm {
     id: string
@@ -65,6 +65,7 @@ export class Creator {
                     id: uid(),
                     owned_courses: {},
                     active: true,
+                    created_at: new Date().getTime().toString(),
                 },
                 include: creator_include,
             })

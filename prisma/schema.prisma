@@ -95,6 +95,7 @@ model Creator {
   active        Boolean    @default(false)
   image         String?    @db.Text
   cover         String?    @db.Text
+  created_at    String     @default("")
   categories    Category[] @relation(name: "CategoryToCreator")
   owned_courses Course[]   @relation(name: "course_owner")
   courses       Course[]   @relation(name: "CourseToCreator")

@@ -5,6 +5,7 @@ import { ContractLog } from "../../class/Plan"
 import forgot_password from "./forgot_password"
 import { Role } from "../../class/Role"
 import { Course } from "../../class/Course"
+import { Creator, CreatorForm } from "../../class"
 
 const router = express.Router()
 
@@ -153,6 +154,40 @@ router.get("/lesson_watchtime", async (request: Request, response: Response) => 
         }
     } else {
         response.status(400).send("user_id and lesson_id params are required")
+    }
+})
+
+router.post("/creator", async (request: Request, response: Response) => {
+    const data = request.body as { user_id: string; creator_flag: boolean }
+
+    try {
+        const user = new User(data.user_id)
+        await user.init()
+
+        if (user.creator) {
+            const creator = new Creator(user.creator.id)
+            await creator.init()
+            await creator.update({ active: data.creator_flag })
+        } else {
+            if (data.creator_flag) {
+                const form: CreatorForm = {
+                    cover: null,
+                    description: "",
+                    image: null,
+                    language: "pt-br",
+                    nickname: user.username,
+                    user_id: user.id,
+                }
+
+                const creator = await Creator.new(form)
+            }
+        }
+
+        await user.init()
+        response.json(user)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
     }
 })
 
