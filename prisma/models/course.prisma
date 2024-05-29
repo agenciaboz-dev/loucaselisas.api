@@ -44,7 +44,7 @@ model Course {
     chat_id     String?         
     chat        Chat?
     status      CStatus          @default(pending)
-    declined_reason String?
+    declined_reason String?     @db.Text
     
 }
 

@@ -31,7 +31,7 @@ export const course_include = Prisma.validator<Prisma.CourseInclude>()({
     owner: { include: { user: true } },
     favorited_by: { select: { id: true } },
     roles: { include: role_include },
-    lessons: { include: { _count: { select: { downloads: true } } } },
+    lessons: { include: lesson_include },
     plans: true,
 
     _count: { select: { lessons: true, favorited_by: true, students: true, views: true } },
@@ -78,6 +78,7 @@ export type CourseForm = Omit<
     owner_id: string
     id?: string
     declined_reason?: string
+    status?: Status
 }
 
 export class Course {
@@ -103,6 +104,7 @@ export class Course {
 
     status: Status
     declined_reason: string | null
+    primitive_lessons: Lesson[]
 
     // ? {_count: }
     likes: number
@@ -237,6 +239,8 @@ export class Course {
         this.downloads = data.lessons.reduce((downloads, lesson) => (lesson._count.downloads += downloads), 0)
         this.status = data.status
         this.declined_reason = data.declined_reason
+
+        this.primitive_lessons = data.lessons.map((item) => new Lesson("", item))
     }
 
     async updateCover(cover: CoverForm) {

@@ -80,7 +80,7 @@ model Course {
   chat_id         String?
   chat            Chat?        @relation(name: "ChatToCourse")
   status          CStatus      @default(pending)
-  declined_reason String?
+  declined_reason String?      @db.Text
 }
 
 model Creator {
