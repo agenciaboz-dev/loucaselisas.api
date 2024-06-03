@@ -145,7 +145,7 @@ export const recover_password = (url: string) => `<!doctype html>
                             <tr>
                               <td style="width:250px;">
                                 <a href="https://www.loucaselisas.com.br/" target="_blank">
-                                  <img height="auto" src="https://loucaselisas.agenciaboz.com.br/assets/email/logo-wide-white.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="250" />
+                                  <img height="auto" src="https://painel.loucaseco.com.br/assets/email/logo-wide-white.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="250" />
                                 </a>
                               </td>
                             </tr>
@@ -172,7 +172,7 @@ export const recover_password = (url: string) => `<!doctype html>
                                     <tr>
                                       <td style="font-size:0;height:45px;vertical-align:middle;width:45px;">
                                         <a href="https://wa.me/5548999401049" target="_blank">
-                                          <img height="45" src="https://loucaselisas.agenciaboz.com.br/assets/email/Whatsapp.png" style="border-radius:3px;display:block;" width="45" />
+                                          <img height="45" src="https://painel.loucaseco.com.br/assets/email/Whatsapp.png" style="border-radius:3px;display:block;" width="45" />
                                         </a>
                                       </td>
                                     </tr>
@@ -192,7 +192,7 @@ export const recover_password = (url: string) => `<!doctype html>
                                     <tr>
                                       <td style="font-size:0;height:45px;vertical-align:middle;width:45px;">
                                         <a href="https://www.instagram.com/loucaselisas/" target="_blank">
-                                          <img height="45" src="https://loucaselisas.agenciaboz.com.br/assets/email/Instagram.png" style="border-radius:3px;display:block;" width="45" />
+                                          <img height="45" src="https://painel.loucaseco.com.br/assets/email/Instagram.png" style="border-radius:3px;display:block;" width="45" />
                                         </a>
                                       </td>
                                     </tr>
@@ -212,7 +212,7 @@ export const recover_password = (url: string) => `<!doctype html>
                                     <tr>
                                       <td style="font-size:0;height:45px;vertical-align:middle;width:45px;">
                                         <a href="https://www.facebook.com/LoucasLisas/" target="_blank">
-                                          <img height="45" src="https://loucaselisas.agenciaboz.com.br/assets/email/Facebook.png" style="border-radius:3px;display:block;" width="45" />
+                                          <img height="45" src="https://painel.loucaseco.com.br/assets/email/Facebook.png" style="border-radius:3px;display:block;" width="45" />
                                         </a>
                                       </td>
                                     </tr>
@@ -307,7 +307,7 @@ export const recover_password = (url: string) => `<!doctype html>
                             <tr>
                               <td style="width:160px;">
                                 <a href="https://www.loucaselisas.com.br/" target="_blank">
-                                  <img height="auto" src="https://loucaselisas.agenciaboz.com.br/assets/email/logo_white.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="160" />
+                                  <img height="auto" src="https://painel.loucaseco.com.br/assets/email/logo_white.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="160" />
                                 </a>
                               </td>
                             </tr>
@@ -373,7 +373,7 @@ export const recover_password = (url: string) => `<!doctype html>
                                     <tr>
                                       <td style="font-size:0;height:35px;vertical-align:middle;width:35px;">
                                         <a href="https://wa.me/5548999401049" target="_blank">
-                                          <img height="35" src="https://loucaselisas.agenciaboz.com.br/assets/email/Whatsapp.png" style="border-radius:3px;display:block;" width="35" />
+                                          <img height="35" src="https://painel.loucaseco.com.br/assets/email/Whatsapp.png" style="border-radius:3px;display:block;" width="35" />
                                         </a>
                                       </td>
                                     </tr>
@@ -393,7 +393,7 @@ export const recover_password = (url: string) => `<!doctype html>
                                     <tr>
                                       <td style="font-size:0;height:35px;vertical-align:middle;width:35px;">
                                         <a href="https://www.instagram.com/loucaselisas/" target="_blank">
-                                          <img height="35" src="https://loucaselisas.agenciaboz.com.br/assets/email/Instagram.png" style="border-radius:3px;display:block;" width="35" />
+                                          <img height="35" src="https://painel.loucaseco.com.br/assets/email/Instagram.png" style="border-radius:3px;display:block;" width="35" />
                                         </a>
                                       </td>
                                     </tr>
@@ -413,7 +413,7 @@ export const recover_password = (url: string) => `<!doctype html>
                                     <tr>
                                       <td style="font-size:0;height:35px;vertical-align:middle;width:35px;">
                                         <a href="https://www.facebook.com/LoucasLisas/" target="_blank">
-                                          <img height="35" src="https://loucaselisas.agenciaboz.com.br/assets/email/Facebook.png" style="border-radius:3px;display:block;" width="35" />
+                                          <img height="35" src="https://painel.loucaseco.com.br/assets/email/Facebook.png" style="border-radius:3px;display:block;" width="35" />
                                         </a>
                                       </td>
                                     </tr>
