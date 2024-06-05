@@ -303,6 +303,14 @@ export class Course {
         })
 
         this.load(data)
+
+        if (like) {
+            const course_owner = new User(this.owner.user_id!)
+            await course_owner.init()
+            const user = new User(user_id)
+            await user.init()
+            await course_owner.sendNotification(`${user.name} curtiu o seu curso ${this.name}`, { course_id: this.id })
+        }
     }
 
     async getLessons() {

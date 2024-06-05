@@ -13,6 +13,7 @@ import { Role, role_include } from "./Role"
 import { ContractLog, Plan, PlanContract, contract_log_include, plan_contract_include } from "./Plan"
 import { Lesson, lesson_include } from "./Course/Lesson"
 import { Message, message_include } from "./Chat/Message"
+import expo from "../api/expo"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
@@ -326,5 +327,12 @@ export class User {
 
         const data = await prisma.lessonWatched.create({ data: { watchedTime: watchedTime.toString(), lesson_id, user_id: this.id } })
         return data
+    }
+
+    async sendNotification(body: string, data?: any) {
+        if (!this.expoPushToken) return
+
+        const tickets = await expo.sendPushNotifications([{ to: this.expoPushToken, sound: "default", body, data }])
+        return tickets
     }
 }
