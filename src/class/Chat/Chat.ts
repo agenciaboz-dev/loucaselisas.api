@@ -17,12 +17,21 @@ export class Chat {
     media: Gallery
     messages: number
 
-    static async join(chat_id: string, socket: Socket) {
+    static async join(socket: Socket, chat_id: string, platform: "app" | "admin") {
         await socket.join(chat_id)
-        const data = await prisma.message.findMany({ where: { chat_id }, include: message_include })
+        const data = await prisma.message.findMany({ where: { chat_id, deleted: platform == "app" ? false : undefined }, include: message_include })
         const messages = data.map((item) => new Message(item))
 
         socket.emit("chat:join", messages)
+    }
+
+    static async deleteMessages(socket: Socket, messages: Message[], chat_id: string) {
+        console.log(messages)
+        const data = await prisma.chat.findFirst({ where: { id: chat_id }, include: chat_include })
+        if (data) {
+            const chat = new Chat(data)
+            await chat.deleteMessages(socket, messages)
+        }
     }
 
     constructor(data: ChatPrisma) {
@@ -30,5 +39,14 @@ export class Chat {
         this.description = data.description
         this.media = new Gallery("", data.media)
         this.messages = data._count.messages
+    }
+
+    async deleteMessages(socket: Socket, messages: Message[]) {
+        const deleted = await Promise.all(
+            messages.map(async (message) => await prisma.message.update({ where: { id: message.id }, data: { deleted: true } }))
+        )
+
+        socket.emit("chat:message:delete", deleted)
+        socket.to(this.id).emit("chat:message:delete", deleted)
     }
 }

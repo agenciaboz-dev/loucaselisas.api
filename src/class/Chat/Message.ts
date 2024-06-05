@@ -30,6 +30,7 @@ export class Message {
 
     media_id: string | null
     media: Media | null
+    deleted: boolean
 
     static async new(data: MessageForm, socket: Socket) {
         let media_id: string | undefined = undefined
@@ -69,5 +70,6 @@ export class Message {
         this.chat_id = data.chat_id
         this.media_id = data.media_id
         this.media = data.media
+        this.deleted = data.deleted
     }
 }

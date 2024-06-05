@@ -24,6 +24,7 @@ model Message {
     id                  String          @id
     text                String          @db.Text
     datetime            String
+    deleted             Boolean         @default(false)
 
     user_id             String?
     user                User?            @relation(fields: [user_id], references: [id], onDelete: SetNull)

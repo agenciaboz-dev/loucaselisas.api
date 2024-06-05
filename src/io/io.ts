@@ -51,8 +51,9 @@ export const handleSocket = (socket: Socket) => {
     socket.on("course:new", (data: CourseForm) => Course.new(data, socket))
 
     // ? chat handling
-    socket.on("chat:join", (chat_id: string) => Chat.join(chat_id, socket))
+    socket.on("chat:join", (chat_id: string, platform: "app" | "admin") => Chat.join(socket, chat_id, platform))
     socket.on("chat:message", (data: MessageForm) => Message.new(data, socket))
+    socket.on("chat:message:delete", (data: Message[], chat_id: string) => Chat.deleteMessages(socket, data, chat_id))
 }
 
 export default { initializeIoServer, getIoInstance, handleSocket }
