@@ -79,6 +79,7 @@ export class User {
 
     google_id: string | null
     google_token: string | null
+    expoPushToken: string | null
 
     favorite_creators: string[] = []
     favorite_courses: { id: string }[] = []
@@ -210,6 +211,7 @@ export class User {
 
         this.google_id = data.google_id
         this.google_token = data.google_token
+        this.expoPushToken = data.expoPushToken
 
         this.favorite_creators = data.favorite_creators.map((item) => item.id)
 
