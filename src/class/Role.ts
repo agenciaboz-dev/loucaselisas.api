@@ -1,10 +1,13 @@
 import { Prisma } from "@prisma/client"
 import { Socket } from "socket.io"
 import { prisma } from "../prisma"
-import { Permissions } from "./Permissions"
+import { Permissions, PermissionsForm } from "./Permissions"
+import { WithoutFunctions } from "./helpers"
 
 export const role_include = Prisma.validator<Prisma.RoleInclude>()({ permissions: true })
 export type RolePrisma = Prisma.RoleGetPayload<{ include: typeof role_include }>
+export type PartialRole = Partial<WithoutFunctions<Role>> & { id: string }
+export type RoleForm = Omit<WithoutFunctions<Role>, "id"> & { permissions: PermissionsForm }
 
 export class Role {
     id: number
@@ -46,7 +49,7 @@ export class Role {
         }
     }
 
-    static async new(role: Partial<Role>) {
+    static async create(role: RoleForm) {
         try {
             if (role) {
                 const data = await prisma.role.create({
@@ -66,7 +69,7 @@ export class Role {
                 })
 
                 const new_role = await new Role(data)
-                console.log(new_role)
+                return new_role
             }
         } catch (error) {}
     }
