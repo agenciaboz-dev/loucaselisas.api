@@ -1,7 +1,10 @@
 import { Prisma } from "@prisma/client"
 import { prisma } from "../prisma"
+import { WithoutFunctions } from "./helpers"
 
-export type PermissionsPrimsa = Prisma.PermissionsGetPayload<{}>
+export type PermissionsPrisma = Prisma.PermissionsGetPayload<{}>
+export type PermissionsForm = Omit<WithoutFunctions<Permissions>, "id">
+export type PartialPermissions = Partial<Permissions> & { id: string }
 
 export class Permissions {
     id: number
@@ -27,7 +30,7 @@ export class Permissions {
         return permissions
     }
 
-    constructor(data: PermissionsPrimsa) {
+    constructor(data: PermissionsPrisma) {
         this.id = data.id
         this.configTab = data.configTab
         this.creatorTab = data.creatorTab

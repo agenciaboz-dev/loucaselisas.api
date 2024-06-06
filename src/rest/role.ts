@@ -1,14 +1,14 @@
 import express, { Express, Request, Response } from "express"
 import { prisma } from "../prisma"
-import { Role } from "../class/Role"
+import { Role, RoleForm, RolePrisma } from "../class/Role"
 
 const router = express.Router()
 
 router.post("/", async (request: Request, response: Response) => {
-    const data = request.body as Partial<Role>
+    const data = request.body as RoleForm
 
     try {
-        const role = await Role.new(data)
+        const role = await Role.create(data)
         console.log(role)
         return response.json(role)
     } catch (error) {
