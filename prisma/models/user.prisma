@@ -11,7 +11,7 @@ model User {
     password        String
     name            String
     cpf             String      @unique
-    birth           String
+    birth           String?
     phone           String      
     pronoun         String
     uf              String
