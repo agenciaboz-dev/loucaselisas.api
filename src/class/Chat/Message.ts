@@ -14,6 +14,7 @@ export type MessagePrisma = Prisma.MessageGetPayload<{ include: typeof message_i
 
 export type MessageForm = Omit<WithoutFunctions<Message>, "id" | "user" | "datetime" | "media_id" | "media" | "deleted"> & {
     media?: MediaForm
+    admin?: boolean
 }
 
 export class Message {
