@@ -4,7 +4,6 @@ import { PushNotification } from "../types/PushNotification"
 import Expo from "expo-server-sdk"
 import { prisma } from "../prisma"
 import { uid } from "uid"
-import { getIoInstance } from "../io/io"
 
 export type NotificationPrisma = Prisma.NotificationGetPayload<{}>
 export type NotificationForm = Omit<WithoutFunctions<Notification>, "id" | "viewed" | "datetime" | "status" | "expoPushToken"> & {
@@ -55,7 +54,7 @@ export class Notification {
                 sound: "default",
                 body: item.body,
                 to: item.expoPushToken,
-                data: { target_route: item.target_route, target_param: item.target_param },
+                data: { id: item.id, target_route: item.target_route, target_param: item.target_param },
             }))
 
         const chunks = expo.chunkPushNotifications(expo_forms)
@@ -71,11 +70,6 @@ export class Notification {
         )
 
         console.log(tickets_chunks)
-
-        const io = getIoInstance()
-        notifications.forEach((notification) => {
-            io.emit("user:notification", notification.user_id, notification)
-        })
 
         return tickets_chunks
     }
