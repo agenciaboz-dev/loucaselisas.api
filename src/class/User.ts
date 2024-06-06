@@ -67,7 +67,7 @@ export class User {
     password: string
     name: string
     cpf: string
-    birth: string
+    birth: string | null
     phone: string
     pronoun: string
     uf: string

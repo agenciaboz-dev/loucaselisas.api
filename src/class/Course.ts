@@ -70,6 +70,7 @@ export type CourseForm = Omit<
     | "declined_reason"
     | "plans"
     | "price"
+    | "primitive_lessons"
 > & {
     lessons: LessonForm[]
     cover?: CoverForm
