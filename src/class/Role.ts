@@ -12,6 +12,7 @@ export type RoleForm = Omit<WithoutFunctions<Role>, "id"> & { permissions: Permi
 export class Role {
     id: number
     name: string
+    description: string
     permissions: Permissions
 
     constructor(data: RolePrisma) {
@@ -37,6 +38,7 @@ export class Role {
                 data: {
                     id: 1,
                     name: "padrão",
+                    description: "",
                     permissions_id: permissions.id,
                 },
                 include: role_include,
@@ -55,6 +57,7 @@ export class Role {
                 const data = await prisma.role.create({
                     data: {
                         name: role.name ? role.name : "",
+                        description: role.description ? role.description : "",
                         permissions: {
                             create: role.permissions && {
                                 configTab: role.permissions?.configTab,
@@ -77,6 +80,7 @@ export class Role {
     load(data: RolePrisma) {
         this.id = data.id
         this.name = data.name
+        this.description = data.description || ""
         this.permissions = new Permissions(data.permissions)
     }
 

@@ -1,6 +1,12 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
 model Role {
     id          Int         @id @default(autoincrement())
     name                    String
+    description  String?    @db.Text @default("")
     permissions_id          Int             @unique
     permissions             Permissions     @relation(fields: [permissions_id], references: [id], onDelete: Cascade)
 }
