@@ -13,6 +13,7 @@ import { Role, role_include } from "./Role"
 import { Message, message_include } from "./Chat/Message"
 import { User } from "./User"
 import { Plan } from "./Plan"
+import { Notification } from "./Notification"
 
 export type Status = "active" | "pending" | "disabled" | "declined"
 export interface StatusForm {
@@ -190,6 +191,8 @@ export class Course {
             socket?.emit("course:new", course)
             socket?.broadcast.emit("course:update", course)
 
+            course.sendPendingNotification()
+
             return course
         } catch (error) {
             console.log(error)
@@ -280,6 +283,14 @@ export class Course {
             include: course_include,
         })
 
+        if (data.status == "declined" && this.status != "declined") {
+            this.sendDeclinedNotification()
+        }
+
+        if (data.status == "active" && this.status != "active") {
+            this.sendActiveNotification()
+        }
+
         this.load(prisma_data)
     }
 
@@ -309,7 +320,15 @@ export class Course {
             await course_owner.init()
             const user = new User(user_id)
             await user.init()
-            await course_owner.sendNotification(`${user.name} curtiu o seu curso ${this.name}`, { course_id: this.id })
+            await Notification.new([
+                {
+                    body: `${user.name} curtiu o seu curso ${this.name}`,
+                    expoPushToken: course_owner.expoPushToken,
+                    target_param: { course_id: this.id },
+                    target_route: "creator,creator:course:manage",
+                    user_id: course_owner.id,
+                },
+            ])
         }
     }
 
@@ -335,6 +354,50 @@ export class Course {
     async getViews() {
         const views = await prisma.course.findUnique({ where: { id: this.id }, select: { views: true } })
         return views?.views
+    }
+
+    async sendPendingNotification() {
+        const admins = await User.getAdmins()
+        const notifications = await Notification.new([
+            {
+                body: "Seu curso foi enviado para análise, aguarde retorno",
+                expoPushToken: this.owner.user.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "creator,creator:course:manage",
+                user_id: this.owner.user_id!,
+            },
+            ...admins.map((admin) => ({
+                body: `Curso ${this.name} foi cadastrado. Aguardando análise`,
+                expoPushToken: admin.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "course:profile",
+                user_id: admin.id,
+            })),
+        ])
+    }
+
+    async sendActiveNotification() {
+        const notifications = await Notification.new([
+            {
+                body: `Parabéns, o curso ${this.name} foi aprovado e já está disponível na plataforma`,
+                expoPushToken: this.owner.user.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "creator,creator:course:manage",
+                user_id: this.owner.user_id!,
+            },
+        ])
+    }
+
+    async sendDeclinedNotification() {
+        const notifications = await Notification.new([
+            {
+                body: `Infelizmente o curso ${this.name} foi reprovado. Toque para mais informações`,
+                expoPushToken: this.owner.user.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "creator,creator:course:manage",
+                user_id: this.owner.user_id!,
+            },
+        ])
     }
 
     // async getLikes() {

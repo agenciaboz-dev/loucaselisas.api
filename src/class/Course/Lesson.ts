@@ -5,6 +5,8 @@ import { prisma } from "../../prisma"
 import { uid } from "uid"
 import { saveFile } from "../../tools/saveFile"
 import { Status } from "../Course"
+import { User } from "../User"
+import { Notification } from "../Notification"
 
 export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
     media: true,
@@ -157,5 +159,49 @@ export class Lesson {
     async getViews() {
         const views = await prisma.lesson.findUnique({ where: { id: this.id }, select: { views: true } })
         return views?.views
+    }
+
+    async sendPendingNotification() {
+        const admins = await User.getAdmins()
+        const notifications = await Notification.new([
+            {
+                body: `Lição ${this.name}, do curso ${this.course.name}, enviada para análise`,
+                expoPushToken: this.owner.user.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "creator,creator:course:manage",
+                user_id: this.owner.user_id!,
+            },
+            ...admins.map((admin) => ({
+                body: `Curso ${this.name} foi cadastrado. Aguardando análise`,
+                expoPushToken: admin.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "course:profile",
+                user_id: admin.id,
+            })),
+        ])
+    }
+
+    async sendActiveNotification() {
+        const notifications = await Notification.new([
+            {
+                body: `Parabéns, o curso ${this.name} foi aprovado e já está disponível na plataforma`,
+                expoPushToken: this.owner.user.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "creator,creator:course:manage",
+                user_id: this.owner.user_id!,
+            },
+        ])
+    }
+
+    async sendDeclinedNotification() {
+        const notifications = await Notification.new([
+            {
+                body: `Infelizmente o curso ${this.name} foi reprovado. Toque para mais informações`,
+                expoPushToken: this.owner.user.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "creator,creator:course:manage",
+                user_id: this.owner.user_id!,
+            },
+        ])
     }
 }

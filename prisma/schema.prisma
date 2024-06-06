@@ -46,6 +46,7 @@ model User {
   messages          Message[]       @relation(name: "MessageToUser")
   plan              PlanContract?   @relation(name: "PlanContractToUser")
   plan_history      ContractLogs[]  @relation(name: "ContractLogsToUser")
+  notifications     Notification[]  @relation(name: "NotificationToUser")
 }
 
 model Role {
@@ -271,6 +272,19 @@ model Permissions {
   searchTab    Boolean
   favoritesTab Boolean
   configTab    Boolean
+}
+
+model Notification {
+  id            String  @id
+  status        String
+  viewed        Boolean @default(false)
+  body          String  @db.Text
+  datetime      String
+  target_route  String
+  target_param  String  @db.Text
+  user_id       String
+  user          User    @relation(name: "NotificationToUser", fields: [user_id], references: [id], onDelete: Cascade)
+  expoPushToken String  @db.Text
 }
 
 enum CoverType {

@@ -12,7 +12,8 @@
                 "prisma/models/lesson.prisma",
                 "prisma/models/chat.prisma",
                 "prisma/models/plan.prisma",
-                "prisma/models/role.prisma"
+                "prisma/models/role.prisma",
+                "prisma/models/notification.prisma"
             ],
             "output": "prisma/schema.prisma"
         }

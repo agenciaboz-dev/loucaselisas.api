@@ -1,0 +1,22 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model Notification {
+    id                  String              @id
+    status              String
+    viewed              Boolean             @default(false)
+    body                String              @db.Text
+    datetime            String
+    target_route        String
+    target_param        String              @db.Text
+    user_id             String
+    user                User                @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    expoPushToken       String              @db.Text
+}
+
+model User {
+    id                  String          @id
+    notifications       Notification[]
+}

@@ -14,6 +14,7 @@ import { ContractLog, Plan, PlanContract, contract_log_include, plan_contract_in
 import { Lesson, lesson_include } from "./Course/Lesson"
 import { Message, message_include } from "./Chat/Message"
 import expo from "../api/expo"
+import { Notification } from "./Notification"
 
 export const user_include = Prisma.validator<Prisma.UserInclude>()({
     creator: { include: creator_include },
@@ -23,6 +24,7 @@ export const user_include = Prisma.validator<Prisma.UserInclude>()({
     payment_cards: true,
     role: { include: role_include },
     plan: { include: plan_contract_include },
+    notifications: true,
     _count: { select: { lessons_likes: true } },
 })
 export type UserPrisma = Prisma.UserGetPayload<{ include: typeof user_include }>
@@ -49,6 +51,7 @@ export type UserForm = Omit<
     | "payment_cards"
     | "liked_lessons"
     | "created_at"
+    | "notifications"
 > & {
     image: FileUpload | null
     cover: FileUpload | null
@@ -95,6 +98,8 @@ export class User {
 
     liked_lessons: number
 
+    notifications: Notification[]
+
     constructor(id: string, user_prisma?: UserPrisma) {
         user_prisma ? this.load(user_prisma) : (this.id = id)
     }
@@ -106,6 +111,12 @@ export class User {
         } else {
             throw "usuário não encontrado"
         }
+    }
+
+    static async getAdmins() {
+        const data = await prisma.user.findMany({ where: { admin: true }, include: user_include })
+        const admins = data.map((item) => new User("", item))
+        return admins
     }
 
     static async update(data: PartialUser, socket: Socket) {
@@ -227,6 +238,7 @@ export class User {
         this.plan = data.plan ? new PlanContract(data.plan) : null
 
         this.liked_lessons = data._count.lessons_likes
+        this.notifications = data.notifications.map((item) => new Notification(item))
     }
 
     async update(data: Partial<User>, socket?: Socket) {
@@ -236,6 +248,7 @@ export class User {
                 data: {
                     ...data,
                     role: data.role ? { connect: { id: data.role.id } } : undefined,
+                    notifications: undefined,
                     favorite_courses: undefined,
                     favorite_creators: undefined,
                     payment_cards: undefined,
@@ -327,12 +340,5 @@ export class User {
 
         const data = await prisma.lessonWatched.create({ data: { watchedTime: watchedTime.toString(), lesson_id, user_id: this.id } })
         return data
-    }
-
-    async sendNotification(body: string, data?: any) {
-        if (!this.expoPushToken) return
-
-        const tickets = await expo.sendPushNotifications([{ to: this.expoPushToken, sound: "default", body, data }])
-        return tickets
     }
 }
