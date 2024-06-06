@@ -200,6 +200,12 @@ export class User {
         return null
     }
 
+    static async findById(id: string) {
+        const data = await prisma.user.findUnique({ where: { id }, include: user_include })
+        if (!data) throw "usuário não encontrado"
+        return new User("", data)
+    }
+
     load(data: UserPrisma) {
         this.id = data.id
         this.cpf = data.cpf

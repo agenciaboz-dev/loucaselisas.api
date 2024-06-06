@@ -191,7 +191,7 @@ export class Course {
             socket?.emit("course:new", course)
             socket?.broadcast.emit("course:update", course)
 
-            course.sendPendingNotification()
+            course.sendCreatedNotification()
 
             return course
         } catch (error) {
@@ -291,6 +291,10 @@ export class Course {
             this.sendActiveNotification()
         }
 
+        if (data.status == "pending" && this.status != "pending") {
+            this.sendPendingNotification()
+        }
+
         this.load(prisma_data)
     }
 
@@ -322,7 +326,7 @@ export class Course {
             await user.init()
             await Notification.new([
                 {
-                    body: `${user.name} curtiu o seu curso ${this.name}`,
+                    body: `${user.username} curtiu o seu curso ${this.name}`,
                     expoPushToken: course_owner.expoPushToken,
                     target_param: { course_id: this.id },
                     target_route: "creator,creator:course:manage",
@@ -357,6 +361,18 @@ export class Course {
     }
 
     async sendPendingNotification() {
+        const notifications = await Notification.new([
+            {
+                body: `O curso ${this.name} foi desativado para análise, toque aqui para acessá-lo`,
+                expoPushToken: this.owner.user.expoPushToken,
+                target_param: { course_id: this.id },
+                target_route: "creator,creator:course:manage",
+                user_id: this.owner.user_id!,
+            },
+        ])
+    }
+
+    async sendCreatedNotification() {
         const admins = await User.getAdmins()
         const notifications = await Notification.new([
             {

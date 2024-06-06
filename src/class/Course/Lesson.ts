@@ -11,7 +11,7 @@ import { Notification } from "../Notification"
 export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
     media: true,
     likes: true,
-    course: true,
+    course: { include: { favorited_by: true } },
     _count: { select: { downloads: true, likes: true, views: true } },
 })
 export type LessonPrisma = Prisma.LessonGetPayload<{ include: typeof lesson_include }>
@@ -22,6 +22,7 @@ export type LessonForm = Omit<
     thumb?: FileUpload
     media?: MediaForm
     declined_reason?: string
+    status?: Status
 }
 export type PartialLesson = Partial<Lesson> & { id: string }
 
@@ -63,6 +64,7 @@ export class Lesson {
         })
 
         const lesson = new Lesson("", lesson_prisma)
+        lesson.sendCreatedNotification()
         return lesson
     }
 
@@ -131,6 +133,14 @@ export class Lesson {
             include: lesson_include,
         })
 
+        if (data.status == "declined" && this.status != "declined") {
+            this.sendDeclinedNotification()
+        }
+
+        if (data.status == "active" && this.status != "active") {
+            this.sendActiveNotification()
+        }
+
         this.load(prisma_data)
     }
 
@@ -144,6 +154,22 @@ export class Lesson {
         })
 
         this.load(data)
+
+        if (like) {
+            const course_owner = await this.getOwner()
+            await course_owner.init()
+            const user = new User(user_id)
+            await user.init()
+            await Notification.new([
+                {
+                    body: `${user.username} curtiu a lição ${this.name} do curso ${this.course.name}`,
+                    expoPushToken: course_owner.expoPushToken,
+                    target_param: { lesson_id: this.id },
+                    target_route: "creator,creator:lesson",
+                    user_id: course_owner.id,
+                },
+            ])
+        }
     }
 
     async addView(user_id: string) {
@@ -161,46 +187,64 @@ export class Lesson {
         return views?.views
     }
 
-    async sendPendingNotification() {
+    async getOwner() {
+        const creator = await prisma.creator.findUnique({ where: { id: this.course.owner_id } })
+        if (!creator) throw "criador não encontrado"
+        const user = await User.findById(creator.user_id)
+        return user
+    }
+
+    async sendCreatedNotification() {
         const admins = await User.getAdmins()
+        const owner = await this.getOwner()
         const notifications = await Notification.new([
             {
-                body: `Lição ${this.name}, do curso ${this.course.name}, enviada para análise`,
-                expoPushToken: this.owner.user.expoPushToken,
-                target_param: { course_id: this.id },
-                target_route: "creator,creator:course:manage",
-                user_id: this.owner.user_id!,
+                body: `Lição ${this.name}, do curso ${this.course.name}, enviada para análise. Aguarde retorno`,
+                expoPushToken: owner.expoPushToken,
+                target_param: { lesson_id: this.id },
+                target_route: "creator,creator:lesson",
+                user_id: owner.id,
             },
             ...admins.map((admin) => ({
-                body: `Curso ${this.name} foi cadastrado. Aguardando análise`,
+                body: `Lição ${this.name}, do curso ${this.course.name} foi cadastrada. Aguardando análise.`,
                 expoPushToken: admin.expoPushToken,
-                target_param: { course_id: this.id },
-                target_route: "course:profile",
+                target_param: { lesson_id: this.id },
+                target_route: "lesson",
                 user_id: admin.id,
             })),
         ])
     }
 
     async sendActiveNotification() {
+        const owner = await this.getOwner()
+        const users_who_liked = await Promise.all(this.course.favorited_by.map(async (item: { id: string }) => await User.findById(item.id)))
         const notifications = await Notification.new([
             {
-                body: `Parabéns, o curso ${this.name} foi aprovado e já está disponível na plataforma`,
-                expoPushToken: this.owner.user.expoPushToken,
-                target_param: { course_id: this.id },
-                target_route: "creator,creator:course:manage",
-                user_id: this.owner.user_id!,
+                body: `Parabéns! A lição ${this.name}, do curso ${this.course.name}, foi aprovada e já está disponível na plataforma`,
+                expoPushToken: owner.expoPushToken,
+                target_param: { lesson_id: this.id },
+                target_route: "creator,creator:lesson",
+                user_id: owner.id,
             },
+            ...users_who_liked.map((user) => ({
+                body: `Uma nova lição foi publicada no curso ${this.course.name}. Toque aqui para acessar`,
+                expoPushToken: user.expoPushToken,
+                target_param: { lesson_id: this.id },
+                target_route: "lesson",
+                user_id: user.id,
+            })),
         ])
     }
 
     async sendDeclinedNotification() {
+        const owner = await this.getOwner()
         const notifications = await Notification.new([
             {
-                body: `Infelizmente o curso ${this.name} foi reprovado. Toque para mais informações`,
-                expoPushToken: this.owner.user.expoPushToken,
-                target_param: { course_id: this.id },
-                target_route: "creator,creator:course:manage",
-                user_id: this.owner.user_id!,
+                body: `Infelizmente, a lição ${this.name}, do curso ${this.course.name} foi reprovada. Toque aqui para mais informações`,
+                expoPushToken: owner.expoPushToken,
+                target_param: { lesson_id: this.id },
+                target_route: "creator,creator:lesson",
+                user_id: owner.id,
             },
         ])
     }

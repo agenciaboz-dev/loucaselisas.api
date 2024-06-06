@@ -5,6 +5,8 @@ import { prisma } from "../../prisma"
 import { uid } from "uid"
 import { User } from "../User"
 import { Media, MediaForm } from "../Gallery/Media"
+import { Notification } from "../Notification"
+import { Course } from "../Course"
 
 export const message_include = Prisma.validator<Prisma.MessageInclude>()({
     user: true,
@@ -58,6 +60,40 @@ export class Message {
 
         socket.emit("chat:message:success", message)
         socket.to(data.chat_id).emit("chat:message", message)
+
+        const course = await Course.getFromChat(data.chat_id)
+        if (course) {
+            if (data.admin) {
+                await Notification.new([
+                    {
+                        body: `Um administrador enviou uma mensagem no chat do curso ${course.name}. Toque aqui para acessar`,
+                        target_param: { course_id: course.id },
+                        target_route: "creator,creator:course:chat",
+                        user_id: course.owner.user_id!,
+                        expoPushToken: course.owner.user.expoPushToken,
+                    },
+                ])
+            } else {
+                const user = await User.findById(data.user_id!)
+                // const users_who_liked = await Promise.all(course.favorited_by.map(async (item: { id: string }) => await User.findById(item.id)))
+                await Notification.new([
+                    {
+                        body: `${user.username} enviou mensagem no curso ${course.name}: ${data.text || "sem texto"}`,
+                        target_param: { course_id: course.id },
+                        target_route: "creator,creator:course:chat",
+                        user_id: course.owner.user_id!,
+                        expoPushToken: course.owner.user.expoPushToken,
+                    },
+                    // ...users_who_liked.map((user) => ({
+                    //     body: `${user.username} enviou mensagem no curso ${course.name}: ${data.text || "sem texto"}`,
+                    //     expoPushToken: user.expoPushToken,
+                    //     target_param: { course_id: course.id },
+                    //     target_route: "chat",
+                    //     user_id: user.id,
+                    // })),
+                ])
+            }
+        }
     }
 
     constructor(data: MessagePrisma) {
