@@ -11,6 +11,7 @@ import lesson from "./src/rest/lesson"
 import stats from "./src/rest/stats"
 import role from "./src/rest/role"
 import notification from "./src/rest/notification"
+import chat from "./src/rest/chat"
 
 export const router = express.Router()
 
@@ -30,3 +31,4 @@ router.use("/lesson", lesson)
 router.use("/stats", stats)
 router.use("/role", role)
 router.use("/notification", notification)
+router.use("/chat", chat)

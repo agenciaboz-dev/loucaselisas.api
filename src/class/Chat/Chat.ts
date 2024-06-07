@@ -25,12 +25,12 @@ export class Chat {
         socket.emit("chat:join", messages)
     }
 
-    static async deleteMessages(socket: Socket, messages: Message[], chat_id: string) {
+    static async deleteMessages(messages: Message[], chat_id: string, socket?: Socket) {
         console.log(messages)
         const data = await prisma.chat.findFirst({ where: { id: chat_id }, include: chat_include })
         if (data) {
             const chat = new Chat(data)
-            await chat.deleteMessages(socket, messages)
+            await chat.deleteMessages(messages, socket)
         }
     }
 
@@ -41,12 +41,12 @@ export class Chat {
         this.messages = data.messages.filter((item) => !item.deleted).length
     }
 
-    async deleteMessages(socket: Socket, messages: Message[]) {
+    async deleteMessages(messages: Message[], socket?: Socket) {
         const deleted = await Promise.all(
             messages.map(async (message) => await prisma.message.update({ where: { id: message.id }, data: { deleted: true } }))
         )
 
-        socket.emit("chat:message:delete", deleted)
-        socket.to(this.id).emit("chat:message:delete", deleted)
+        socket?.emit("chat:message:delete", deleted)
+        socket?.to(this.id).emit("chat:message:delete", deleted)
     }
 }
