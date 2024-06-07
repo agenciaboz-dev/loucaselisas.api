@@ -13,7 +13,7 @@ export class Role {
     id: number
     name: string
     description: string
-    permissions: Permissions
+    permissions: PermissionsForm
 
     constructor(data: RolePrisma) {
         this.load(data)
