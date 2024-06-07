@@ -10,6 +10,7 @@ import card from "./src/rest/card"
 import lesson from "./src/rest/lesson"
 import stats from "./src/rest/stats"
 import role from "./src/rest/role"
+import notification from "./src/rest/notification"
 
 export const router = express.Router()
 
@@ -28,3 +29,4 @@ router.use("/card", card)
 router.use("/lesson", lesson)
 router.use("/stats", stats)
 router.use("/role", role)
+router.use("/notification", notification)

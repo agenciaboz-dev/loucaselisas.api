@@ -23,20 +23,22 @@ export class Notification {
     target_route: string
     target_param: any
     user_id: string
-    expoPushToken: string
+    expoPushToken: string[]
     image: string
     title: string
 
-    static async new(forms: NotificationForm[]) {
-        const expo_splitted_forms = forms
-            .map((item) =>
-                item.expoPushToken ? item.expoPushToken.map((token) => ({ ...item, expoPushToken: token })) : { ...item, expoPushToken: "" }
-            )
-            .flatMap((item) => item)
+    static async findById(id: string) {
+        const data = await prisma.notification.findUnique({ where: { id } })
+        if (!data) throw "notificação não encontrada"
 
+        const notification = new Notification(data)
+        return notification
+    }
+
+    static async new(forms: NotificationForm[]) {
         const notifications = (
             await Promise.all(
-                expo_splitted_forms.map(
+                forms.map(
                     async (item) =>
                         await prisma.notification.create({
                             data: {
@@ -47,7 +49,7 @@ export class Notification {
                                 target_param: JSON.stringify(item.target_param),
                                 target_route: item.target_route,
                                 user_id: item.user_id,
-                                expoPushToken: item.expoPushToken,
+                                expoPushToken: JSON.stringify(item.expoPushToken),
                                 image: item.image,
                                 title: item.title,
                             },
@@ -58,16 +60,20 @@ export class Notification {
 
         console.log(notifications)
 
-        const expo_forms: PushNotification[] = notifications
+        const splitted_forms = notifications
             .filter((item) => !!item.expoPushToken)
-            .map((item) => ({
-                sound: "default",
-                body: item.body,
-                to: item.expoPushToken,
-                data: { id: item.id, target_route: item.target_route, target_param: item.target_param },
-            }))
+            .map((notification) => {
+                const tokens = notification.expoPushToken.map((token) => ({
+                    sound: "default",
+                    body: notification.body,
+                    to: token,
+                    data: { id: notification.id, target_route: notification.target_route, target_param: notification.target_param },
+                }))
+                return tokens
+            })
+            .flatMap((item) => item)
 
-        const chunks = expo.chunkPushNotifications(expo_forms)
+        const chunks = expo.chunkPushNotifications(splitted_forms as PushNotification[])
         const tickets_chunks = await Promise.all(
             chunks.map(async (chunk) => {
                 try {
@@ -93,7 +99,7 @@ export class Notification {
         this.target_param = JSON.parse(data.target_param)
         this.target_route = data.target_route
         this.user_id = data.user_id
-        this.expoPushToken = data.expoPushToken
+        this.expoPushToken = JSON.parse(data.expoPushToken)
         this.image = data.image
         this.title = data.title
     }
