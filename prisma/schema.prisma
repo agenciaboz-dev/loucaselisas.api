@@ -279,6 +279,8 @@ model Notification {
   id            String  @id
   status        String
   viewed        Boolean @default(false)
+  title         String  @default("") @db.Text
+  image         String  @default("") @db.Text
   body          String  @db.Text
   datetime      String
   target_route  String

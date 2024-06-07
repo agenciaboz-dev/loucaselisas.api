@@ -24,6 +24,8 @@ export class Notification {
     target_param: any
     user_id: string
     expoPushToken: string
+    image: string
+    title: string
 
     static async new(forms: NotificationForm[]) {
         const expo_splitted_forms = forms
@@ -46,6 +48,8 @@ export class Notification {
                                 target_route: item.target_route,
                                 user_id: item.user_id,
                                 expoPushToken: item.expoPushToken,
+                                image: item.image,
+                                title: item.title,
                             },
                         })
                 )
@@ -90,5 +94,7 @@ export class Notification {
         this.target_route = data.target_route
         this.user_id = data.user_id
         this.expoPushToken = data.expoPushToken
+        this.image = data.image
+        this.title = data.title
     }
 }

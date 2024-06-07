@@ -332,6 +332,8 @@ export class Course {
                     target_param: { course_id: this.id },
                     target_route: "creator,creator:course:manage",
                     user_id: course_owner.id,
+                    title: "Curso curtido",
+                    image: this.cover,
                 },
             ])
         }
@@ -369,6 +371,8 @@ export class Course {
                 target_param: { course_id: this.id },
                 target_route: "creator,creator:course:manage",
                 user_id: this.owner.user_id!,
+                image: this.cover,
+                title: "Curso desativado",
             },
         ])
     }
@@ -382,6 +386,8 @@ export class Course {
                 target_param: { course_id: this.id },
                 target_route: "creator,creator:course:manage",
                 user_id: this.owner.user_id!,
+                image: this.cover,
+                title: "Curso cadastrado",
             },
             ...admins.map((admin) => ({
                 body: `Curso ${this.name} foi cadastrado. Aguardando análise`,
@@ -389,6 +395,8 @@ export class Course {
                 target_param: { course_id: this.id },
                 target_route: "course:profile",
                 user_id: admin.id,
+                image: this.cover,
+                title: "Curso cadastrado",
             })),
         ])
     }
@@ -401,6 +409,8 @@ export class Course {
                 target_param: { course_id: this.id },
                 target_route: "creator,creator:course:manage",
                 user_id: this.owner.user_id!,
+                image: this.cover,
+                title: "Curso aprovado",
             },
         ])
     }
@@ -413,6 +423,8 @@ export class Course {
                 target_param: { course_id: this.id },
                 target_route: "creator,creator:course:manage",
                 user_id: this.owner.user_id!,
+                image: this.cover,
+                title: "Curso reprovado",
             },
         ])
     }

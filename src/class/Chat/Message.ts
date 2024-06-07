@@ -71,6 +71,8 @@ export class Message {
                         target_route: "creator,creator:course:chat",
                         user_id: course.owner.user_id!,
                         expoPushToken: course.owner.user.expoPushToken,
+                        image: course.cover,
+                        title: "Nova mensagem do administrador",
                     },
                 ])
             } else {
@@ -83,6 +85,8 @@ export class Message {
                         target_route: "creator,creator:course:chat",
                         user_id: course.owner.user_id!,
                         expoPushToken: course.owner.user.expoPushToken,
+                        image: course.cover,
+                        title: "Novo comentário",
                     },
                     // ...users_who_liked.map((user) => ({
                     //     body: `${user.username} enviou mensagem no curso ${course.name}: ${data.text || "sem texto"}`,
