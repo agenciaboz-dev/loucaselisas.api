@@ -24,7 +24,7 @@ model User {
     cover           String?     @db.Text
     bio             String?     @db.Text
     
-    expoPushToken   String?     @db.Text
+    expoPushToken   String?     @db.Text    @default("[]")
     google_id       String?
     google_token    String?     @db.Text
 

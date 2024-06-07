@@ -28,7 +28,7 @@ model User {
   image             String?         @db.Text
   cover             String?         @db.Text
   bio               String?         @db.Text
-  expoPushToken     String?         @db.Text
+  expoPushToken     String?         @default("[]") @db.Text
   google_id         String?
   google_token      String?         @db.Text
   favorite_creators Creator[]       @relation(name: "favorite_creators")

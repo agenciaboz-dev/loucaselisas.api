@@ -223,7 +223,7 @@ export class Course {
 
         this.categories = data.categories.map((category) => new Category("", category))
 
-        this.owner = data.owner
+        this.owner = { ...data.owner, user: { ...data.owner.user, expoPushToken: JSON.parse(data.owner.user.expoPushToken || "null") || [] } }
         this.owner_id = data.owner_id
         this.creators = data.creators
         this.price = data.price

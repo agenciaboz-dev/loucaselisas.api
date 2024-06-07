@@ -7,7 +7,7 @@ import { uid } from "uid"
 
 export type NotificationPrisma = Prisma.NotificationGetPayload<{}>
 export type NotificationForm = Omit<WithoutFunctions<Notification>, "id" | "viewed" | "datetime" | "status" | "expoPushToken"> & {
-    expoPushToken?: string | null
+    expoPushToken?: string[] | null
 }
 
 const expo = new Expo({
@@ -26,9 +26,15 @@ export class Notification {
     expoPushToken: string
 
     static async new(forms: NotificationForm[]) {
+        const expo_splitted_forms = forms
+            .map((item) =>
+                item.expoPushToken ? item.expoPushToken.map((token) => ({ ...item, expoPushToken: token })) : { ...item, expoPushToken: "" }
+            )
+            .flatMap((item) => item)
+
         const notifications = (
             await Promise.all(
-                forms.map(
+                expo_splitted_forms.map(
                     async (item) =>
                         await prisma.notification.create({
                             data: {
@@ -39,7 +45,7 @@ export class Notification {
                                 target_param: JSON.stringify(item.target_param),
                                 target_route: item.target_route,
                                 user_id: item.user_id,
-                                expoPushToken: item.expoPushToken || "",
+                                expoPushToken: item.expoPushToken,
                             },
                         })
                 )

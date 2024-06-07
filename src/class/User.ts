@@ -83,7 +83,7 @@ export class User {
 
     google_id: string | null
     google_token: string | null
-    expoPushToken: string | null
+    expoPushToken: string[] | null
 
     favorite_creators: string[] = []
     favorite_courses: { id: string }[] = []
@@ -149,6 +149,7 @@ export class User {
                     image: null,
                     cover: null,
                     created_at: new Date().getTime().toString(),
+                    expoPushToken: undefined,
                     creator: data.creator ? { create: { id: uid(), ...data.creator, favorited_by: undefined, owned_courses: {} } } : {},
                     student: data.student ? { create: { id: uid() } } : {},
                     role: { connect: { id: 1 } },
@@ -229,7 +230,7 @@ export class User {
 
         this.google_id = data.google_id
         this.google_token = data.google_token
-        this.expoPushToken = data.expoPushToken
+        this.expoPushToken = JSON.parse(data.expoPushToken || "null") || []
 
         this.favorite_creators = data.favorite_creators.map((item) => item.id)
 
@@ -248,12 +249,14 @@ export class User {
     }
 
     async update(data: Partial<User>, socket?: Socket) {
+        console.log(data)
         try {
             const user_prisma = await prisma.user.update({
                 where: { id: this.id },
                 data: {
                     ...data,
                     role: data.role ? { connect: { id: data.role.id } } : undefined,
+                    expoPushToken: data.expoPushToken ? JSON.stringify(data.expoPushToken) : undefined,
                     notifications: undefined,
                     favorite_courses: undefined,
                     favorite_creators: undefined,
