@@ -103,4 +103,9 @@ export class Notification {
         this.image = data.image
         this.title = data.title
     }
+
+    async view() {
+        await prisma.notification.update({ where: { id: this.id }, data: { viewed: true } })
+        this.viewed = true
+    }
 }

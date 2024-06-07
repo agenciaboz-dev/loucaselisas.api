@@ -18,4 +18,17 @@ router.get("/", async (request: Request, response: Response) => {
     }
 })
 
+router.post("/viewed", async (request: Request, response: Response) => {
+    const data = request.body as { id: string }
+
+    try {
+        const notification = await Notification.findById(data.id)
+        await notification.view()
+        response.json(notification)
+    } catch (error) {
+        console.log(error)
+        response.status(500).send(error)
+    }
+})
+
 export default router
