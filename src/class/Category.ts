@@ -56,8 +56,11 @@ export class Category {
         this.load(data)
     }
 
-    async getCourses() {
-        const data = await prisma.course.findMany({ where: { categories: { some: { id: this.id } } }, include: course_include })
+    async getCourses(role_id?: number) {
+        const data = await prisma.course.findMany({
+            where: { roles: { some: { id: { equals: role_id } } }, categories: { some: { id: this.id } }, status: role_id ? "active" : undefined },
+            include: course_include,
+        })
         const courses = data.map((item) => new Course("", item))
         return courses
     }

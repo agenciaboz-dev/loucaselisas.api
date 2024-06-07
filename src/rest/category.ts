@@ -61,12 +61,13 @@ router.patch("/", async (request: Request, response: Response) => {
 
 router.get("/courses", async (request: Request, response: Response) => {
     const category_id = request.query.category_id as string | undefined
+    const role_id = request.query.role_id as number | undefined
 
     if (category_id) {
         try {
             const category = new Category(category_id)
             await category.init()
-            const courses = await category.getCourses()
+            const courses = await category.getCourses(Number(role_id))
             response.json(courses)
         } catch (error) {
             console.log(error)
