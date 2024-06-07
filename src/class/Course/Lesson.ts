@@ -7,6 +7,7 @@ import { saveFile } from "../../tools/saveFile"
 import { Status } from "../Course"
 import { User } from "../User"
 import { Notification } from "../Notification"
+import templates from "../../templates"
 
 export const lesson_include = Prisma.validator<Prisma.LessonInclude>()({
     media: true,
@@ -160,15 +161,16 @@ export class Lesson {
             await course_owner.init()
             const user = new User(user_id)
             await user.init()
+            const template = templates.notifications.onLessonLike(user.username, this.course.name, this.name)
             await Notification.new([
                 {
-                    body: `${user.username} curtiu a lição ${this.name} do curso ${this.course.name}`,
+                    title: template.title,
+                    body: template.body,
                     expoPushToken: course_owner.expoPushToken,
                     target_param: { lesson_id: this.id },
                     target_route: "creator,creator:lesson",
                     user_id: course_owner.id,
                     image: this.thumb || this.media.url,
-                    title: "Lição curtida",
                 },
             ])
         }
@@ -199,24 +201,27 @@ export class Lesson {
     async sendCreatedNotification() {
         const admins = await User.getAdmins()
         const owner = await this.getOwner()
+        const template_creator = templates.notifications.onLessonCreate(this.course.name, this.name)
+        const template_adm = templates.notifications.onLessonCreateAdm(this.course.name, this.name)
+
         const notifications = await Notification.new([
             {
-                body: `Lição ${this.name}, do curso ${this.course.name}, enviada para análise. Aguarde retorno`,
+                title: template_creator.title,
+                body: template_creator.body,
                 expoPushToken: owner.expoPushToken,
                 target_param: { lesson_id: this.id },
                 target_route: "creator,creator:lesson",
                 user_id: owner.id,
                 image: this.thumb || this.media.url,
-                title: "Lição cadastrada",
             },
             ...admins.map((admin) => ({
-                body: `Lição ${this.name}, do curso ${this.course.name} foi cadastrada. Aguardando análise.`,
+                title: template_adm.title,
+                body: template_adm.body,
                 expoPushToken: admin.expoPushToken,
                 target_param: { lesson_id: this.id },
                 target_route: "lesson",
                 user_id: admin.id,
                 image: this.course.cover,
-                title: "Lição cadastrada",
             })),
         ])
     }
@@ -224,39 +229,43 @@ export class Lesson {
     async sendActiveNotification() {
         const owner = await this.getOwner()
         const users_who_liked = await Promise.all(this.course.favorited_by.map(async (item: { id: string }) => await User.findById(item.id)))
+        const template_creator = templates.notifications.onLessonApprove(this.course.name, this.name)
+        const template_followers = templates.notifications.onLessonApproveToFollowers(this.course.name)
+
         const notifications = await Notification.new([
             {
-                body: `Parabéns! A lição ${this.name}, do curso ${this.course.name}, foi aprovada e já está disponível na plataforma`,
+                title: template_creator.title,
+                body: template_creator.body,
                 expoPushToken: owner.expoPushToken,
                 target_param: { lesson_id: this.id },
                 target_route: "creator,creator:lesson",
                 user_id: owner.id,
                 image: this.thumb || this.media.url,
-                title: "Lição aprovada",
             },
             ...users_who_liked.map((user) => ({
-                body: `Uma nova lição foi publicada no curso ${this.course.name}. Toque aqui para acessar`,
+                title: template_followers.title,
+                body: template_followers.body,
                 expoPushToken: user.expoPushToken,
                 target_param: { lesson_id: this.id },
                 target_route: "lesson",
                 user_id: user.id,
                 image: this.course.cover,
-                title: "Nova lição",
             })),
         ])
     }
 
     async sendDeclinedNotification() {
         const owner = await this.getOwner()
+        const template = templates.notifications.onLessonDecline(this.course.name, this.name)
         const notifications = await Notification.new([
             {
-                body: `Infelizmente, a lição ${this.name}, do curso ${this.course.name} foi reprovada. Toque aqui para mais informações`,
+                title: template.title,
+                body: template.body,
                 expoPushToken: owner.expoPushToken,
                 target_param: { lesson_id: this.id },
                 target_route: "creator,creator:lesson",
                 user_id: owner.id,
                 image: this.thumb || this.media.url,
-                title: "Lição reprovada",
             },
         ])
     }

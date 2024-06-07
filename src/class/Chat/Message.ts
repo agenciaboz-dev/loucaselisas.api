@@ -7,6 +7,7 @@ import { User } from "../User"
 import { Media, MediaForm } from "../Gallery/Media"
 import { Notification } from "../Notification"
 import { Course } from "../Course"
+import templates from "../../templates"
 
 export const message_include = Prisma.validator<Prisma.MessageInclude>()({
     user: true,
@@ -64,29 +65,31 @@ export class Message {
         const course = await Course.getFromChat(data.chat_id)
         if (course) {
             if (data.admin) {
+                const template = templates.notifications.onAdmMessage(course.name)
                 await Notification.new([
                     {
-                        body: `Um administrador enviou uma mensagem no chat do curso ${course.name}. Toque aqui para acessar`,
+                        title: template.title,
+                        body: template.body,
                         target_param: { course_id: course.id },
                         target_route: "creator,creator:course:chat",
                         user_id: course.owner.user_id!,
                         expoPushToken: course.owner.user.expoPushToken,
                         image: course.cover,
-                        title: "Nova mensagem do administrador",
                     },
                 ])
             } else {
                 const user = await User.findById(data.user_id!)
                 // const users_who_liked = await Promise.all(course.favorited_by.map(async (item: { id: string }) => await User.findById(item.id)))
+                const template = templates.notifications.onMessageToCreator(user.username, course.name, data.text)
                 await Notification.new([
                     {
-                        body: `${user.username} enviou mensagem no curso ${course.name}: ${data.text || "sem texto"}`,
+                        title: template.title,
+                        body: template.body,
                         target_param: { course_id: course.id },
                         target_route: "creator,creator:course:chat",
                         user_id: course.owner.user_id!,
                         expoPushToken: course.owner.user.expoPushToken,
                         image: course.cover,
-                        title: "Novo comentário",
                     },
                     // ...users_who_liked.map((user) => ({
                     //     body: `${user.username} enviou mensagem no curso ${course.name}: ${data.text || "sem texto"}`,

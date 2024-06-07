@@ -14,6 +14,7 @@ import { Message, message_include } from "./Chat/Message"
 import { User } from "./User"
 import { Plan } from "./Plan"
 import { Notification } from "./Notification"
+import templates from "../templates"
 
 export type Status = "active" | "pending" | "disabled" | "declined"
 export interface StatusForm {
@@ -325,14 +326,15 @@ export class Course {
             await course_owner.init()
             const user = new User(user_id)
             await user.init()
+            const template = templates.notifications.onCourseLike(user.username, this.name)
             await Notification.new([
                 {
-                    body: `${user.username} curtiu o seu curso ${this.name}`,
+                    title: template.title,
+                    body: template.body,
                     expoPushToken: course_owner.expoPushToken,
                     target_param: { course_id: this.id },
                     target_route: "creator,creator:course:manage",
                     user_id: course_owner.id,
-                    title: "Curso curtido",
                     image: this.cover,
                 },
             ])
@@ -364,67 +366,73 @@ export class Course {
     }
 
     async sendPendingNotification() {
+        const template = templates.notifications.onCourseDisable(this.name)
         const notifications = await Notification.new([
             {
-                body: `O curso ${this.name} foi desativado para análise, toque aqui para acessá-lo`,
+                title: template.title,
+                body: template.body,
                 expoPushToken: this.owner.user.expoPushToken,
                 target_param: { course_id: this.id },
                 target_route: "creator,creator:course:manage",
                 user_id: this.owner.user_id!,
                 image: this.cover,
-                title: "Curso desativado",
             },
         ])
     }
 
     async sendCreatedNotification() {
         const admins = await User.getAdmins()
+        const template_creator = templates.notifications.onCourseCreate()
+        const template_adm = templates.notifications.onCourseCreateAdm(this.name)
+
         const notifications = await Notification.new([
             {
-                body: "Seu curso foi enviado para análise, aguarde retorno",
+                title: template_creator.title,
+                body: template_creator.body,
                 expoPushToken: this.owner.user.expoPushToken,
                 target_param: { course_id: this.id },
                 target_route: "creator,creator:course:manage",
                 user_id: this.owner.user_id!,
                 image: this.cover,
-                title: "Curso cadastrado",
             },
             ...admins.map((admin) => ({
-                body: `Curso ${this.name} foi cadastrado. Aguardando análise`,
+                title: template_adm.title,
+                body: template_adm.body,
                 expoPushToken: admin.expoPushToken,
                 target_param: { course_id: this.id },
                 target_route: "course:profile",
                 user_id: admin.id,
                 image: this.cover,
-                title: "Curso cadastrado",
             })),
         ])
     }
 
     async sendActiveNotification() {
+        const template = templates.notifications.onCourseApprove(this.name)
         const notifications = await Notification.new([
             {
-                body: `Parabéns, o curso ${this.name} foi aprovado e já está disponível na plataforma`,
+                title: template.title,
+                body: template.body,
                 expoPushToken: this.owner.user.expoPushToken,
                 target_param: { course_id: this.id },
                 target_route: "creator,creator:course:manage",
                 user_id: this.owner.user_id!,
                 image: this.cover,
-                title: "Curso aprovado",
             },
         ])
     }
 
     async sendDeclinedNotification() {
+        const template = templates.notifications.onCourseDecline(this.name)
         const notifications = await Notification.new([
             {
-                body: `Infelizmente o curso ${this.name} foi reprovado. Toque para mais informações`,
+                title: template.title,
+                body: template.body,
                 expoPushToken: this.owner.user.expoPushToken,
                 target_param: { course_id: this.id },
                 target_route: "creator,creator:course:manage",
                 user_id: this.owner.user_id!,
                 image: this.cover,
-                title: "Curso reprovado",
             },
         ])
     }
