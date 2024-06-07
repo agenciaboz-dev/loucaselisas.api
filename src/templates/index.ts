@@ -1,3 +1,4 @@
 import email from "./email"
+import notifications from "./notifications"
 
-export default { email }
+export default { email, notifications }

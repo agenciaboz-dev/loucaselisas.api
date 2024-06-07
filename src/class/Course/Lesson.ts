@@ -167,6 +167,8 @@ export class Lesson {
                     target_param: { lesson_id: this.id },
                     target_route: "creator,creator:lesson",
                     user_id: course_owner.id,
+                    image: this.thumb || this.media.url,
+                    title: "Lição curtida",
                 },
             ])
         }
@@ -204,6 +206,8 @@ export class Lesson {
                 target_param: { lesson_id: this.id },
                 target_route: "creator,creator:lesson",
                 user_id: owner.id,
+                image: this.thumb || this.media.url,
+                title: "Lição cadastrada",
             },
             ...admins.map((admin) => ({
                 body: `Lição ${this.name}, do curso ${this.course.name} foi cadastrada. Aguardando análise.`,
@@ -211,6 +215,8 @@ export class Lesson {
                 target_param: { lesson_id: this.id },
                 target_route: "lesson",
                 user_id: admin.id,
+                image: this.course.cover,
+                title: "Lição cadastrada",
             })),
         ])
     }
@@ -225,6 +231,8 @@ export class Lesson {
                 target_param: { lesson_id: this.id },
                 target_route: "creator,creator:lesson",
                 user_id: owner.id,
+                image: this.thumb || this.media.url,
+                title: "Lição aprovada",
             },
             ...users_who_liked.map((user) => ({
                 body: `Uma nova lição foi publicada no curso ${this.course.name}. Toque aqui para acessar`,
@@ -232,6 +240,8 @@ export class Lesson {
                 target_param: { lesson_id: this.id },
                 target_route: "lesson",
                 user_id: user.id,
+                image: this.course.cover,
+                title: "Nova lição",
             })),
         ])
     }
@@ -245,6 +255,8 @@ export class Lesson {
                 target_param: { lesson_id: this.id },
                 target_route: "creator,creator:lesson",
                 user_id: owner.id,
+                image: this.thumb || this.media.url,
+                title: "Lição reprovada",
             },
         ])
     }
