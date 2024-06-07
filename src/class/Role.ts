@@ -101,4 +101,21 @@ export class Role {
             console.log(error)
         }
     }
+
+    static async remove(id: number | undefined) {
+        try {
+            const updatedUsers = await prisma.user.updateMany({
+                where: { role_id: id },
+                data: {
+                    role_id: 1,
+                },
+            })
+            const deleted = await prisma.role.delete({ where: { id } })
+
+            return { deleted, updatedUsers }
+        } catch (error) {
+            console.log(error)
+            throw new Error("Erro ao deletar o tipo de usuário")
+        }
+    }
 }
