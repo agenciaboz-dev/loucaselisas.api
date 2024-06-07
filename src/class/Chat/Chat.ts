@@ -6,8 +6,8 @@ import { Message, message_include } from "./Message"
 
 export const chat_include = Prisma.validator<Prisma.ChatInclude>()({
     media: { include: gallery_include },
-    _count: { select: { messages: true } },
     course: true,
+    messages: true,
 })
 export type ChatPrisma = Prisma.ChatGetPayload<{ include: typeof chat_include }>
 
@@ -38,7 +38,7 @@ export class Chat {
         this.id = data.id
         this.description = data.description
         this.media = new Gallery("", data.media)
-        this.messages = data._count.messages
+        this.messages = data.messages.filter((item) => !item.deleted).length
     }
 
     async deleteMessages(socket: Socket, messages: Message[]) {
