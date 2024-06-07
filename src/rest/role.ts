@@ -17,18 +17,18 @@ router.post("/", async (request: Request, response: Response) => {
     }
 })
 
-// router.post("/update", async (request: Request, response: Response) => {
-//     const data = request.body as Partial<Role>
+router.post("/update", async (request: Request, response: Response) => {
+    const data = request.body as PartialRole
 
-//     try {
-//         const role = await Role.update(data)
-//         console.log(role)
-//         return response.json(role)
-//     } catch (error) {
-//         console.log(error)
-//         return response.status(500).send("Error create new role")
-//     }
-// })
+    try {
+        const role = await Role.updateRole(data)
+        console.log(role)
+        return response.json(role)
+    } catch (error) {
+        console.log(error)
+        return response.status(500).send("Error create new role")
+    }
+})
 
 router.get("/delete", async (request: Request, response: Response) => {
     const data = request.query.id as number | undefined

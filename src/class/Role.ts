@@ -102,6 +102,31 @@ export class Role {
         }
     }
 
+    static async updateRole(data: PartialRole) {
+        try {
+            if (data) {
+                const role = await prisma.role.update({
+                    where: { id: data.id },
+                    data: {
+                        name: data.name,
+                        description: data.description,
+
+                        permissions: {
+                            update: data.permissions && {
+                                ...data.permissions,
+                            },
+                        },
+                    },
+                    include: role_include,
+                })
+                return role
+            }
+        } catch (error) {
+            console.log(error)
+            throw new Error("Erro ao atualizar Role.")
+        }
+    }
+
     static async remove(id: number | undefined) {
         try {
             const updatedUsers = await prisma.user.updateMany({
