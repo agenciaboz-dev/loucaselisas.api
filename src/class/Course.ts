@@ -345,7 +345,7 @@ export class Course {
 
     async getLastMessage() {
         const data = await prisma.message.findFirst({
-            where: { chat_id: this.chat?.id },
+            where: { chat_id: this.chat?.id, deleted: false },
             orderBy: { datetime: "desc" },
             take: 1,
             include: message_include,
