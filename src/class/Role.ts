@@ -13,7 +13,7 @@ export class Role {
     id: number
     name: string
     description: string
-    permissions: Permissions
+    permissions: PermissionsForm
 
     constructor(data: RolePrisma) {
         this.load(data)
@@ -99,6 +99,31 @@ export class Role {
             this.load(updated)
         } catch (error) {
             console.log(error)
+        }
+    }
+
+    static async updateRole(data: PartialRole) {
+        try {
+            if (data) {
+                const role = await prisma.role.update({
+                    where: { id: data.id },
+                    data: {
+                        name: data.name,
+                        description: data.description,
+
+                        permissions: {
+                            update: data.permissions && {
+                                ...data.permissions,
+                            },
+                        },
+                    },
+                    include: role_include,
+                })
+                return role
+            }
+        } catch (error) {
+            console.log(error)
+            throw new Error("Erro ao atualizar Role.")
         }
     }
 
