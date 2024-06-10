@@ -30,8 +30,11 @@ export class Chat {
         const data = await prisma.chat.findFirst({ where: { id: chat_id }, include: chat_include })
         if (data) {
             const chat = new Chat(data)
-            await chat.deleteMessages(messages, socket)
+            const deleted = await chat.deleteMessages(messages, socket)
+            return deleted
         }
+
+        return []
     }
 
     constructor(data: ChatPrisma) {
@@ -48,5 +51,7 @@ export class Chat {
 
         socket?.emit("chat:message:delete", deleted)
         socket?.to(this.id).emit("chat:message:delete", deleted)
+
+        return deleted
     }
 }
