@@ -8,6 +8,7 @@ router.delete("/delete_message", async (request: Request, response: Response) =>
 
     try {
         const deleted = await Chat.deleteMessages(data.messages, data.chat_id)
+        response.json(deleted)
     } catch (error) {
         console.log(error)
         response.status(500).send(error)
