@@ -279,7 +279,6 @@ export class Course {
                 cover: undefined,
                 lessons: undefined,
                 plans: data.plans ? { set: [], connect: data.plans.map((id) => ({ id })) } : undefined,
-                // TODO
                 roles: data.roles
                     ? {
                           set: [],
